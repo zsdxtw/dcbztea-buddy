@@ -1,0 +1,67 @@
+import { useNavigate } from 'react-router-dom';
+import { useAppStore } from '../../stores/appStore';
+import { TOPNAV_TABS } from '../../data/modules';
+import { ModuleKey } from '../../types';
+
+/** 顶部导航栏 */
+export default function TopNav() {
+  const navigate = useNavigate();
+  const currentModule = useAppStore((s) => s.currentModule);
+  const switchModule = useAppStore((s) => s.switchModule);
+
+  const handleTabClick = (key: ModuleKey) => {
+    switchModule(key);
+    navigate(`/${key}`);
+  };
+
+  return (
+    <header className="topnav">
+      {/* 品牌 */}
+      <div className="topnav-brand">
+        <svg className="topnav-brand-icon" viewBox="0 0 28 28" fill="none">
+          <rect x="2" y="6" width="24" height="18" rx="3" stroke="currentColor" strokeWidth="1.5"/>
+          <path d="M8 6V4a2 2 0 012-2h8a2 2 0 012 2v2" stroke="currentColor" strokeWidth="1.5"/>
+          <path d="M7 14h14M7 18h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          <circle cx="14" cy="10" r="2" fill="currentColor" opacity="0.3"/>
+        </svg>
+        <span className="topnav-brand-text">淡茶半盏</span>
+      </div>
+
+      {/* 模块 Tab */}
+      <nav className="topnav-tabs">
+        {TOPNAV_TABS.map((tab) => (
+          <button
+            key={tab.key}
+            className={`topnav-tab ${currentModule === tab.key ? 'active' : ''}`}
+            onClick={() => handleTabClick(tab.key)}
+          >
+            <span className="topnav-tab-icon">{tab.icon}</span>
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* 右侧工具栏 */}
+      <div className="topnav-right">
+        <div className="topnav-search">
+          <svg className="topnav-search-icon" viewBox="0 0 16 16" fill="none">
+            <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.3"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+          </svg>
+          <input type="text" className="topnav-search-input" placeholder="搜索订单、商品、客户..." />
+        </div>
+        <button className="topnav-icon-btn" title="通知">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M10 2a5 5 0 015 5v3l2 2H3l2-2V7a5 5 0 015-5z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+            <path d="M8 15a2 2 0 004 0" stroke="currentColor" strokeWidth="1.3"/>
+          </svg>
+          <span className="notification-dot"></span>
+        </button>
+        <div className="topnav-avatar">陈</div>
+      </div>
+
+      {/* 模块色指示条 */}
+      <div className="topnav-module-indicator"></div>
+    </header>
+  );
+}
