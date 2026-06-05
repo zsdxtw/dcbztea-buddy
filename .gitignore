@@ -4,3 +4,9 @@ dist/
 *.d.ts.map
 vite.config.js
 vite.config.d.ts
+
+# Temp files from failed GitHub push attempts
+_batch_*.json
+_mbatch_*.json
+_github_push.cjs
+_push_all.json
