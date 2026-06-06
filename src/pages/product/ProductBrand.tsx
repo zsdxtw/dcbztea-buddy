@@ -13,10 +13,90 @@ import type { StatCardData, BrandItem } from '../../types';
 
 const stats: StatCardData[] = [
   { label: '品牌总数', value: '24', trend: { direction: 'up', value: '+3' }, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M10 2L3 5v8l6 3 6-3V5L10 2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg> },
-  { label: '关联商品数', value: '86', trend: { direction: 'up', value: '+5 件' }, icon: <svg viewBox="0 0 18 18" fill="none"><rect x="4" y="4" width="10" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M4 8h10M8 4v10" stroke="currentColor" strokeWidth="1.2"/></svg> },
-  { label: '启用品牌', value: '21', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
-  { label: '本月新增', value: '3', trend: { direction: 'up', value: '+1' }, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> },
 ];
+
+/* ── 品牌排名数据 ── */
+type RankPeriod = 'month' | 'year';
+
+const rankData: Record<RankPeriod, {
+  salesAmount: { name: string; value: number }[];
+  profitTotal: { name: string; value: number }[];
+  salesQuantity: { name: string; value: number }[];
+}> = {
+  month: {
+    salesAmount: [
+      { name: '大益', value: 286000 },
+      { name: '八马', value: 235000 },
+      { name: '中茶', value: 198000 },
+      { name: '天福茗茶', value: 172000 },
+      { name: '正山堂', value: 156000 },
+    ],
+    profitTotal: [
+      { name: '大益', value: 85600 },
+      { name: '八马', value: 72800 },
+      { name: '正山堂', value: 62400 },
+      { name: '中茶', value: 55200 },
+      { name: '品品香', value: 48600 },
+    ],
+    salesQuantity: [
+      { name: '八马', value: 1280 },
+      { name: '大益', value: 1150 },
+      { name: '天福茗茶', value: 980 },
+      { name: '中茶', value: 860 },
+      { name: '张一元', value: 720 },
+    ],
+  },
+  year: {
+    salesAmount: [
+      { name: '大益', value: 3280000 },
+      { name: '八马', value: 2760000 },
+      { name: '中茶', value: 2350000 },
+      { name: '天福茗茶', value: 1980000 },
+      { name: '西湖牌', value: 1860000 },
+    ],
+    profitTotal: [
+      { name: '大益', value: 985000 },
+      { name: '八马', value: 862000 },
+      { name: '中茶', value: 728000 },
+      { name: '正山堂', value: 656000 },
+      { name: '品品香', value: 580000 },
+    ],
+    salesQuantity: [
+      { name: '八马', value: 15200 },
+      { name: '大益', value: 13800 },
+      { name: '天福茗茶', value: 11600 },
+      { name: '中茶', value: 10200 },
+      { name: '张一元', value: 8600 },
+    ],
+  },
+};
+
+const barColors = ['var(--color-module-current-base)', 'var(--color-tea-oolong)', 'var(--color-tea-green)', 'var(--color-tea-dark)', 'var(--color-neutral-300)'];
+
+function formatAmount(v: number) {
+  if (v >= 10000) return `¥${(v / 10000).toFixed(1)}万`;
+  return `¥${v.toLocaleString()}`;
+}
+
+function RankBarChart({ title, data, period }: { title: string; data: { name: string; value: number }[]; period: RankPeriod }) {
+  const max = Math.max(...data.map((d) => d.value));
+  return (
+    <Card title={title} className="rank-chart-card">
+      <div className="rank-chart">
+        {data.map((item, i) => (
+          <div key={item.name} className="rank-chart-row">
+            <span className="rank-chart-rank">{i + 1}</span>
+            <span className="rank-chart-name">{item.name}</span>
+            <div className="rank-chart-bar-wrap">
+              <div className="rank-chart-bar" style={{ width: `${(item.value / max) * 100}%`, background: barColors[i] }} />
+            </div>
+            <span className="rank-chart-value">{formatAmount(item.value)}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
 
 const brandItems: BrandItem[] = [
   {
@@ -141,6 +221,7 @@ export default function ProductBrand() {
   const [filterStatus, setFilterStatus] = useState('全部状态');
   const [filterTeaCategory, setFilterTeaCategory] = useState('全部茶类');
   const [filterLevel, setFilterLevel] = useState('全部等级');
+  const [rankPeriod, setRankPeriod] = useState<RankPeriod>('month');
 
   const filteredItems = brandItems.filter((b) => {
     if (filterKeyword && !b.name.includes(filterKeyword) && !b.code.toLowerCase().includes(filterKeyword.toLowerCase()) && !b.owner.includes(filterKeyword)) return false;
@@ -165,6 +246,21 @@ export default function ProductBrand() {
       <div className="content-body">
         <div className="stat-cards">
           {stats.map((s, i) => <StatCard key={i} data={s} />)}
+        </div>
+        {/* 品牌排名 */}
+        <div className="rank-section">
+          <div className="rank-section-header">
+            <span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>品牌排名</span>
+            <div className="rank-period-toggle">
+              <button className={`rank-period-btn${rankPeriod === 'month' ? ' active' : ''}`} onClick={() => setRankPeriod('month')}>按月</button>
+              <button className={`rank-period-btn${rankPeriod === 'year' ? ' active' : ''}`} onClick={() => setRankPeriod('year')}>按年</button>
+            </div>
+          </div>
+          <div className="rank-charts-grid">
+            <RankBarChart title="销售金额 TOP5" data={rankData[rankPeriod].salesAmount} period={rankPeriod} />
+            <RankBarChart title="利润总额 TOP5" data={rankData[rankPeriod].profitTotal} period={rankPeriod} />
+            <RankBarChart title="销售数量 TOP5" data={rankData[rankPeriod].salesQuantity} period={rankPeriod} />
+          </div>
         </div>
         <FilterBar>
           <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => setFilterKeyword(e.target.value)} />
