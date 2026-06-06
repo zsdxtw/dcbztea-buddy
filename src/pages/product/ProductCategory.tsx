@@ -299,7 +299,7 @@ export default function ProductCategory() {
           </span>
           {node.icon && <span className="category-tree-icon" style={{ width: 18, height: 18, flexShrink: 0, color: 'var(--color-module-current-base)' }}>{node.icon}</span>}
           <span className="category-tree-name">{node.name}</span>
-          <span className="category-tree-count">{node.productCount}个</span>
+          <span className="category-tree-count">{node.productCount}</span>
           {/* 二级/三级节点显示操作按钮 */}
           {!nodeIsLevel1 && (
             <span className="category-tree-actions" onClick={(e) => e.stopPropagation()}>
@@ -390,7 +390,7 @@ export default function ProductCategory() {
                     </div>
                     <div className="detail-row">
                       <div className="detail-label">商品数量</div>
-                      <div className="detail-value"><span className="mono">{selectedNode.productCount}</span> 个</div>
+                      <div className="detail-value"><span className="mono">{selectedNode.productCount}</span></div>
                     </div>
                     {selectedNode.children && (
                       <div className="detail-row detail-row-span">
@@ -399,7 +399,7 @@ export default function ProductCategory() {
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
                             {selectedNode.children.map((child) => (
                               <span key={child.id} className="brand-series-tag" style={{ cursor: 'pointer' }} onClick={() => { setSelectedId(child.id); setEditing(false); }}>
-                                {child.name} ({child.productCount}个)
+                                {child.name} ({child.productCount})
                               </span>
                             ))}
                           </div>
