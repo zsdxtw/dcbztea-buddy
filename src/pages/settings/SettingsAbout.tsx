@@ -6,7 +6,7 @@ import SettingsRow from '../../components/settings/SettingsRow';
 export default function SettingsAbout() {
   return (
     <>
-      <ContentHeader title="关于" breadcrumbs={['设置', '关于']} />
+      <ContentHeader title="关于" breadcrumbs={['系统', '关于']} />
       <div className="content-body">
         <Card>
           <SettingsSection title="系统信息">

@@ -45,7 +45,7 @@ function backupStatusLabel(status: string) {
 export default function SettingsDataBackup() {
   return (
     <>
-      <ContentHeader title="数据备份" breadcrumbs={['设置', '数据备份']} actions={<><Button variant="ghost">备份设置</Button><Button><PlusIcon />立即备份</Button></>} />
+      <ContentHeader title="数据备份" breadcrumbs={['系统', '数据备份']} actions={<><Button variant="ghost">备份设置</Button><Button><PlusIcon />立即备份</Button></>} />
       <div className="content-body">
         <div className="stat-cards">
           {stats.map((s, i) => <StatCard key={i} data={s} />)}

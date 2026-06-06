@@ -8,7 +8,7 @@ import Button from '../../components/common/Button';
 export default function SettingsSystem() {
   return (
     <>
-      <ContentHeader title="系统设置" breadcrumbs={['设置', '系统设置']} />
+      <ContentHeader title="系统设置" breadcrumbs={['系统', '系统设置']} />
       <div className="content-body">
         <Card>
           <SettingsSection title="基础设置">

@@ -48,7 +48,7 @@ function userStatusLabel(status: string) {
 export default function SettingsUserManagement() {
   return (
     <>
-      <ContentHeader title="用户管理" breadcrumbs={['设置', '用户管理']} actions={<Button><PlusIcon />新增用户</Button>} />
+      <ContentHeader title="用户管理" breadcrumbs={['系统', '用户管理']} actions={<Button><PlusIcon />新增用户</Button>} />
       <div className="content-body">
         <div className="stat-cards">
           {stats.map((s, i) => <StatCard key={i} data={s} />)}
