@@ -41,6 +41,7 @@ import ProductGrade from './pages/product/ProductGrade';
 import ProductSpecs from './pages/product/ProductSpecs';
 import ProductCategory from './pages/product/ProductCategory';
 import ProductBrand from './pages/product/ProductBrand';
+import ProductBrandDetail from './pages/product/ProductBrandDetail';
 import ProductUnit from './pages/product/ProductUnit';
 
 import FinanceOverview from './pages/finance/FinanceOverview';
@@ -118,6 +119,7 @@ export const router = createBrowserRouter([
       { path: 'product/product-specs', element: <ProductSpecs /> },
       { path: 'product/product-category', element: <ProductCategory /> },
       { path: 'product/product-brand', element: <ProductBrand /> },
+      { path: 'product/product-brand/:id', element: <ProductBrandDetail /> },
       { path: 'product/product-unit', element: <ProductUnit /> },
       /* ── 财务 ── */
       { path: 'finance', element: <FinanceOverview /> },

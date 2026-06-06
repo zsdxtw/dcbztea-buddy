@@ -305,3 +305,45 @@ export enum BackupStatus {
   SUCCESS = 'success',
   FAILED = 'failed',
 }
+
+/** 品牌等级 */
+export enum BrandLevel {
+  S = 'S',
+  A = 'A',
+  B = 'B',
+  C = 'C',
+}
+
+/** 品牌状态 */
+export enum BrandStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
+
+/** 品牌项 */
+export interface BrandItem {
+  id: string;
+  code: string;
+  name: string;
+  logo: string;
+  owner: string;
+  introduction: string;
+  requirements: string;
+  policy: string;
+  series: string[];
+  trademarkCert: string;
+  jdStoreUrl: string;
+  tmallStoreUrl: string;
+  contactPerson: string;
+  contactPhone: string;
+  address: string;
+  teaCategory: TeaCategory;
+  level: BrandLevel;
+  status: BrandStatus;
+  productCount: number;
+  website: string;
+  cooperationDate: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
