@@ -271,7 +271,7 @@ export default function ProductBrand() {
 
   return (
     <>
-      <ContentHeader title="品牌管理" breadcrumbs={['商品', '品牌管理']} actions={<Button><PlusIcon />新增品牌</Button>} />
+      <ContentHeader title="品牌管理" breadcrumbs={['商品', '品牌管理']} />
       <div className="content-body">
         {/* 品牌排名 */}
         <div className="rank-section">
@@ -288,18 +288,21 @@ export default function ProductBrand() {
             <RankBarChart title="销售数量 TOP5" data={rankData[rankPeriod].salesQuantity} />
           </div>
         </div>
-        <FilterBar>
-          <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => setFilterKeyword(e.target.value)} />
-          <select className="filter-select" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-            <option>全部状态</option><option>启用</option><option>禁用</option>
-          </select>
-          <select className="filter-select" value={filterTeaCategory} onChange={(e) => setFilterTeaCategory(e.target.value)}>
-            <option>全部茶类</option><option>绿茶</option><option>白茶</option><option>黄茶</option><option>青茶</option><option>红茶</option><option>黑茶</option>
-          </select>
-          <select className="filter-select" value={filterLevel} onChange={(e) => setFilterLevel(e.target.value)}>
-            <option>全部等级</option><option>S级</option><option>A级</option><option>B级</option><option>C级</option>
-          </select>
-        </FilterBar>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
+          <FilterBar>
+            <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => setFilterKeyword(e.target.value)} />
+            <select className="filter-select" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+              <option>全部状态</option><option>启用</option><option>禁用</option>
+            </select>
+            <select className="filter-select" value={filterTeaCategory} onChange={(e) => setFilterTeaCategory(e.target.value)}>
+              <option>全部茶类</option><option>绿茶</option><option>白茶</option><option>黄茶</option><option>青茶</option><option>红茶</option><option>黑茶</option>
+            </select>
+            <select className="filter-select" value={filterLevel} onChange={(e) => setFilterLevel(e.target.value)}>
+              <option>全部等级</option><option>S级</option><option>A级</option><option>B级</option><option>C级</option>
+            </select>
+          </FilterBar>
+          <Button><PlusIcon />新增品牌</Button>
+        </div>
         <Card>
           <Table
             headers={['品牌LOGO', '品牌名称', '品牌编号', '品牌所属', '所属茶类', '品牌等级', '关联商品', '联系人', '状态', '操作']}
