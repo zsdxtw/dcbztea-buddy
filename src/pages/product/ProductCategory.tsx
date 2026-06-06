@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
-import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
 import Toggle from '../../components/common/Toggle';
-import type { StatCardData } from '../../types';
 
 /* ── 分类数据结构 ── */
 interface CategoryNode {
@@ -183,23 +181,6 @@ const initialCategories: CategoryNode[] = [
   },
 ];
 
-const stats: StatCardData[] = [
-  { label: '一级分类', value: '4', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="3" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="10" y="3" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="3" y="10" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg> },
-  { label: '二级分类', value: '17', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 5h8M3 10h5M3 15h8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
-  { label: '三级分类', value: '46', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M9 3v7h7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
-  { label: '商品总数', value: '246', trend: { direction: 'up', value: '+12' }, icon: <svg viewBox="0 0 18 18" fill="none"><rect x="4" y="4" width="10" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M4 8h10M8 4v10" stroke="currentColor" strokeWidth="1.2"/></svg> },
-];
-
-/** 递归统计所有分类数 */
-function countAll(nodes: CategoryNode[]): number {
-  let count = 0;
-  for (const n of nodes) {
-    count++;
-    if (n.children) count += countAll(n.children);
-  }
-  return count;
-}
-
 /** 查找节点路径 */
 function findPath(nodes: CategoryNode[], targetId: string, path: CategoryNode[] = []): CategoryNode[] | null {
   for (const node of nodes) {
@@ -346,9 +327,6 @@ export default function ProductCategory() {
     <>
       <ContentHeader title="分类管理" breadcrumbs={['商品', '分类管理']} actions={<Button onClick={() => setShowAddDialog({ parentId: 'root', level: -1 })}><PlusIcon />新增一级分类</Button>} />
       <div className="content-body">
-        <div className="stat-cards">
-          {stats.map((s, i) => <StatCard key={i} data={s} />)}
-        </div>
         <div className="category-layout">
           {/* 左侧分类树 */}
           <Card title="分类结构" className="category-tree-card">
