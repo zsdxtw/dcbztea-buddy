@@ -245,7 +245,6 @@ export default function ProductBrand() {
         {/* 品牌排名 */}
         <div className="rank-section">
           <div className="rank-section-header">
-            <span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>品牌排名</span>
             <div className="rank-period-toggle">
               <button className={`rank-period-btn${rankPeriod === 'month' ? ' active' : ''}`} onClick={() => setRankPeriod('month')}>按月</button>
               <button className={`rank-period-btn${rankPeriod === 'year' ? ' active' : ''}`} onClick={() => setRankPeriod('year')}>按年</button>
