@@ -92,7 +92,7 @@ const rankData: Record<RankPeriod, {
   },
 };
 
-const barColors = ['var(--color-module-current-base)', 'var(--color-tea-oolong)', 'var(--color-tea-green)', 'var(--color-tea-dark)', 'var(--color-neutral-300)'];
+const barColors = ['#CB405D', '#F18F4D', '#0DAFC6', '#27254B', '#5F4027'];
 
 function formatAmount(v: number) {
   if (v >= 10000) return `¥${(v / 10000).toFixed(1)}万`;
