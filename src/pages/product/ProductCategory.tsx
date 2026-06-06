@@ -248,6 +248,7 @@ export default function ProductCategory() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(['tea', 'teaware', 'tea-peripheral', 'other']));
   const [editing, setEditing] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState<{ parentId: string; level: number } | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const selectedNode = selectedId ? findNode(categories, selectedId) : null;
   const selectedPath = selectedId ? findPath(categories, selectedId) : null;
@@ -363,18 +364,7 @@ export default function ProductCategory() {
           <div className="category-detail-area">
             {selectedNode ? (
               <>
-                <Card title="分类详情" headerRight={
-                  !isLevel1 ? (
-                    editing ? (
-                      <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                        <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>取消</Button>
-                        <Button size="sm" onClick={() => setEditing(false)}>保存</Button>
-                      </div>
-                    ) : (
-                      <Button size="sm" onClick={() => setEditing(true)}>编辑</Button>
-                    )
-                  ) : undefined
-                }>
+                <Card title="分类详情">
                   {/* 面包屑路径 */}
                   {selectedPath && (
                     <div className="category-breadcrumb">
@@ -476,7 +466,17 @@ export default function ProductCategory() {
 
                   {!isLevel1 && (
                     <div style={{ marginTop: 'var(--space-5)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-neutral-200)', display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
-                      <Button variant="ghost" style={{ color: 'var(--color-semantic-error)' }} onClick={() => handleDelete(selectedNode.id)}>删除此分类</Button>
+                      {editing ? (
+                        <>
+                          <Button variant="ghost" onClick={() => setEditing(false)}>取消</Button>
+                          <Button onClick={() => setEditing(false)}>保存</Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button size="sm" onClick={() => setEditing(true)}>编辑</Button>
+                          <Button size="sm" style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
+                        </>
+                      )}
                     </div>
                   )}
                 </Card>
@@ -505,6 +505,22 @@ export default function ProductCategory() {
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
                 <Button variant="ghost" onClick={() => setShowAddDialog(null)}>取消</Button>
                 <Button onClick={handleConfirmAdd}>确认</Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 删除确认弹窗 */}
+        {showDeleteConfirm && selectedNode && (
+          <div className="category-dialog-overlay" onClick={() => setShowDeleteConfirm(false)}>
+            <div className="category-dialog" onClick={(e) => e.stopPropagation()}>
+              <div className="category-dialog-title">确认删除</div>
+              <div style={{ marginBottom: 'var(--space-5)', fontSize: 'var(--text-base)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-md)' }}>
+                确定要删除分类「<span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{selectedNode.name}</span>」吗？{selectedNode.children && selectedNode.children.length > 0 && <span style={{ color: '#FD742D', display: 'block', marginTop: 'var(--space-2)' }}>该分类下还有子分类，删除后将一并移除。</span>}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+                <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
+                <Button style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => { handleDelete(selectedNode.id); setShowDeleteConfirm(false); }}>确认删除</Button>
               </div>
             </div>
           </div>
