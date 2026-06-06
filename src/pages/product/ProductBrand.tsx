@@ -11,9 +11,7 @@ import FilterBar from '../../components/business/FilterBar';
 import { TeaCategory, BrandLevel, BrandStatus } from '../../types';
 import type { StatCardData, BrandItem } from '../../types';
 
-const stats: StatCardData[] = [
-  { label: '品牌总数', value: '24', trend: { direction: 'up', value: '+3' }, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M10 2L3 5v8l6 3 6-3V5L10 2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg> },
-];
+const stats: StatCardData[] = [];
 
 /* ── 品牌排名数据 ── */
 type RankPeriod = 'month' | 'year';
@@ -244,9 +242,6 @@ export default function ProductBrand() {
     <>
       <ContentHeader title="品牌管理" breadcrumbs={['商品', '品牌管理']} actions={<Button><PlusIcon />新增品牌</Button>} />
       <div className="content-body">
-        <div className="stat-cards">
-          {stats.map((s, i) => <StatCard key={i} data={s} />)}
-        </div>
         {/* 品牌排名 */}
         <div className="rank-section">
           <div className="rank-section-header">
