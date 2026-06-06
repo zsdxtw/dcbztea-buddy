@@ -622,6 +622,12 @@ tbody tr:last-child td { border-bottom: none; }
 .category-tree-icon { font-size: var(--text-md); flex-shrink: 0; }
 .category-tree-name { flex: 1; font-size: var(--text-base); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .category-tree-count { font-size: var(--text-xs); color: var(--color-neutral-400); font-family: var(--font-family-mono); flex-shrink: 0; }
+.category-tree-actions { display: none; align-items: center; gap: 2px; margin-left: auto; flex-shrink: 0; }
+.category-tree-node:hover .category-tree-actions { display: flex; }
+.category-tree-action-btn { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; color: var(--color-neutral-400); transition: var(--transition-fast); }
+.category-tree-action-btn svg { width: 13px; height: 13px; }
+.category-tree-action-btn:hover { background: var(--color-neutral-100); color: var(--color-neutral-600); }
+.category-tree-action-delete:hover { background: var(--color-semantic-error-lightest, #fef2f2); color: var(--color-semantic-error); }
 .category-tree-inactive { font-size: var(--text-xs); color: var(--color-semantic-warning); flex-shrink: 0; }
 
 /* ── 分类面包屑 ── */
