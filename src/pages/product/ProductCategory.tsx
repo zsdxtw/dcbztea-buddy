@@ -11,17 +11,31 @@ import type { StatCardData } from '../../types';
 interface CategoryNode {
   id: string;
   name: string;
-  icon?: string;
+  icon?: React.ReactNode;
   sort: number;
   active: boolean;
   productCount: number;
   children?: CategoryNode[];
 }
 
+/* ── 一级分类图标（与侧边栏菜单图标风格一致，不重复） ── */
+const TeaCategoryIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M10 2C6 2 3 5 3 9c0 3 2 5.5 5 6.5V17h4v-1.5c3-1 5-3.5 5-6.5 0-4-3-7-7-7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><path d="M7 17h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><path d="M10 5v4M8 7h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
+const TeawareCategoryIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M5 3h10v2a8 8 0 01-3 6.3V14H8v-2.7A8 8 0 015 5V3z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><path d="M7 14h6v2a1 1 0 01-1 1H8a1 1 0 01-1-1v-2z" stroke="currentColor" strokeWidth="1.3"/><path d="M15 6h2a1 1 0 011 1v1a2 2 0 01-2 2h-1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
+const PeripheralCategoryIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.5 5 5.5.8-4 3.9.9 5.5L10 14.7 5.1 17.2l.9-5.5-4-3.9L7.5 7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>
+);
+const OtherCategoryIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg>
+);
+
 /* ── Mock 数据 ── */
 const initialCategories: CategoryNode[] = [
   {
-    id: 'tea', name: '茶叶', icon: '🍵', sort: 1, active: true, productCount: 151,
+    id: 'tea', name: '茶叶', icon: <TeaCategoryIcon />, sort: 1, active: true, productCount: 151,
     children: [
       {
         id: 'red-tea', name: '红茶', sort: 1, active: true, productCount: 26,
@@ -77,7 +91,7 @@ const initialCategories: CategoryNode[] = [
     ],
   },
   {
-    id: 'teaware', name: '茶具', icon: '🫖', sort: 2, active: true, productCount: 45,
+    id: 'teaware', name: '茶具', icon: <TeawareCategoryIcon />, sort: 2, active: true, productCount: 45,
     children: [
       {
         id: 'teapot', name: '茶壶', sort: 1, active: true, productCount: 15,
@@ -113,7 +127,7 @@ const initialCategories: CategoryNode[] = [
     ],
   },
   {
-    id: 'tea-peripheral', name: '茶周边', icon: '🎁', sort: 3, active: true, productCount: 38,
+    id: 'tea-peripheral', name: '茶周边', icon: <PeripheralCategoryIcon />, sort: 3, active: true, productCount: 38,
     children: [
       {
         id: 'tea-food', name: '茶食品', sort: 1, active: true, productCount: 15,
@@ -142,7 +156,7 @@ const initialCategories: CategoryNode[] = [
     ],
   },
   {
-    id: 'other', name: '其他', icon: '📦', sort: 4, active: true, productCount: 12,
+    id: 'other', name: '其他', icon: <OtherCategoryIcon />, sort: 4, active: true, productCount: 12,
     children: [
       {
         id: 'tea-water', name: '泡茶水', sort: 1, active: true, productCount: 6,
@@ -314,7 +328,7 @@ export default function ProductCategory() {
               <svg viewBox="0 0 12 12" fill="none"><path d="M4.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
             )}
           </span>
-          {node.icon && <span className="category-tree-icon">{node.icon}</span>}
+          {node.icon && <span className="category-tree-icon" style={{ width: 18, height: 18, flexShrink: 0, color: 'var(--color-module-current-base)' }}>{node.icon}</span>}
           <span className="category-tree-name">{node.name}</span>
           <span className="category-tree-count">{node.productCount}</span>
           {!node.active && <span className="category-tree-inactive">停用</span>}
