@@ -596,3 +596,45 @@ tbody tr:last-child td { border-bottom: none; }
   line-height: var(--leading-base); transition: var(--transition-fast);
 }
 .detail-textarea:focus { outline: none; border-color: var(--color-module-current-base); box-shadow: 0 0 0 3px var(--color-module-current-light); }
+
+/* ═══ 分类管理页 ═══ */
+
+/* ── 左右布局 ── */
+.category-layout { display: grid; grid-template-columns: 320px 1fr; gap: var(--space-6); }
+.category-tree-card { overflow: hidden; }
+.category-tree-card .card-body { padding: 0; max-height: 600px; overflow-y: auto; }
+
+/* ── 分类树节点 ── */
+.category-tree-node {
+  display: flex; align-items: center; gap: var(--space-2); height: 38px;
+  padding-right: var(--space-4); cursor: pointer; transition: var(--transition-fast);
+  border-bottom: 1px solid var(--color-neutral-150); user-select: none;
+}
+.category-tree-node:hover { background: var(--color-neutral-50); }
+.category-tree-node.selected { background: var(--color-module-current-lightest); color: var(--color-module-current-base); }
+.category-tree-expand {
+  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer; transition: var(--transition-fast); border-radius: var(--radius-sm);
+}
+.category-tree-expand:hover { background: var(--color-neutral-100); }
+.category-tree-expand svg { width: 12px; height: 12px; color: var(--color-neutral-400); transition: transform var(--duration-fast) var(--ease-default); }
+.category-tree-expand.expanded svg { transform: rotate(90deg); }
+.category-tree-icon { font-size: var(--text-md); flex-shrink: 0; }
+.category-tree-name { flex: 1; font-size: var(--text-base); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.category-tree-count { font-size: var(--text-xs); color: var(--color-neutral-400); font-family: var(--font-family-mono); flex-shrink: 0; }
+.category-tree-inactive { font-size: var(--text-xs); color: var(--color-semantic-warning); flex-shrink: 0; }
+
+/* ── 分类面包屑 ── */
+.category-breadcrumb { display: flex; align-items: center; gap: var(--space-1); margin-bottom: var(--space-4); padding: var(--space-2) var(--space-3); background: var(--color-neutral-50); border-radius: var(--radius-md); font-size: var(--text-sm); }
+.category-breadcrumb-item { color: var(--color-neutral-500); }
+.category-breadcrumb-current { color: var(--color-module-current-base); font-weight: 'var(--font-medium)'; }
+.category-breadcrumb-sep { color: var(--color-neutral-300); margin: 0 var(--space-1); }
+
+/* ── 新增弹窗 ── */
+.category-dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.category-dialog { background: var(--color-neutral-0); border-radius: var(--radius-xl); padding: var(--space-6); width: 400px; box-shadow: var(--shadow-lg); }
+.category-dialog-title { font-size: var(--text-lg); font-weight: 'var(--font-semibold)'; color: var(--color-neutral-800); margin-bottom: var(--space-5); }
+
+@media (max-width: 1023px) {
+  .category-layout { grid-template-columns: 1fr; }
+}
