@@ -14,7 +14,7 @@ import type { StatCardData, BrandItem } from '../../types';
 const stats: StatCardData[] = [];
 
 /* ── 品牌排名数据 ── */
-type RankPeriod = 'month' | 'year';
+type RankPeriod = 'month' | 'year' | 'oneYear';
 
 const rankData: Record<RankPeriod, {
   salesAmount: { name: string; value: number }[];
@@ -67,6 +67,29 @@ const rankData: Record<RankPeriod, {
       { name: '张一元', value: 8600 },
     ],
   },
+  oneYear: {
+    salesAmount: [
+      { name: '大益', value: 3050000 },
+      { name: '八马', value: 2560000 },
+      { name: '中茶', value: 2150000 },
+      { name: '天福茗茶', value: 1820000 },
+      { name: '西湖牌', value: 1720000 },
+    ],
+    profitTotal: [
+      { name: '大益', value: 920000 },
+      { name: '八马', value: 798000 },
+      { name: '中茶', value: 695000 },
+      { name: '正山堂', value: 605000 },
+      { name: '品品香', value: 530000 },
+    ],
+    salesQuantity: [
+      { name: '八马', value: 14200 },
+      { name: '大益', value: 12900 },
+      { name: '天福茗茶', value: 10900 },
+      { name: '中茶', value: 9600 },
+      { name: '张一元', value: 8100 },
+    ],
+  },
 };
 
 const barColors = ['var(--color-module-current-base)', 'var(--color-tea-oolong)', 'var(--color-tea-green)', 'var(--color-tea-dark)', 'var(--color-neutral-300)'];
@@ -76,8 +99,16 @@ function formatAmount(v: number) {
   return `¥${v.toLocaleString()}`;
 }
 
-function RankBarChart({ title, data, period }: { title: string; data: { name: string; value: number }[]; period: RankPeriod }) {
+function RankBarChart({ title, data }: { title: string; data: { name: string; value: number }[] }) {
   const max = Math.max(...data.map((d) => d.value));
+  const isQuantity = title.includes('数量');
+
+  function formatValue(v: number) {
+    if (isQuantity) return v.toLocaleString();
+    if (v >= 10000) return `¥${(v / 10000).toFixed(1)}万`;
+    return `¥${v.toLocaleString()}`;
+  }
+
   return (
     <Card title={title} className="rank-chart-card">
       <div className="rank-chart">
@@ -88,7 +119,7 @@ function RankBarChart({ title, data, period }: { title: string; data: { name: st
             <div className="rank-chart-bar-wrap">
               <div className="rank-chart-bar" style={{ width: `${(item.value / max) * 100}%`, background: barColors[i] }} />
             </div>
-            <span className="rank-chart-value">{formatAmount(item.value)}</span>
+            <span className="rank-chart-value">{formatValue(item.value)}</span>
           </div>
         ))}
       </div>
@@ -246,14 +277,15 @@ export default function ProductBrand() {
         <div className="rank-section">
           <div className="rank-section-header">
             <div className="rank-period-toggle">
-              <button className={`rank-period-btn${rankPeriod === 'month' ? ' active' : ''}`} onClick={() => setRankPeriod('month')}>按月</button>
-              <button className={`rank-period-btn${rankPeriod === 'year' ? ' active' : ''}`} onClick={() => setRankPeriod('year')}>按年</button>
+              <button className={`rank-period-btn${rankPeriod === 'month' ? ' active' : ''}`} onClick={() => setRankPeriod('month')}>当月</button>
+              <button className={`rank-period-btn${rankPeriod === 'year' ? ' active' : ''}`} onClick={() => setRankPeriod('year')}>当年</button>
+              <button className={`rank-period-btn${rankPeriod === 'oneYear' ? ' active' : ''}`} onClick={() => setRankPeriod('oneYear')}>一年内</button>
             </div>
           </div>
           <div className="rank-charts-grid">
-            <RankBarChart title="销售金额 TOP5" data={rankData[rankPeriod].salesAmount} period={rankPeriod} />
-            <RankBarChart title="利润总额 TOP5" data={rankData[rankPeriod].profitTotal} period={rankPeriod} />
-            <RankBarChart title="销售数量 TOP5" data={rankData[rankPeriod].salesQuantity} period={rankPeriod} />
+            <RankBarChart title="销售金额 TOP5" data={rankData[rankPeriod].salesAmount} />
+            <RankBarChart title="利润总额 TOP5" data={rankData[rankPeriod].profitTotal} />
+            <RankBarChart title="销售数量 TOP5" data={rankData[rankPeriod].salesQuantity} />
           </div>
         </div>
         <FilterBar>
