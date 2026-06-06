@@ -138,7 +138,7 @@ export const router = createBrowserRouter([
       { path: 'statistics/statistics-finance', element: <StatisticsFinance /> },
       { path: 'statistics/statistics-tea-category', element: <StatisticsTeaCategory /> },
       { path: 'statistics/statistics-year-on-year', element: <StatisticsYearOnYear /> },
-      /* ── 设置 ── */
+      /* ── 系统 ── */
       { path: 'settings', element: <SettingsSystem /> },
       { path: 'settings/settings-system', element: <SettingsSystem /> },
       { path: 'settings/settings-roles', element: <SettingsRoles /> },

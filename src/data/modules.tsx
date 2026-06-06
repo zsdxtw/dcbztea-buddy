@@ -284,7 +284,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
   },
   [ModuleKey.SETTINGS]: {
     key: ModuleKey.SETTINGS,
-    label: '设置',
+    label: '系统',
     menus: [
       { key: 'settings-system', label: '系统设置', icon: <SystemSettingsIcon /> },
       { key: 'settings-roles', label: '角色权限', icon: <RolesIcon /> },
@@ -310,5 +310,5 @@ export const TOPNAV_TABS: Array<{ key: ModuleKey; label: string; icon: React.Rea
   { key: ModuleKey.PRODUCT, label: '商品', icon: <ProductTabIcon /> },
   { key: ModuleKey.FINANCE, label: '财务', icon: <FinanceTabIcon /> },
   { key: ModuleKey.STATISTICS, label: '统计', icon: <StatisticsTabIcon /> },
-  { key: ModuleKey.SETTINGS, label: '设置', icon: <SettingsTabIcon /> },
+  { key: ModuleKey.SETTINGS, label: '系统', icon: <SettingsTabIcon /> },
 ];
