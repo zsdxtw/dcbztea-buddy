@@ -238,41 +238,13 @@ export default function ProductManageTea() {
                   (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
                 }}
               >
-                {/* 商品主图 + 价格角标 */}
+                {/* 商品主图 */}
                 <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)', position: 'relative' }}>
                   <img
                     src={mainImage}
                     alt={product.name}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   />
-                  {/* 价格角标 */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: 'linear-gradient(transparent, rgba(0,0,0,0.55))',
-                    padding: 'var(--space-4) var(--space-3) var(--space-2)',
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'space-between',
-                  }}>
-                    <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}>
-                      ¥{product.marketPrice}
-                    </span>
-                    {teaCat && <Tag category={teaCat} />}
-                  </div>
-                  {/* 上架状态角标 */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 'var(--space-2)',
-                    right: 'var(--space-2)',
-                  }}>
-                    <StatusTag
-                      variant={product.shelfStatus === 'on' ? 'success' : 'error'}
-                      label={getShelfStatusLabel(product.shelfStatus)}
-                    />
-                  </div>
                   {/* 茶类色条 */}
                   <div style={{
                     position: 'absolute',
@@ -290,22 +262,6 @@ export default function ProductManageTea() {
 
                 {/* 商品信息 */}
                 <div style={{ padding: 'var(--space-3) var(--space-3) var(--space-2)' }}>
-                  {/* 品牌突出展示 */}
-                  <div style={{ marginBottom: 'var(--space-1)' }}>
-                    <span style={{
-                      display: 'inline-block',
-                      padding: '1px 8px',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'var(--color-module-current-lightest)',
-                      color: 'var(--color-module-current-base)',
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: 'var(--font-semibold)',
-                      lineHeight: '20px',
-                    }}>
-                      {product.brand}
-                    </span>
-                  </div>
-
                   {/* 商品名称 */}
                   <div style={{
                     fontSize: 'var(--text-sm)',
@@ -358,6 +314,37 @@ export default function ProductManageTea() {
                       return color || 'var(--color-neutral-200)';
                     })(),
                   }} />
+                  {/* 价格 + 标签 */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginTop: 'var(--space-2)',
+                    gap: 'var(--space-1)',
+                  }}>
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: '#FD742D', flexShrink: 0 }}>
+                      ¥{product.marketPrice}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '1px 6px',
+                        borderRadius: 'var(--radius-sm)',
+                        background: 'var(--color-module-current-lightest)',
+                        color: 'var(--color-module-current-base)',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-semibold)',
+                        lineHeight: '18px',
+                      }}>
+                        {product.brand}
+                      </span>
+                      {teaCat && <Tag category={teaCat} />}
+                      <StatusTag
+                        variant={product.shelfStatus === 'on' ? 'success' : 'error'}
+                        label={getShelfStatusLabel(product.shelfStatus)}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* 底部数据栏 */}
