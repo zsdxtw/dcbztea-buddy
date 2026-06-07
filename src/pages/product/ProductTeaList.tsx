@@ -10,10 +10,9 @@ import type { TeaVariety } from '../../data/teaVarieties';
 
 const PAGE_SIZE = 16;
 
-/** 空表单 */
-const emptyForm: Omit<TeaVariety, 'popularity'> & { popularity: string } = {
-  name: '', category: TeaCategory.GREEN, origin: '', originDetail: '',
-  introduction: '', characteristics: '', brands: [], popularity: '50',
+const emptyForm = {
+  name: '', category: TeaCategory.GREEN, origin: [] as string[], originDetail: '',
+  introduction: '', characteristics: '', brands: [] as string[],
 };
 
 /** 茶种大全页面 */
@@ -30,14 +29,11 @@ export default function ProductTeaList() {
   const [form, setForm] = useState({ ...emptyForm });
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
-  // 删除确认
-  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  // 批量删除模式
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [selectedForDelete, setSelectedForDelete] = useState<Set<number>>(new Set());
 
-  const origins = useMemo(() => {
-    const set = new Set<string>();
-    teas.forEach((t) => set.add(t.origin));
-    return Array.from(set).sort();
-  }, [teas]);
+  const allOrigins = useMemo(() => getAllOrigins(), []);
 
   const filtered = useMemo(() => {
     return teas.filter((t) => {
@@ -74,7 +70,7 @@ export default function ProductTeaList() {
     const tea = filtered[idx];
     const globalIdx = teas.indexOf(tea);
     setDrawerMode('edit');
-    setForm({ ...tea, popularity: String(tea.popularity), brands: [...tea.brands] });
+    setForm({ ...tea, origin: [tea.origin], brands: [...tea.brands] });
     setEditIndex(globalIdx);
     setShowDrawer(true);
   };
@@ -82,26 +78,52 @@ export default function ProductTeaList() {
   // 保存
   const handleSave = () => {
     if (!form.name.trim()) return;
-    const data: TeaVariety = { ...form, popularity: Number(form.popularity) || 50, brands: form.brands.filter(Boolean) };
+    const data: TeaVariety = { ...form, origin: form.origin[0] || '', brands: form.brands.filter(Boolean), popularity: 50 };
     if (drawerMode === 'add') {
-      const next = [...teas, data].sort((a, b) => b.popularity - a.popularity);
-      setTeas(next);
+      setTeas((prev) => [...prev, data]);
     } else if (editIndex !== null) {
       const next = [...teas];
       next[editIndex] = data;
-      next.sort((a, b) => b.popularity - a.popularity);
       setTeas(next);
     }
     setShowDrawer(false);
   };
 
-  // 删除
-  const handleDelete = (idx: number) => {
-    const tea = filtered[idx];
-    const globalIdx = teas.indexOf(tea);
-    const next = teas.filter((_, i) => i !== globalIdx);
+  // 批量删除
+  const handleEnterDeleteMode = () => {
+    setDeleteMode(true);
+    setSelectedForDelete(new Set());
+  };
+
+  const handleCancelDeleteMode = () => {
+    setDeleteMode(false);
+    setSelectedForDelete(new Set());
+  };
+
+  const handleToggleSelect = (globalIdx: number) => {
+    setSelectedForDelete((prev) => {
+      const next = new Set(prev);
+      if (next.has(globalIdx)) next.delete(globalIdx);
+      else next.add(globalIdx);
+      return next;
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    const next = teas.filter((_, i) => !selectedForDelete.has(i));
     setTeas(next);
-    setDeleteConfirm(null);
+    setDeleteMode(false);
+    setSelectedForDelete(new Set());
+  };
+
+  // 产地多选
+  const handleToggleFormOrigin = (origin: string) => {
+    setForm((prev) => ({
+      ...prev,
+      origin: prev.origin.includes(origin)
+        ? prev.origin.filter((o) => o !== origin)
+        : [...prev.origin, origin],
+    }));
   };
 
   const filterBtnStyle = (active: boolean) => ({
@@ -122,22 +144,19 @@ export default function ProductTeaList() {
       <div className="content-body">
         {/* 筛选区 */}
         <Card>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>茶类：</span>
-              <button style={filterBtnStyle(!selectedCategory)} onClick={() => handleCategoryChange(null)}>全部</button>
-              {Object.values(TeaCategory).map((cat) => (
-                <button key={cat} style={filterBtnStyle(selectedCategory === cat)} onClick={() => handleCategoryChange(selectedCategory === cat ? null : cat)}>
-                  {getTeaCategoryLabel(cat)}
-                </button>
-              ))}
-            </div>
-            <Button onClick={handleOpenAdd}>+ 新增茶种</Button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>茶类：</span>
+            <button style={filterBtnStyle(!selectedCategory)} onClick={() => handleCategoryChange(null)}>全部</button>
+            {Object.values(TeaCategory).map((cat) => (
+              <button key={cat} style={filterBtnStyle(selectedCategory === cat)} onClick={() => handleCategoryChange(selectedCategory === cat ? null : cat)}>
+                {getTeaCategoryLabel(cat)}
+              </button>
+            ))}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>产地：</span>
             <button style={filterBtnStyle(!selectedOrigin)} onClick={() => handleOriginChange(null)}>全部</button>
-            {origins.map((o) => (
+            {allOrigins.map((o) => (
               <button key={o} style={filterBtnStyle(selectedOrigin === o)} onClick={() => handleOriginChange(selectedOrigin === o ? null : o)}>
                 {o}
               </button>
@@ -151,8 +170,19 @@ export default function ProductTeaList() {
               onChange={(e) => handleSearch(e.target.value)}
               style={{ maxWidth: 320 }}
             />
+            <Button onClick={handleOpenAdd}>+ 新增茶种</Button>
+            {deleteMode ? (
+              <>
+                <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
+                <Button onClick={handleConfirmDelete} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D' }}>
+                  删除所选({selectedForDelete.size})
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" onClick={handleEnterDeleteMode} style={{ color: '#FD742D' }}>删除</Button>
+            )}
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>
-              共 {filtered.length} 个茶种，按知名度排序
+              共 {filtered.length} 个茶种
             </span>
           </div>
         </Card>
@@ -160,46 +190,63 @@ export default function ProductTeaList() {
         {/* 茶种卡片列表 - 4列 */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
           {paged.map((tea, idx) => {
-            const globalIdx = (currentPage - 1) * PAGE_SIZE + idx;
+            const globalIdx = teas.indexOf(tea);
+            const isSelected = selectedForDelete.has(globalIdx);
             return (
-              <Card key={`${tea.category}-${tea.name}-${idx}`}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <span style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', lineHeight: 1.3 }}>{tea.name}</span>
-                    <span style={{ fontSize: 'var(--text-xs)', color: tea.popularity >= 80 ? '#FD742D' : 'var(--color-neutral-400)', fontWeight: 'var(--font-medium)' }}>🔥{tea.popularity}</span>
-                  </div>
-                  <Tag category={tea.category} />
-                </div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {tea.introduction}
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-1)', marginBottom: 'var(--space-3)' }}>
-                  <div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: '1px' }}>产地</div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-700)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${tea.origin}·${tea.originDetail}`}>{tea.origin}·{tea.originDetail}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: '1px' }}>特点</div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-700)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={tea.characteristics}>{tea.characteristics}</div>
-                  </div>
-                </div>
-                <div style={{ borderTop: '1px solid var(--color-neutral-100)', paddingTop: 'var(--space-2)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 'var(--space-1)' }}>代表品牌</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {tea.brands.map((brand) => (
-                        <span key={brand} style={{ padding: '1px 8px', borderRadius: 'var(--radius-full)', background: 'var(--color-neutral-100)', color: 'var(--color-neutral-600)', fontSize: 'var(--text-xs)', whiteSpace: 'nowrap' }}>
-                          {brand}
-                        </span>
-                      ))}
+              <div key={`${tea.category}-${tea.name}-${idx}`} className="tea-card-hover" style={{ position: 'relative' }}>
+                {deleteMode && (
+                  <div
+                    style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', zIndex: 10, cursor: 'pointer' }}
+                    onClick={() => handleToggleSelect(globalIdx)}
+                  >
+                    <div style={{
+                      width: 18, height: 18, borderRadius: 'var(--radius-sm)',
+                      border: `2px solid ${isSelected ? '#FD742D' : 'var(--color-neutral-300)'}`,
+                      background: isSelected ? '#FD742D' : 'var(--color-neutral-0)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'var(--transition-fast)',
+                    }}>
+                      {isSelected && <svg viewBox="0 0 12 12" fill="none" style={{ width: 10, height: 10 }}><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '4px', flexShrink: 0, marginLeft: 'var(--space-2)' }}>
-                    <Button variant="ghost" size="sm" onClick={() => handleOpenEdit(globalIdx)} style={{ color: '#01795D', padding: '2px 6px', fontSize: 'var(--text-xs)' }}>编辑</Button>
-                    <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm(globalIdx)} style={{ color: '#FD742D', padding: '2px 6px', fontSize: 'var(--text-xs)' }}>删除</Button>
+                )}
+                <Card style={isSelected ? { outline: '2px solid #FD742D', borderRadius: 'var(--radius-lg)' } : undefined}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
+                    <span style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', lineHeight: 1.3 }}>{tea.name}</span>
+                    <Tag category={tea.category} />
                   </div>
-                </div>
-              </Card>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-3)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {tea.introduction}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-1)', marginBottom: 'var(--space-3)' }}>
+                    <div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: '1px' }}>产地</div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-700)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${tea.origin}·${tea.originDetail}`}>{tea.origin}·{tea.originDetail}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: '1px' }}>特点</div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-700)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={tea.characteristics}>{tea.characteristics}</div>
+                    </div>
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--color-neutral-100)', paddingTop: 'var(--space-2)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 'var(--space-1)' }}>代表品牌</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {tea.brands.map((brand) => (
+                          <span key={brand} style={{ padding: '1px 8px', borderRadius: 'var(--radius-full)', background: 'var(--color-neutral-100)', color: 'var(--color-neutral-600)', fontSize: 'var(--text-xs)', whiteSpace: 'nowrap' }}>
+                            {brand}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    {!deleteMode && (
+                      <div className="tea-card-edit-btn" style={{ flexShrink: 0, marginLeft: 'var(--space-2)' }}>
+                        <Button variant="ghost" size="sm" onClick={() => handleOpenEdit(idx)} style={{ color: '#01795D', padding: '2px 6px', fontSize: 'var(--text-xs)' }}>编辑</Button>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </div>
             );
           })}
         </div>
@@ -223,22 +270,6 @@ export default function ProductTeaList() {
           </div>
         )}
       </div>
-
-      {/* 删除确认弹窗 */}
-      {deleteConfirm !== null && (
-        <div className="category-dialog-overlay" onClick={() => setDeleteConfirm(null)}>
-          <div className="category-dialog" onClick={(e) => e.stopPropagation()}>
-            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-4)' }}>确认删除</div>
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', marginBottom: 'var(--space-5)' }}>
-              确定要删除茶种「{filtered[deleteConfirm - (currentPage - 1) * PAGE_SIZE]?.name}」吗？此操作不可恢复。
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
-              <Button variant="ghost" onClick={() => setDeleteConfirm(null)}>取消</Button>
-              <Button onClick={() => handleDelete(deleteConfirm - (currentPage - 1) * PAGE_SIZE)} style={{ background: '#FD742D' }}>确认删除</Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 新增/编辑抽屉 */}
       {showDrawer && (
@@ -265,12 +296,21 @@ export default function ProductTeaList() {
                   </select>
                 </div>
               </div>
-              <div className="drawer-form-row">
-                <div className="drawer-form-field">
-                  <label className="drawer-label">产地（省份）</label>
-                  <input className="detail-input" value={form.origin} onChange={(e) => setForm({ ...form, origin: e.target.value })} placeholder="如：浙江" />
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">产地（支持多选）</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginTop: '4px' }}>
+                    {allOrigins.map((o) => (
+                      <label key={o} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
+                        <input type="checkbox" checked={form.origin.includes(o)} onChange={() => handleToggleFormOrigin(o)} />
+                        {o}
+                      </label>
+                    ))}
+                  </div>
                 </div>
-                <div className="drawer-form-field">
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field" style={{ width: '100%' }}>
                   <label className="drawer-label">产地详情</label>
                   <input className="detail-input" value={form.originDetail} onChange={(e) => setForm({ ...form, originDetail: e.target.value })} placeholder="如：杭州西湖区" />
                 </div>
@@ -281,14 +321,10 @@ export default function ProductTeaList() {
                   <textarea className="detail-textarea" value={form.introduction} onChange={(e) => setForm({ ...form, introduction: e.target.value })} placeholder="请输入茶种介绍" rows={3} />
                 </div>
               </div>
-              <div className="drawer-form-row">
-                <div className="drawer-form-field">
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
                   <label className="drawer-label">特点</label>
                   <input className="detail-input" value={form.characteristics} onChange={(e) => setForm({ ...form, characteristics: e.target.value })} placeholder="请输入特点" />
-                </div>
-                <div className="drawer-form-field">
-                  <label className="drawer-label">知名度 (1-100)</label>
-                  <input className="detail-input" type="number" min={1} max={100} value={form.popularity} onChange={(e) => setForm({ ...form, popularity: e.target.value })} />
                 </div>
               </div>
               <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
