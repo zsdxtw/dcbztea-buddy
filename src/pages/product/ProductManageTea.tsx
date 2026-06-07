@@ -519,7 +519,7 @@ export default function ProductManageTea() {
                     padding: '2px 8px',
                     borderRadius: 'var(--radius-sm)',
                     background: 'rgba(1, 121, 93, 0.85)',
-                    color: '#fff',
+                    color: '#FD742D',
                     fontSize: 'var(--text-xs)',
                     fontWeight: 'var(--font-semibold)',
                     lineHeight: '18px',
