@@ -198,6 +198,17 @@ export default function ProductBrandDetail() {
               ) : (
                 <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-md)' }}>{brand.introduction}</div>
               )}
+              {/* 统计数字 */}
+              <div style={{ display: 'flex', gap: 'var(--space-8)', marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-neutral-200)' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
+                  <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#FD742D' }}>{associatedProducts.length}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>个关联商品</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
+                  <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#FD742D' }}>{associatedSuppliers.length}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>家供应商</span>
+                </div>
+              </div>
             </div>
           </div>
         </Card>
