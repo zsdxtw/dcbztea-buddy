@@ -5,8 +5,11 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
-import { teaProducts, getShelfStatusLabel, getPurchaseStatusLabel, getProductionStatusLabel } from '../../data/teaProducts';
-import { TeaCategory } from '../../types';
+import { teaProducts as initialProducts, getShelfStatusLabel, getPurchaseStatusLabel, getProductionStatusLabel } from '../../data/teaProducts';
+import { TeaProduct, TeaCategory } from '../../types';
+import { teaCategoryData, teawareCategoryData, teaPeripheralCategoryData, otherCategoryData, productCategoryLabels, type ProductCategoryType, type CategoryNode } from '../../data/productCategories';
+import { brandItems } from '../../data/brands';
+import { generateProductCode } from '../../utils/productCode';
 
 const PAGE_SIZE = 20;
 
@@ -38,9 +41,57 @@ function parseCategory(category: string): TeaCategory | null {
   return CATEGORY_MAP[prefix] ?? null;
 }
 
+/** 一级分类数据映射 */
+const CATEGORY_DATA_MAP: Record<ProductCategoryType, CategoryNode> = {
+  tea: teaCategoryData,
+  teaware: teawareCategoryData,
+  'tea-peripheral': teaPeripheralCategoryData,
+  other: otherCategoryData,
+};
+
+/** 新增商品表单初始值 */
+const emptyForm = {
+  name: '',
+  selectedL1: 'tea' as ProductCategoryType,
+  selectedL2: [] as string[],
+  selectedL3: [] as string[],
+  brand: '',
+  series: '',
+  packageUnit: '罐',
+  barcode69: '',
+  model: '',
+  spec: '',
+  weight: 0,
+  volume: { length: 0, width: 0, height: 0 },
+  quantityPerUnit: 0,
+  grade: '',
+  origin: '',
+  shelfLife: 12,
+  taxRate: 9,
+  packageList: '',
+  marketPrice: 0,
+  tmallPrice: 0,
+  tmallUrl: '',
+  jdPrice: 0,
+  jdUrl: '',
+  shelfStatus: 'on' as 'on' | 'off',
+  purchaseStatus: 'available' as 'available' | 'stopped',
+  productionStatus: 'producing' as 'producing' | 'stopped',
+  mainImages: [] as string[],
+  detailImages: [] as string[],
+  stockAlert: 50,
+  stock: 0,
+  reservedStock: 0,
+  totalSales: 0,
+  features: '',
+  includesTeaware: false,
+  remark: '',
+};
+
 /** 茶叶商品管理页面 */
 export default function ProductManageTea() {
   const navigate = useNavigate();
+  const [products, setProducts] = useState<TeaProduct[]>(initialProducts);
   const [keyword, setKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [shelfFilter, setShelfFilter] = useState('');
@@ -53,16 +104,20 @@ export default function ProductManageTea() {
   const [priceMax, setPriceMax] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
+  // 抽屉状态
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [form, setForm] = useState({ ...emptyForm });
+
   // 提取所有品牌
   const allBrands = useMemo(() => {
     const brands = new Set<string>();
-    teaProducts.forEach((p) => brands.add(p.brand));
+    products.forEach((p) => brands.add(p.brand));
     return Array.from(brands).sort();
-  }, []);
+  }, [products]);
 
   // 筛选 + 排序
   const filtered = useMemo(() => {
-    let result = teaProducts.filter((p) => {
+    let result = products.filter((p) => {
       if (categoryFilter) {
         const prefix = p.category.split('-')[0];
         if (prefix !== categoryFilter) return false;
@@ -99,7 +154,7 @@ export default function ProductManageTea() {
       result = [...result].sort((a, b) => a.totalSales - b.totalSales);
     }
     return result;
-  }, [keyword, categoryFilter, shelfFilter, purchaseFilter, productionFilter, brandFilter, quickFilter, sortBy, priceMin, priceMax]);
+  }, [products, keyword, categoryFilter, shelfFilter, purchaseFilter, productionFilter, brandFilter, quickFilter, sortBy, priceMin, priceMax]);
 
   // 分页
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -118,6 +173,155 @@ export default function ProductManageTea() {
   const handleSortChange = (sort: 'default' | 'price-asc' | 'price-desc' | 'sales-asc' | 'sales-desc') => { setSortBy(sort); setCurrentPage(1); };
   const handlePriceMinChange = (v: string) => { setPriceMin(v); setCurrentPage(1); };
   const handlePriceMaxChange = (v: string) => { setPriceMax(v); setCurrentPage(1); };
+
+  // ── 分类联动 ──
+  const l2Options = useMemo(() => {
+    const data = CATEGORY_DATA_MAP[form.selectedL1];
+    return data?.children || [];
+  }, [form.selectedL1]);
+
+  const l3Options = useMemo(() => {
+    if (form.selectedL1 !== 'tea') return {};
+    const result: Record<string, CategoryNode[]> = {};
+    const teaData = teaCategoryData.children || [];
+    for (const l2 of teaData) {
+      if (form.selectedL2.includes(l2.name) && l2.children && l2.children.length > 0) {
+        result[l2.name] = l2.children;
+      }
+    }
+    return result;
+  }, [form.selectedL1, form.selectedL2]);
+
+  // 计算选中的分类路径
+  const computedCategories = useMemo(() => {
+    const cats: string[] = [];
+    if (form.selectedL1 === 'tea') {
+      for (const l2Name of form.selectedL2) {
+        const l2Node = teaCategoryData.children?.find(c => c.name === l2Name);
+        if (l2Node?.children && l2Node.children.length > 0) {
+          const selectedL3ForL2 = form.selectedL3.filter(l3Name =>
+            l2Node.children!.some(c => c.name === l3Name)
+          );
+          if (selectedL3ForL2.length > 0) {
+            for (const l3Name of selectedL3ForL2) {
+              cats.push(`${l2Name}-${l3Name}`);
+            }
+          } else {
+            cats.push(l2Name);
+          }
+        } else {
+          cats.push(l2Name);
+        }
+      }
+    } else {
+      for (const l2Name of form.selectedL2) {
+        cats.push(l2Name);
+      }
+    }
+    return cats;
+  }, [form.selectedL1, form.selectedL2, form.selectedL3]);
+
+  // 自动判断是否含茶具
+  const computedIncludesTeaware = useMemo(() => {
+    if (form.selectedL1 === 'teaware') return true;
+    return false;
+  }, [form.selectedL1]);
+
+  // L1 变更时重置 L2/L3
+  const handleL1Change = (l1: ProductCategoryType) => {
+    setForm(prev => ({ ...prev, selectedL1: l1, selectedL2: [], selectedL3: [] }));
+  };
+
+  // L2 多选切换
+  const handleToggleL2 = (name: string) => {
+    setForm(prev => {
+      const newL2 = prev.selectedL2.includes(name)
+        ? prev.selectedL2.filter(n => n !== name)
+        : [...prev.selectedL2, name];
+      // 移除不再属于已选L2的L3
+      const validL3 = prev.selectedL3.filter(l3Name => {
+        const teaData = teaCategoryData.children || [];
+        for (const l2 of teaData) {
+          if (newL2.includes(l2.name) && l2.children?.some(c => c.name === l3Name)) {
+            return true;
+          }
+        }
+        return false;
+      });
+      return { ...prev, selectedL2: newL2, selectedL3: validL3 };
+    });
+  };
+
+  // L3 多选切换
+  const handleToggleL3 = (name: string) => {
+    setForm(prev => ({
+      ...prev,
+      selectedL3: prev.selectedL3.includes(name)
+        ? prev.selectedL3.filter(n => n !== name)
+        : [...prev.selectedL3, name],
+    }));
+  };
+
+  // 新增商品
+  const handleOpenAdd = () => {
+    setForm({ ...emptyForm });
+    setShowDrawer(true);
+  };
+
+  // 保存商品
+  const handleSaveProduct = () => {
+    if (!form.name.trim()) return;
+    if (computedCategories.length === 0) return;
+    if (!form.brand) return;
+
+    const category = computedCategories[0];
+    const l1Name = productCategoryLabels[form.selectedL1];
+    const l2Name = form.selectedL2[0] || '';
+
+    const existingCount = products.filter(p => p.brand === form.brand).length;
+    const code = generateProductCode(l1Name, l2Name, form.brand, existingCount + 1);
+
+    const newProduct: TeaProduct = {
+      id: String(Date.now()),
+      code,
+      name: form.name.trim(),
+      category,
+      brand: form.brand,
+      series: form.series,
+      packageUnit: form.packageUnit,
+      barcode69: form.barcode69,
+      model: form.model,
+      spec: form.spec,
+      weight: form.weight,
+      volume: form.volume,
+      quantityPerUnit: form.quantityPerUnit,
+      grade: form.grade,
+      origin: form.origin,
+      shelfLife: form.shelfLife,
+      taxRate: form.taxRate,
+      packageList: form.packageList,
+      marketPrice: form.marketPrice,
+      tmallPrice: form.tmallPrice,
+      tmallUrl: form.tmallUrl,
+      jdPrice: form.jdPrice,
+      jdUrl: form.jdUrl,
+      shelfStatus: form.shelfStatus,
+      purchaseStatus: form.purchaseStatus,
+      productionStatus: form.productionStatus,
+      mainImages: form.mainImages.length > 0 ? form.mainImages : [`https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(form.name)}&image_size=square_hd`],
+      detailImages: form.detailImages,
+      stockAlert: form.stockAlert,
+      stock: form.stock,
+      reservedStock: form.reservedStock,
+      totalSales: form.totalSales,
+      features: form.features,
+      includesTeaware: computedIncludesTeaware,
+      remark: form.remark,
+    };
+
+    setProducts(prev => [...prev, newProduct]);
+    setShowDrawer(false);
+  };
 
   const filterBtnStyle = (active: boolean): React.CSSProperties => ({
     padding: '4px 12px',
@@ -141,6 +345,16 @@ export default function ProductManageTea() {
     outline: 'none',
     cursor: 'pointer',
   });
+
+  const sectionTitleStyle: React.CSSProperties = {
+    fontSize: 'var(--text-sm)',
+    fontWeight: 'var(--font-semibold)',
+    color: 'var(--color-module-current-base)',
+    paddingTop: 'var(--space-3)',
+    paddingBottom: 'var(--space-2)',
+    borderTop: '1px solid var(--color-neutral-100)',
+    marginTop: 'var(--space-2)',
+  };
 
   return (
     <>
@@ -236,7 +450,7 @@ export default function ProductManageTea() {
             <button style={filterBtnStyle(sortBy === 'sales-desc' || sortBy === 'sales-asc')} onClick={() => handleSortChange(sortBy === 'sales-desc' ? 'sales-asc' : 'sales-desc')}>
               销量{(sortBy === 'sales-asc' || sortBy === 'sales-desc') ? (sortBy === 'sales-asc' ? ' ↑' : ' ↓') : ''}
             </button>
-            <Button onClick={() => { /* TODO: 新增商品 */ }}>
+            <Button onClick={handleOpenAdd}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                 <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
@@ -501,6 +715,343 @@ export default function ProductManageTea() {
           </div>
         )}
       </div>
+
+      {/* 新增商品抽屉 */}
+      {showDrawer && (
+        <div className="drawer-overlay" onClick={() => setShowDrawer(false)}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 560 }}>
+            <div className="drawer-header">
+              <span className="drawer-title">新增商品</span>
+              <button className="drawer-close" onClick={() => setShowDrawer(false)}>
+                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              {/* ── 基本信息 ── */}
+              <div style={sectionTitleStyle}>基本信息</div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">商品名称 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <input className="detail-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="请输入商品名称" />
+                </div>
+              </div>
+
+              {/* 一级分类 */}
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">一级分类 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <select
+                    className="detail-input"
+                    value={form.selectedL1}
+                    onChange={(e) => handleL1Change(e.target.value as ProductCategoryType)}
+                  >
+                    {(Object.keys(productCategoryLabels) as ProductCategoryType[]).map((key) => (
+                      <option key={key} value={key}>{productCategoryLabels[key]}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* 二级分类（多选） */}
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">二级分类 <span style={{ color: '#FD742D' }}>*</span>（多选）</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
+                    {l2Options.map((l2) => (
+                      <label key={l2.id} style={{
+                        display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer',
+                        fontSize: 'var(--text-sm)', padding: '2px 8px', borderRadius: 'var(--radius-md)',
+                        border: `1px solid ${form.selectedL2.includes(l2.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                        background: form.selectedL2.includes(l2.name) ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+                        color: form.selectedL2.includes(l2.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+                        transition: 'var(--transition-fast)',
+                      }}>
+                        <input
+                          type="checkbox"
+                          checked={form.selectedL2.includes(l2.name)}
+                          onChange={() => handleToggleL2(l2.name)}
+                          style={{ display: 'none' }}
+                        />
+                        {l2.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 三级茶种（仅茶叶，多选） */}
+              {form.selectedL1 === 'tea' && Object.keys(l3Options).length > 0 && (
+                <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                  <div className="drawer-form-field" style={{ width: '100%' }}>
+                    <label className="drawer-label">三级茶种（多选）</label>
+                    {Object.entries(l3Options).map(([l2Name, l3Nodes]) => (
+                      <div key={l2Name} style={{ marginBottom: 'var(--space-2)' }}>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginBottom: '4px', fontWeight: 'var(--font-medium)' }}>{l2Name}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                          {l3Nodes.map((l3) => (
+                            <label key={l3.id} style={{
+                              display: 'flex', alignItems: 'center', gap: '3px', cursor: 'pointer',
+                              fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 'var(--radius-sm)',
+                              border: `1px solid ${form.selectedL3.includes(l3.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                              background: form.selectedL3.includes(l3.name) ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+                              color: form.selectedL3.includes(l3.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+                              transition: 'var(--transition-fast)',
+                            }}>
+                              <input
+                                type="checkbox"
+                                checked={form.selectedL3.includes(l3.name)}
+                                onChange={() => handleToggleL3(l3.name)}
+                                style={{ display: 'none' }}
+                              />
+                              {l3.name}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 已选分类预览 */}
+              {computedCategories.length > 0 && (
+                <div style={{ marginBottom: 'var(--space-2)' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>已选分类：</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-module-current-base)', fontWeight: 'var(--font-medium)' }}>
+                    {computedCategories.join('、')}
+                  </span>
+                </div>
+              )}
+
+              {/* 品牌 + 系列 */}
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">品牌 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <select
+                    className="detail-input"
+                    value={form.brand}
+                    onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                  >
+                    <option value="">请选择品牌</option>
+                    {brandItems.map((b) => (
+                      <option key={b.id} value={b.name}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">系列</label>
+                  <input className="detail-input" value={form.series} onChange={(e) => setForm({ ...form, series: e.target.value })} placeholder="请输入系列" />
+                </div>
+              </div>
+
+              {/* 品级 + 产地 */}
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">品级</label>
+                  <select className="detail-input" value={form.grade} onChange={(e) => setForm({ ...form, grade: e.target.value })}>
+                    <option value="">请选择品级</option>
+                    <option value="特级">特级</option>
+                    <option value="一级">一级</option>
+                    <option value="二级">二级</option>
+                    <option value="三级">三级</option>
+                    <option value="精品">精品</option>
+                    <option value="珍品">珍品</option>
+                  </select>
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">产地</label>
+                  <input className="detail-input" value={form.origin} onChange={(e) => setForm({ ...form, origin: e.target.value })} placeholder="如：浙江杭州西湖区" />
+                </div>
+              </div>
+
+              {/* ── 规格包装 ── */}
+              <div style={sectionTitleStyle}>规格包装</div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">规格</label>
+                  <input className="detail-input" value={form.spec} onChange={(e) => setForm({ ...form, spec: e.target.value })} placeholder="如：50g/罐" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">包装单位</label>
+                  <select className="detail-input" value={form.packageUnit} onChange={(e) => setForm({ ...form, packageUnit: e.target.value })}>
+                    <option value="罐">罐</option>
+                    <option value="袋">袋</option>
+                    <option value="盒">盒</option>
+                    <option value="饼">饼</option>
+                    <option value="砖">砖</option>
+                    <option value="条">条</option>
+                    <option value="箱">箱</option>
+                  </select>
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">重量(kg)</label>
+                  <input className="detail-input" type="number" value={form.weight || ''} onChange={(e) => setForm({ ...form, weight: Number(e.target.value) })} placeholder="0" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">每箱数量</label>
+                  <input className="detail-input" type="number" value={form.quantityPerUnit || ''} onChange={(e) => setForm({ ...form, quantityPerUnit: Number(e.target.value) })} placeholder="0" />
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">体积(cm) 长×宽×高</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    <input className="detail-input" type="number" value={form.volume.length || ''} onChange={(e) => setForm({ ...form, volume: { ...form.volume, length: Number(e.target.value) } })} placeholder="长" style={{ width: '33%' }} />
+                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
+                    <input className="detail-input" type="number" value={form.volume.width || ''} onChange={(e) => setForm({ ...form, volume: { ...form.volume, width: Number(e.target.value) } })} placeholder="宽" style={{ width: '33%' }} />
+                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
+                    <input className="detail-input" type="number" value={form.volume.height || ''} onChange={(e) => setForm({ ...form, volume: { ...form.volume, height: Number(e.target.value) } })} placeholder="高" style={{ width: '33%' }} />
+                  </div>
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">69码</label>
+                  <input className="detail-input" value={form.barcode69} onChange={(e) => setForm({ ...form, barcode69: e.target.value })} placeholder="13位条码" maxLength={13} />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">型号</label>
+                  <input className="detail-input" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="请输入型号" />
+                </div>
+              </div>
+
+              {/* ── 价格信息 ── */}
+              <div style={sectionTitleStyle}>价格信息</div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">市场价(元) <span style={{ color: '#FD742D' }}>*</span></label>
+                  <input className="detail-input" type="number" value={form.marketPrice || ''} onChange={(e) => setForm({ ...form, marketPrice: Number(e.target.value) })} placeholder="0" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">税率(%)</label>
+                  <input className="detail-input" type="number" value={form.taxRate || ''} onChange={(e) => setForm({ ...form, taxRate: Number(e.target.value) })} placeholder="9" />
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">天猫价(元)</label>
+                  <input className="detail-input" type="number" value={form.tmallPrice || ''} onChange={(e) => setForm({ ...form, tmallPrice: Number(e.target.value) })} placeholder="0" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">天猫链接</label>
+                  <input className="detail-input" value={form.tmallUrl} onChange={(e) => setForm({ ...form, tmallUrl: e.target.value })} placeholder="https://" />
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">京东价(元)</label>
+                  <input className="detail-input" type="number" value={form.jdPrice || ''} onChange={(e) => setForm({ ...form, jdPrice: Number(e.target.value) })} placeholder="0" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">京东链接</label>
+                  <input className="detail-input" value={form.jdUrl} onChange={(e) => setForm({ ...form, jdUrl: e.target.value })} placeholder="https://" />
+                </div>
+              </div>
+
+              {/* ── 状态与库存 ── */}
+              <div style={sectionTitleStyle}>状态与库存</div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">上下架状态</label>
+                  <select className="detail-input" value={form.shelfStatus} onChange={(e) => setForm({ ...form, shelfStatus: e.target.value as 'on' | 'off' })}>
+                    <option value="on">上架</option>
+                    <option value="off">下架</option>
+                  </select>
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">采购状态</label>
+                  <select className="detail-input" value={form.purchaseStatus} onChange={(e) => setForm({ ...form, purchaseStatus: e.target.value as 'available' | 'stopped' })}>
+                    <option value="available">可采</option>
+                    <option value="stopped">停采</option>
+                  </select>
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">生产状态</label>
+                  <select className="detail-input" value={form.productionStatus} onChange={(e) => setForm({ ...form, productionStatus: e.target.value as 'producing' | 'stopped' })}>
+                    <option value="producing">生产</option>
+                    <option value="stopped">停产</option>
+                  </select>
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">库存预警值</label>
+                  <input className="detail-input" type="number" value={form.stockAlert || ''} onChange={(e) => setForm({ ...form, stockAlert: Number(e.target.value) })} placeholder="50" />
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">自有库存</label>
+                  <input className="detail-input" type="number" value={form.stock || ''} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} placeholder="0" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">预占库存</label>
+                  <input className="detail-input" type="number" value={form.reservedStock || ''} onChange={(e) => setForm({ ...form, reservedStock: Number(e.target.value) })} placeholder="0" />
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">总销量</label>
+                  <input className="detail-input" type="number" value={form.totalSales || ''} onChange={(e) => setForm({ ...form, totalSales: Number(e.target.value) })} placeholder="0" />
+                </div>
+                <div className="drawer-form-field" />
+              </div>
+
+              {/* ── 商品属性 ── */}
+              <div style={sectionTitleStyle}>商品属性</div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">产品特点</label>
+                  <input className="detail-input" value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} placeholder="如：明前头采·豆花香·扁平挺直" />
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">保质期(月)</label>
+                  <input className="detail-input" type="number" value={form.shelfLife || ''} onChange={(e) => setForm({ ...form, shelfLife: Number(e.target.value) })} placeholder="12" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">含茶具</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', height: 32 }}>
+                    <span style={{
+                      padding: '2px 10px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-medium)',
+                      background: computedIncludesTeaware ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-100)',
+                      color: computedIncludesTeaware ? 'var(--color-module-current-base)' : 'var(--color-neutral-500)',
+                      border: `1px solid ${computedIncludesTeaware ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                    }}>
+                      {computedIncludesTeaware ? '是（分类含茶具自动标记）' : '否'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">包装清单</label>
+                  <input className="detail-input" value={form.packageList} onChange={(e) => setForm({ ...form, packageList: e.target.value })} placeholder="如：茶叶罐×1、手提袋×1、品鉴茶具套装×1" />
+                </div>
+              </div>
+
+              {/* ── 备注 ── */}
+              <div style={sectionTitleStyle}>备注</div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">备注信息</label>
+                  <textarea className="detail-textarea" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} placeholder="请输入备注信息" rows={3} />
+                </div>
+              </div>
+            </div>
+            <div className="drawer-footer">
+              <Button variant="ghost" onClick={() => setShowDrawer(false)}>取消</Button>
+              <Button onClick={handleSaveProduct} disabled={!form.name.trim() || computedCategories.length === 0 || !form.brand}>确认新增</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
