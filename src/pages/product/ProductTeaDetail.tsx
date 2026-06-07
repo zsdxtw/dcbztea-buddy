@@ -663,19 +663,9 @@ export default function ProductTeaDetail() {
               <Card title="价格信息">
                 <div className="detail-grid">
                   <DetailRow label="市场价" span>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
-                      <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: '#CB405D' }}>
-                        ¥{product.marketPrice}
-                      </span>
-                      {product.spec && (
-                        <>
-                          <span style={{ color: 'var(--color-neutral-300)' }}>|</span>
-                          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {product.spec}
-                          </span>
-                        </>
-                      )}
-                    </div>
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: '#CB405D' }}>
+                      ¥{product.marketPrice}
+                    </span>
                   </DetailRow>
                   <DetailRow label="天猫价" span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
