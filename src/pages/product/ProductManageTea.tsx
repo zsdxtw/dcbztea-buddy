@@ -57,6 +57,8 @@ const emptyForm = {
   selectedL3: [] as string[],
   brand: '',
   series: '',
+  isNewSeries: false,
+  newSeriesName: '',
   packageUnit: '罐',
   barcode69: '',
   model: '',
@@ -329,8 +331,9 @@ export default function ProductManageTea() {
     const code = generateProductCode(l1Name, l2Name, form.brand, existingCount + 1);
 
     // 同步新系列到品牌管理
-    if (form.series) {
-      syncSeriesToBrand(form.brand, form.series);
+    const finalSeries = form.isNewSeries ? form.newSeriesName : form.series;
+    if (finalSeries && form.brand) {
+      syncSeriesToBrand(form.brand, finalSeries);
     }
 
     const newProduct: TeaProduct = {
@@ -339,7 +342,7 @@ export default function ProductManageTea() {
       name: form.name.trim(),
       category,
       brand: form.brand,
-      series: form.series,
+      series: finalSeries,
       packageUnit: form.packageUnit,
       barcode69: form.barcode69,
       model: form.model,
@@ -948,20 +951,37 @@ export default function ProductManageTea() {
                 </div>
                 <div className="drawer-form-field">
                   <label className="drawer-label">系列</label>
-                  <input
-                    className="detail-input"
-                    value={form.series}
-                    onChange={(e) => setForm({ ...form, series: e.target.value })}
-                    placeholder={currentBrandSeries.length > 0 ? '选择或输入系列名称' : '请输入系列名称'}
-                    list="series-options"
-                  />
-                  {currentBrandSeries.length > 0 && (
-                    <datalist id="series-options">
+                  <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                    <select
+                      className="detail-input"
+                      value={form.isNewSeries ? '__new__' : form.series}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '__new__') {
+                          setForm({ ...form, isNewSeries: true, series: '' });
+                        } else {
+                          setForm({ ...form, isNewSeries: false, newSeriesName: '', series: val });
+                        }
+                      }}
+                      style={{ flex: form.isNewSeries ? '0 0 auto' : 1, minWidth: 120 }}
+                    >
+                      <option value="">请选择系列</option>
                       {currentBrandSeries.map((s) => (
-                        <option key={s} value={s} />
+                        <option key={s} value={s}>{s}</option>
                       ))}
-                    </datalist>
-                  )}
+                      <option value="__new__">填写新系列</option>
+                    </select>
+                    {form.isNewSeries && (
+                      <input
+                        className="detail-input"
+                        value={form.newSeriesName}
+                        onChange={(e) => setForm({ ...form, newSeriesName: e.target.value })}
+                        placeholder="输入新系列名称"
+                        style={{ flex: 1 }}
+                        autoFocus
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
 
