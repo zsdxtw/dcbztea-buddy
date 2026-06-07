@@ -672,7 +672,7 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ── 抽屉面板 ── */
 .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1000; display: flex; justify-content: flex-end; animation: fadeIn 0.2s ease; }
-.drawer-panel { background: var(--color-neutral-0); width: 520px; max-width: 90vw; height: 100vh; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,0.1); animation: slideInRight 0.25s ease; }
+.drawer-panel { background: var(--color-neutral-0); width: 780px; max-width: 90vw; height: 100vh; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,0.1); animation: slideInRight 0.25s ease; }
 .drawer-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--color-neutral-200); flex-shrink: 0; }
 .drawer-title { font-size: var(--text-lg); font-weight: var(--font-semibold); color: var(--color-neutral-800); }
 .drawer-close { background: none; border: none; cursor: pointer; color: var(--color-neutral-400); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); transition: var(--transition-fast); }
