@@ -326,11 +326,18 @@ export default function ProductCategory() {
           {node.icon && <span className="category-tree-icon" style={{ width: 18, height: 18, flexShrink: 0, color: 'var(--color-module-current-base)' }}>{node.icon}</span>}
           <span className="category-tree-name">{node.name}</span>
           <span className="category-tree-count">{node.productCount}</span>
-          {!nodeIsLevel1 && (
+          {!nodeIsLevel1 && nodeDepth < 2 && (
             <span className="category-tree-actions" onClick={(e) => e.stopPropagation()}>
               <button className="category-tree-action-btn" title="新增子分类" onClick={() => handleAddChild(node.id, nodeDepth)}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
               </button>
+              <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
+                <svg viewBox="0 0 14 14" fill="none"><path d="M3 4h8M5 4V3h4v1M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 4l.7 7h4.6l.7-7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
+              </button>
+            </span>
+          )}
+          {!nodeIsLevel1 && nodeDepth >= 2 && (
+            <span className="category-tree-actions" onClick={(e) => e.stopPropagation()}>
               <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M3 4h8M5 4V3h4v1M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 4l.7 7h4.6l.7-7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
               </button>
@@ -452,11 +459,11 @@ export default function ProductCategory() {
                         </div>
                       </div>
                     )}
-                    {!selectedNode.children && selectedPath && selectedPath.length === 2 && (
+                    {!selectedNode.children && selectedPath && selectedPath.length < 3 && (
                       <div className="detail-row detail-row-span">
                         <div className="detail-label">子分类</div>
                         <div className="detail-value">
-                          <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, 2)}>
+                          <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, selectedPath.length - 1)}>
                             <PlusIcon /> 添加子分类
                           </Button>
                         </div>
