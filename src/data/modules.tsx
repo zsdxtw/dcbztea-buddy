@@ -258,7 +258,6 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
         { key: 'product-category-other', label: '其他', icon: <ProductCategoryIcon /> },
       ] },
       { key: 'product-brand', label: '品牌管理', icon: <BrandIcon /> },
-      { key: 'product-unit', label: '单位管理', icon: <UnitIcon /> },
     ],
   },
   [ModuleKey.FINANCE]: {
@@ -298,6 +297,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'settings-about', label: '关于', icon: <AboutIcon /> },
       { key: 'settings-user-management', label: '用户管理', icon: <UserManagementIcon /> },
       { key: 'settings-data-backup', label: '数据备份', icon: <DataBackupIcon /> },
+      { key: 'settings-unit', label: '单位设置', icon: <UnitIcon /> },
     ],
   },
 };

@@ -44,7 +44,6 @@ import ProductCategoryPeripheral from './pages/product/ProductCategoryPeripheral
 import ProductCategoryOther from './pages/product/ProductCategoryOther';
 import ProductBrand from './pages/product/ProductBrand';
 import ProductBrandDetail from './pages/product/ProductBrandDetail';
-import ProductUnit from './pages/product/ProductUnit';
 
 import FinanceOverview from './pages/finance/FinanceOverview';
 import FinanceReceivable from './pages/finance/FinanceReceivable';
@@ -69,6 +68,7 @@ import SettingsLogs from './pages/settings/SettingsLogs';
 import SettingsAbout from './pages/settings/SettingsAbout';
 import SettingsUserManagement from './pages/settings/SettingsUserManagement';
 import SettingsDataBackup from './pages/settings/SettingsDataBackup';
+import SettingsUnit from './pages/settings/SettingsUnit';
 
 export const router = createBrowserRouter([
   {
@@ -125,7 +125,6 @@ export const router = createBrowserRouter([
       { path: 'product/product-category-other', element: <ProductCategoryOther /> },
       { path: 'product/product-brand', element: <ProductBrand /> },
       { path: 'product/product-brand/:id', element: <ProductBrandDetail /> },
-      { path: 'product/product-unit', element: <ProductUnit /> },
       /* ── 财务 ── */
       { path: 'finance', element: <FinanceOverview /> },
       { path: 'finance/finance-overview', element: <FinanceOverview /> },
@@ -153,6 +152,7 @@ export const router = createBrowserRouter([
       { path: 'settings/settings-about', element: <SettingsAbout /> },
       { path: 'settings/settings-user-management', element: <SettingsUserManagement /> },
       { path: 'settings/settings-data-backup', element: <SettingsDataBackup /> },
+      { path: 'settings/settings-unit', element: <SettingsUnit /> },
     ],
   },
 ]);
