@@ -331,7 +331,7 @@ export interface BrandItem {
   requirements: string;
   policy: string;
   series: string[];
-  trademarkCert: string;
+  trademarkCert: string[];
   jdStoreUrl: string;
   tmallStoreUrl: string;
   contactPerson: string;

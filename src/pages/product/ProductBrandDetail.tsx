@@ -16,7 +16,7 @@ const brandItems: BrandItem[] = [
   {
     id: '1', code: '001', name: '西湖牌', logo: '', owner: '杭州西湖茶叶有限公司',
     introduction: '始创于1949年，西湖龙井茶核心产区标杆品牌，传承传统炒制技艺', requirements: '需提供原产地证明，品质符合GB/T 18650标准', policy: '年度返利3%，季度结算', series: ['明前龙井', '雨前龙井', '龙井红茶'],
-    trademarkCert: '西湖龙井地理标志.pdf', jdStoreUrl: 'https://xihupai.jd.com', tmallStoreUrl: 'https://xihupai.tmall.com',
+    trademarkCert: ['西湖龙井地理标志.pdf'], jdStoreUrl: 'https://xihupai.jd.com', tmallStoreUrl: 'https://xihupai.tmall.com',
     contactPerson: '王明华', contactPhone: '0571-8765****', address: '浙江省杭州市西湖区龙井路88号',
     mainCategories: ['绿茶'], productCount: 8,
     website: 'https://www.xihupai.com', cooperationDate: '2023-03-15',
@@ -24,7 +24,7 @@ const brandItems: BrandItem[] = [
   {
     id: '2', code: '002', name: '八马', logo: '', owner: '八马茶业股份有限公司',
     introduction: '中国茶业领军品牌，铁观音十三代传人，全国连锁门店超3000家', requirements: '需具备八马品牌授权书，门店面积不低于80㎡', policy: '首批进货额≥50万，年度返利5%', series: ['赛珍珠铁观音', '浓香铁观音', '陈皮普洱'],
-    trademarkCert: '八马商标注册证.pdf', jdStoreUrl: 'https://bama.jd.com', tmallStoreUrl: 'https://bama.tmall.com',
+    trademarkCert: ['八马商标注册证.pdf'], jdStoreUrl: 'https://bama.jd.com', tmallStoreUrl: 'https://bama.tmall.com',
     contactPerson: '林文杰', contactPhone: '0595-2345****', address: '福建省泉州市安溪县八马茶业大厦',
     mainCategories: ['乌龙茶'], productCount: 12,
     website: 'https://www.bama.com', cooperationDate: '2022-08-01',
@@ -32,7 +32,7 @@ const brandItems: BrandItem[] = [
   {
     id: '3', code: '003', name: '张一元', logo: '', owner: '北京张一元茶叶有限责任公司',
     introduction: '百年老字号，始创于1900年，茉莉花茶制作技艺入选国家级非遗', requirements: '需通过品牌方资质审核，具备冷链仓储条件', policy: '年度返利4%，季度结算，提供品牌宣传支持', series: ['茉莉龙毫', '茉莉毛尖', '茉莉云雾'],
-    trademarkCert: '张一元商标注册证.pdf', jdStoreUrl: 'https://zhangyiyuan.jd.com', tmallStoreUrl: 'https://zhangyiyuan.tmall.com',
+    trademarkCert: ['张一元商标注册证.pdf'], jdStoreUrl: 'https://zhangyiyuan.jd.com', tmallStoreUrl: 'https://zhangyiyuan.tmall.com',
     contactPerson: '赵国强', contactPhone: '010-6303****', address: '北京市西城区大栅栏街22号',
     mainCategories: ['绿茶', '花草茶'], productCount: 6,
     website: 'https://www.zhangyiyuan.com', cooperationDate: '2023-01-10',
@@ -40,7 +40,7 @@ const brandItems: BrandItem[] = [
   {
     id: '6', code: '006', name: '大益', logo: '', owner: '云南大益茶业集团有限公司',
     introduction: '普洱茶行业标杆，勐海茶厂传承，7542被誉为评判普洱茶的标准', requirements: '需具备普洱茶专业仓储，温湿度可调控', policy: '首批进货额≥80万，年度返利6%，提供品鉴培训', series: ['7542生茶', '7572熟茶', '金针白莲'],
-    trademarkCert: '大益商标注册证.pdf', jdStoreUrl: 'https://dayi.jd.com', tmallStoreUrl: 'https://dayi.tmall.com',
+    trademarkCert: ['大益商标注册证.pdf'], jdStoreUrl: 'https://dayi.jd.com', tmallStoreUrl: 'https://dayi.tmall.com',
     contactPerson: '吴远之', contactPhone: '0691-512****', address: '云南省西双版纳州勐海县勐海茶厂',
     mainCategories: ['黑茶'], productCount: 10,
     website: 'https://www.dayi.com', cooperationDate: '2022-05-18',
@@ -132,8 +132,15 @@ export default function ProductBrandDetail() {
         {/* 品牌头部信息 */}
         <Card style={{ marginBottom: 'var(--space-6)' }}>
           <div className="brand-detail-header">
-            <div className="brand-detail-logo">
+            <div className="brand-detail-logo" style={{ position: 'relative' }}>
               {brand.logo ? <img src={brand.logo} alt={brand.name} /> : <div className="brand-logo-placeholder brand-logo-lg">{brand.name[0]}</div>}
+              {editing && (
+                <label style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', borderRadius: 'var(--radius-lg)', cursor: 'pointer', color: 'white', fontSize: 'var(--text-xs)', flexDirection: 'column', gap: '2px' }}>
+                  <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  更换LOGO
+                  <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" style={{ display: 'none' }} />
+                </label>
+              )}
             </div>
             <div className="brand-detail-header-info">
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
@@ -147,6 +154,23 @@ export default function ProductBrandDetail() {
               ) : (
                 <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-md)' }}>{brand.introduction}</div>
               )}
+              {editing ? (
+                <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: '2px' }}>京东店地址</div>
+                    <input className="detail-input" defaultValue={brand.jdStoreUrl} placeholder="https://" style={{ fontSize: 'var(--text-sm)' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: '2px' }}>天猫店地址</div>
+                    <input className="detail-input" defaultValue={brand.tmallStoreUrl} placeholder="https://" style={{ fontSize: 'var(--text-sm)' }} />
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
+                  {brand.jdStoreUrl && <a href={brand.jdStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)', display: 'flex', alignItems: 'center', gap: '4px' }}><span>京东店</span></a>}
+                  {brand.tmallStoreUrl && <a href={brand.tmallStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)', display: 'flex', alignItems: 'center', gap: '4px' }}><span>天猫店</span></a>}
+                </div>
+              )}
             </div>
           </div>
         </Card>
@@ -158,22 +182,31 @@ export default function ProductBrandDetail() {
               <div className="detail-grid">
                 <EditRow label="品牌编号"><input className="detail-input" defaultValue={brand.code} /></EditRow>
                 <EditRow label="品牌名称"><input className="detail-input" defaultValue={brand.name} /></EditRow>
-                <EditRow label="品牌所属"><input className="detail-input" defaultValue={brand.owner} /></EditRow>
-                <EditRow label="主营品类" span>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                    {SECOND_LEVEL_CATEGORIES.map((cat) => (
-                      <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
-                        <input type="checkbox" defaultChecked={brand.mainCategories.includes(cat)} />
-                        {cat}
-                      </label>
-                    ))}
+                <EditRow label="品牌所属" span>
+                  <div className="detail-value">
+                    <input className="detail-input" defaultValue={brand.owner} style={{ marginBottom: 'var(--space-2)' }} />
+                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-1)' }}>主营品类</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                      {SECOND_LEVEL_CATEGORIES.map((cat) => (
+                        <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
+                          <input type="checkbox" defaultChecked={brand.mainCategories.includes(cat)} />
+                          {cat}
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </EditRow>
                 <EditRow label="品牌官网"><input className="detail-input" defaultValue={brand.website} /></EditRow>
                 <EditRow label="商标证书" span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                    <span className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>{brand.trademarkCert}</span>
-                    <Button variant="ghost" size="sm">上传文件</Button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {brand.trademarkCert.map((file, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                        <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, color: 'var(--color-semantic-info)', flexShrink: 0 }}><rect x="3" y="1.5" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M6 5h4M6 7.5h4M6 10h3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/></svg>
+                        <span className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>{file}</span>
+                        <Button variant="ghost" size="sm" style={{ color: 'var(--color-semantic-error)' }}>删除</Button>
+                      </div>
+                    ))}
+                    <Button variant="ghost" size="sm">+ 上传文件</Button>
                   </div>
                 </EditRow>
               </div>
@@ -181,20 +214,26 @@ export default function ProductBrandDetail() {
               <div className="detail-grid">
                 <DetailRow label="品牌编号"><span className="mono">{brand.code}</span></DetailRow>
                 <DetailRow label="品牌名称"><span style={{ fontWeight: 'var(--font-medium)' }}>{brand.name}</span></DetailRow>
-                <DetailRow label="品牌所属">{brand.owner}</DetailRow>
-                <DetailRow label="主营品类" span>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                    {brand.mainCategories.map((c) => (
-                      <span key={c} className="brand-series-tag">{c}</span>
-                    ))}
+                <DetailRow label="品牌所属">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                    <span>{brand.owner}</span>
+                    <span style={{ color: 'var(--color-neutral-400)', fontSize: 'var(--text-sm)' }}>|</span>
+                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', flexShrink: 0 }}>主营品类</span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                      {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
+                    </div>
                   </div>
                 </DetailRow>
                 <DetailRow label="品牌官网">{brand.website ? <a href={brand.website} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>{brand.website}</a> : <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>}</DetailRow>
                 <DetailRow label="商标证书" span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, color: 'var(--color-semantic-info)' }}><rect x="3" y="1.5" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M6 5h4M6 7.5h4M6 10h3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/></svg>
-                    <span className="mono" style={{ fontSize: 'var(--text-sm)' }}>{brand.trademarkCert}</span>
-                    <Button variant="ghost" size="sm">下载</Button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {brand.trademarkCert.map((file, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                        <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, color: 'var(--color-semantic-info)', flexShrink: 0 }}><rect x="3" y="1.5" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M6 5h4M6 7.5h4M6 10h3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/></svg>
+                        <span className="mono" style={{ fontSize: 'var(--text-sm)' }}>{file}</span>
+                        <Button variant="ghost" size="sm">下载</Button>
+                      </div>
+                    ))}
                   </div>
                 </DetailRow>
               </div>
@@ -220,6 +259,7 @@ export default function ProductBrandDetail() {
                     {showSeriesInput ? (
                       <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                         <input className="detail-input" value={newSeries} onChange={(e) => setNewSeries(e.target.value)} placeholder="输入系列名称" style={{ flex: 1 }} onKeyDown={(e) => { if (e.key === 'Enter') handleAddSeries(); }} />
+                        <Button variant="ghost" size="sm" onClick={() => { setShowSeriesInput(false); setNewSeries(''); }} style={{ color: 'var(--color-neutral-400)' }}>取消</Button>
                         <Button size="sm" onClick={handleAddSeries}>确认</Button>
                       </div>
                     ) : (
@@ -245,6 +285,7 @@ export default function ProductBrandDetail() {
                     {showSeriesInput ? (
                       <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                         <input className="detail-input" value={newSeries} onChange={(e) => setNewSeries(e.target.value)} placeholder="输入系列名称" style={{ flex: 1 }} onKeyDown={(e) => { if (e.key === 'Enter') handleAddSeries(); }} />
+                        <Button variant="ghost" size="sm" onClick={() => { setShowSeriesInput(false); setNewSeries(''); }} style={{ color: 'var(--color-neutral-400)' }}>取消</Button>
                         <Button size="sm" onClick={handleAddSeries}>确认</Button>
                       </div>
                     ) : (
@@ -263,20 +304,12 @@ export default function ProductBrandDetail() {
                 <EditRow label="联系人"><input className="detail-input" defaultValue={brand.contactPerson} /></EditRow>
                 <EditRow label="联系电话"><input className="detail-input" defaultValue={brand.contactPhone} /></EditRow>
                 <EditRow label="地址" span><input className="detail-input" defaultValue={brand.address} /></EditRow>
-                <EditRow label="京东店地址"><input className="detail-input" defaultValue={brand.jdStoreUrl} placeholder="https://" /></EditRow>
-                <EditRow label="天猫店地址"><input className="detail-input" defaultValue={brand.tmallStoreUrl} placeholder="https://" /></EditRow>
               </div>
             ) : (
               <div className="detail-grid">
                 <DetailRow label="联系人"><span style={{ fontWeight: 'var(--font-medium)' }}>{brand.contactPerson}</span></DetailRow>
                 <DetailRow label="联系电话"><span className="mono">{brand.contactPhone}</span></DetailRow>
                 <DetailRow label="地址" span>{brand.address || <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>}</DetailRow>
-                <DetailRow label="京东店地址">
-                  {brand.jdStoreUrl ? <a href={brand.jdStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>{brand.jdStoreUrl}</a> : <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>}
-                </DetailRow>
-                <DetailRow label="天猫店地址">
-                  {brand.tmallStoreUrl ? <a href={brand.tmallStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>{brand.tmallStoreUrl}</a> : <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>}
-                </DetailRow>
               </div>
             )}
           </Card>
