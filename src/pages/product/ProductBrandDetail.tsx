@@ -18,7 +18,7 @@ const brandItems: BrandItem[] = [
     introduction: '始创于1949年，西湖龙井茶核心产区标杆品牌，传承传统炒制技艺', requirements: '需提供原产地证明，品质符合GB/T 18650标准', policy: '年度返利3%，季度结算', series: ['明前龙井', '雨前龙井', '龙井红茶'],
     trademarkCert: ['西湖龙井地理标志.pdf'], jdStoreUrl: 'https://xihupai.jd.com', tmallStoreUrl: 'https://xihupai.tmall.com',
     contactPerson: '王明华', contactPhone: '0571-8765****', address: '浙江省杭州市西湖区龙井路88号',
-    mainCategories: ['绿茶'], productCount: 8,
+    mainCategories: ['绿茶'], productCount: 8, supplierCount: 3,
     website: 'https://www.xihupai.com', cooperationDate: '2023-03-15',
   },
   {
@@ -26,7 +26,7 @@ const brandItems: BrandItem[] = [
     introduction: '中国茶业领军品牌，铁观音十三代传人，全国连锁门店超3000家', requirements: '需具备八马品牌授权书，门店面积不低于80㎡', policy: '首批进货额≥50万，年度返利5%', series: ['赛珍珠铁观音', '浓香铁观音', '陈皮普洱'],
     trademarkCert: ['八马商标注册证.pdf'], jdStoreUrl: 'https://bama.jd.com', tmallStoreUrl: 'https://bama.tmall.com',
     contactPerson: '林文杰', contactPhone: '0595-2345****', address: '福建省泉州市安溪县八马茶业大厦',
-    mainCategories: ['乌龙茶'], productCount: 12,
+    mainCategories: ['乌龙茶'], productCount: 12, supplierCount: 4,
     website: 'https://www.bama.com', cooperationDate: '2022-08-01',
   },
   {
@@ -34,7 +34,7 @@ const brandItems: BrandItem[] = [
     introduction: '百年老字号，始创于1900年，茉莉花茶制作技艺入选国家级非遗', requirements: '需通过品牌方资质审核，具备冷链仓储条件', policy: '年度返利4%，季度结算，提供品牌宣传支持', series: ['茉莉龙毫', '茉莉毛尖', '茉莉云雾'],
     trademarkCert: ['张一元商标注册证.pdf'], jdStoreUrl: 'https://zhangyiyuan.jd.com', tmallStoreUrl: 'https://zhangyiyuan.tmall.com',
     contactPerson: '赵国强', contactPhone: '010-6303****', address: '北京市西城区大栅栏街22号',
-    mainCategories: ['绿茶', '花草茶'], productCount: 6,
+    mainCategories: ['绿茶', '花草茶'], productCount: 6, supplierCount: 2,
     website: 'https://www.zhangyiyuan.com', cooperationDate: '2023-01-10',
   },
   {
@@ -42,7 +42,7 @@ const brandItems: BrandItem[] = [
     introduction: '普洱茶行业标杆，勐海茶厂传承，7542被誉为评判普洱茶的标准', requirements: '需具备普洱茶专业仓储，温湿度可调控', policy: '首批进货额≥80万，年度返利6%，提供品鉴培训', series: ['7542生茶', '7572熟茶', '金针白莲'],
     trademarkCert: ['大益商标注册证.pdf'], jdStoreUrl: 'https://dayi.jd.com', tmallStoreUrl: 'https://dayi.tmall.com',
     contactPerson: '吴远之', contactPhone: '0691-512****', address: '云南省西双版纳州勐海县勐海茶厂',
-    mainCategories: ['黑茶'], productCount: 10,
+    mainCategories: ['黑茶'], productCount: 10, supplierCount: 3,
     website: 'https://www.dayi.com', cooperationDate: '2022-05-18',
   },
 ];

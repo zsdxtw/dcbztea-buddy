@@ -339,6 +339,7 @@ export interface BrandItem {
   address: string;
   mainCategories: string[];
   productCount: number;
+  supplierCount: number;
   website: string;
   cooperationDate: string;
 }
