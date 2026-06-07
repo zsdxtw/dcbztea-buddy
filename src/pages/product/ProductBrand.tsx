@@ -115,7 +115,7 @@ function formatAmount(v: number) {
   return `¥${v.toLocaleString()}`;
 }
 
-function RankBarChart({ title, data }: { title: string; data: { name: string; value: number }[] }) {
+function RankBarChart({ title, data, period, onPeriodChange }: { title: string; data: { name: string; value: number }[]; period: RankPeriod; onPeriodChange: (p: RankPeriod) => void }) {
   const max = Math.max(...data.map((d) => d.value));
   const isQuantity = title.includes('数量');
 
@@ -125,8 +125,20 @@ function RankBarChart({ title, data }: { title: string; data: { name: string; va
     return `¥${v.toLocaleString()}`;
   }
 
+  const periods: { key: RankPeriod; label: string }[] = [
+    { key: 'month', label: '当月' },
+    { key: 'year', label: '当年' },
+    { key: 'oneYear', label: '一年内' },
+  ];
+
   return (
-    <Card title={title} className="rank-chart-card">
+    <Card title={title} className="rank-chart-card" headerRight={
+      <div className="rank-period-toggle">
+        {periods.map((p) => (
+          <button key={p.key} className={`rank-period-btn${period === p.key ? ' active' : ''}`} onClick={() => onPeriodChange(p.key)}>{p.label}</button>
+        ))}
+      </div>
+    }>
       <div className="rank-chart">
         {data.map((item, i) => (
           <div key={item.name} className="rank-chart-row">
@@ -262,7 +274,9 @@ export default function ProductBrand() {
   const navigate = useNavigate();
   const [filterKeyword, setFilterKeyword] = useState('');
   const [filterCategory, setFilterCategory] = useState('主营品类');
-  const [rankPeriod, setRankPeriod] = useState<RankPeriod>('month');
+  const [salesAmountPeriod, setSalesAmountPeriod] = useState<RankPeriod>('month');
+  const [profitTotalPeriod, setProfitTotalPeriod] = useState<RankPeriod>('month');
+  const [salesQuantityPeriod, setSalesQuantityPeriod] = useState<RankPeriod>('month');
   const [showDrawer, setShowDrawer] = useState(false);
   const [form, setForm] = useState({ ...emptyForm });
   const [newSeries, setNewSeries] = useState('');
@@ -325,14 +339,9 @@ export default function ProductBrand() {
         {/* 品牌排名 */}
         <div className="rank-section">
           <div className="rank-charts-grid">
-            <RankBarChart title="销售金额 TOP5" data={rankData[rankPeriod].salesAmount} />
-            <RankBarChart title="利润总额 TOP5" data={rankData[rankPeriod].profitTotal} />
-            <RankBarChart title="销售数量 TOP5" data={rankData[rankPeriod].salesQuantity} />
-          </div>
-          <div className="rank-period-toggle">
-            <button className={`rank-period-btn${rankPeriod === 'month' ? ' active' : ''}`} onClick={() => setRankPeriod('month')}>当月</button>
-            <button className={`rank-period-btn${rankPeriod === 'year' ? ' active' : ''}`} onClick={() => setRankPeriod('year')}>当年</button>
-            <button className={`rank-period-btn${rankPeriod === 'oneYear' ? ' active' : ''}`} onClick={() => setRankPeriod('oneYear')}>一年内</button>
+            <RankBarChart title="销售金额 TOP5" data={rankData[salesAmountPeriod].salesAmount} period={salesAmountPeriod} onPeriodChange={setSalesAmountPeriod} />
+            <RankBarChart title="利润总额 TOP5" data={rankData[profitTotalPeriod].profitTotal} period={profitTotalPeriod} onPeriodChange={setProfitTotalPeriod} />
+            <RankBarChart title="销售数量 TOP5" data={rankData[salesQuantityPeriod].salesQuantity} period={salesQuantityPeriod} onPeriodChange={setSalesQuantityPeriod} />
           </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
