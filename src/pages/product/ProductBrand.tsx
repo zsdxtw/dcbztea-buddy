@@ -476,9 +476,10 @@ export default function ProductBrand() {
         </div>
         <Card>
           <Table
-            headers={['序号', '品牌LOGO', '品牌名称', '品牌编号', '品牌所属', '主营品类', '商品数量', '联系人', '联系电话', '操作']},
+            headers={['序号', '品牌LOGO', '品牌名称', '品牌编号', '品牌所属', '主营品类', '商品数量', '联系人', '联系电话', '操作']}
             rows={filteredItems.map((b, idx) => [
               <span className="mono">{idx + 1}</span>,
+              <div className="brand-logo-cell" onClick={() => handleRowClick(b.id)} style={{ cursor: 'pointer' }}>
                 {b.logo ? <img src={b.logo} alt={b.name} className="brand-logo-img" /> : <div className="brand-logo-placeholder">{b.name[0]}</div>}
               </div>,
               <span style={{ fontWeight: 'var(--font-medium)', cursor: 'pointer', color: 'var(--color-module-current-base)' }} onClick={() => handleRowClick(b.id)}>{b.name}</span>,
