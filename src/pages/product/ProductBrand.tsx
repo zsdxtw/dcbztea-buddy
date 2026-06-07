@@ -303,8 +303,8 @@ export default function ProductBrand() {
               <span>{b.contactPerson}</span>,
               <span className="mono">{b.contactPhone}</span>,
               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                <Button variant="ghost" size="sm" onClick={() => handleRowClick(b.id)}>详情</Button>
-                <Button variant="ghost" size="sm" style={{ color: 'var(--color-semantic-error)' }}>删除</Button>
+                <Button variant="ghost" size="sm" onClick={() => handleRowClick(b.id)} style={{ color: '#0DAFC6' }}>详情</Button>
+                <Button variant="ghost" size="sm" style={{ color: '#FDF42D' }}>删除</Button>
               </div>,
             ])}
           />
