@@ -48,7 +48,7 @@ export default function ProductManageTea() {
   const [productionFilter, setProductionFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
   const [quickFilter, setQuickFilter] = useState<'' | 'teaware' | 'lowStock'>('');
-  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'sales'>('default');
+  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'sales-asc' | 'sales-desc'>('default');
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,8 +93,10 @@ export default function ProductManageTea() {
       result = [...result].sort((a, b) => a.marketPrice - b.marketPrice);
     } else if (sortBy === 'price-desc') {
       result = [...result].sort((a, b) => b.marketPrice - a.marketPrice);
-    } else if (sortBy === 'sales') {
+    } else if (sortBy === 'sales-desc') {
       result = [...result].sort((a, b) => b.totalSales - a.totalSales);
+    } else if (sortBy === 'sales-asc') {
+      result = [...result].sort((a, b) => a.totalSales - b.totalSales);
     }
     return result;
   }, [keyword, categoryFilter, shelfFilter, purchaseFilter, productionFilter, brandFilter, quickFilter, sortBy, priceMin, priceMax]);
@@ -113,7 +115,7 @@ export default function ProductManageTea() {
   const handleBrandChange = (value: string) => { setBrandFilter(value); setCurrentPage(1); };
   const handleQuickFilter = (value: '' | 'teaware' | 'lowStock') => { setQuickFilter(quickFilter === value ? '' : value); setCurrentPage(1); };
   const handleSearch = (kw: string) => { setKeyword(kw); setCurrentPage(1); };
-  const handleSortChange = (sort: 'default' | 'price-asc' | 'price-desc' | 'sales') => { setSortBy(sort); setCurrentPage(1); };
+  const handleSortChange = (sort: 'default' | 'price-asc' | 'price-desc' | 'sales-asc' | 'sales-desc') => { setSortBy(sort); setCurrentPage(1); };
   const handlePriceMinChange = (v: string) => { setPriceMin(v); setCurrentPage(1); };
   const handlePriceMaxChange = (v: string) => { setPriceMax(v); setCurrentPage(1); };
 
@@ -219,6 +221,16 @@ export default function ProductManageTea() {
               style={{ width: 80, textAlign: 'center' }}
               type="number"
             />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>排序：</span>
+            <button style={filterBtnStyle(sortBy === 'default')} onClick={() => handleSortChange('default')}>默认</button>
+            <button style={filterBtnStyle(sortBy === 'price-desc' || sortBy === 'price-asc')} onClick={() => handleSortChange(sortBy === 'price-desc' ? 'price-asc' : 'price-desc')}>
+              价格{sortBy === 'price-asc' ? ' ↑' : ' ↓'}
+            </button>
+            <button style={filterBtnStyle(sortBy === 'sales-desc' || sortBy === 'sales-asc')} onClick={() => handleSortChange(sortBy === 'sales-desc' ? 'sales-asc' : 'sales-desc')}>
+              销量{sortBy === 'sales-asc' ? ' ↑' : ' ↓'}
+            </button>
             <Button onClick={() => { /* TODO: 新增商品 */ }}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                 <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -231,16 +243,6 @@ export default function ProductManageTea() {
               </svg>
               删除
             </Button>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>排序：</span>
-            <button style={filterBtnStyle(sortBy === 'default')} onClick={() => handleSortChange('default')}>默认</button>
-            <button style={filterBtnStyle(sortBy === 'price-desc' || sortBy === 'price-asc')} onClick={() => handleSortChange(sortBy === 'price-desc' ? 'price-asc' : 'price-desc')}>
-              价格{sortBy === 'price-asc' ? ' ↑' : ' ↓'}
-            </button>
-            <button style={filterBtnStyle(sortBy === 'sales')} onClick={() => handleSortChange('sales')}>
-              销量{sortBy === 'sales' ? ' ↓' : ''}
-            </button>
             <span style={{ marginLeft: 'auto' }}>
               <input
                 className="filter-input"
