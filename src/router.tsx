@@ -38,8 +38,6 @@ import ProductOverview from './pages/product/ProductOverview';
 import ProductList from './pages/product/ProductList';
 import ProductTeaCategory from './pages/product/ProductTeaCategory';
 import ProductTeaList from './pages/product/ProductTeaList';
-import ProductGrade from './pages/product/ProductGrade';
-import ProductSpecs from './pages/product/ProductSpecs';
 import ProductCategoryTea from './pages/product/ProductCategoryTea';
 import ProductCategoryTeaware from './pages/product/ProductCategoryTeaware';
 import ProductCategoryPeripheral from './pages/product/ProductCategoryPeripheral';
@@ -121,8 +119,6 @@ export const router = createBrowserRouter([
       { path: 'product/product-tea-category', element: <ProductTeaCategory /> },
       { path: 'product/product-tea-seven', element: <ProductTeaCategory /> },
       { path: 'product/product-tea-list', element: <ProductTeaList /> },
-      { path: 'product/product-grade', element: <ProductGrade /> },
-      { path: 'product/product-specs', element: <ProductSpecs /> },
       { path: 'product/product-category-tea', element: <ProductCategoryTea /> },
       { path: 'product/product-category-teaware', element: <ProductCategoryTeaware /> },
       { path: 'product/product-category-peripheral', element: <ProductCategoryPeripheral /> },
