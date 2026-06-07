@@ -170,16 +170,20 @@ export default function ProductTeaList() {
               onChange={(e) => handleSearch(e.target.value)}
               style={{ maxWidth: 320 }}
             />
-            <Button onClick={handleOpenAdd}>+ 新增茶种</Button>
+            <Button onClick={handleOpenAdd}><svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>新增</Button>
             {deleteMode ? (
               <>
                 <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
-                <Button onClick={handleConfirmDelete} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D' }}>
+                <Button onClick={handleConfirmDelete} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+                  <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   删除所选({selectedForDelete.size})
                 </Button>
               </>
             ) : (
-              <Button variant="ghost" onClick={handleEnterDeleteMode} style={{ color: '#FD742D' }}>删除</Button>
+              <Button onClick={handleEnterDeleteMode} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+                <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                删除
+              </Button>
             )}
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>
               共 {filtered.length} 个茶种
