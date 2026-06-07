@@ -948,19 +948,19 @@ export default function ProductManageTea() {
                 </div>
                 <div className="drawer-form-field">
                   <label className="drawer-label">系列</label>
-                  {currentBrandSeries.length > 0 ? (
-                    <select
-                      className="detail-input"
-                      value={form.series}
-                      onChange={(e) => setForm({ ...form, series: e.target.value })}
-                    >
-                      <option value="">请选择系列</option>
+                  <input
+                    className="detail-input"
+                    value={form.series}
+                    onChange={(e) => setForm({ ...form, series: e.target.value })}
+                    placeholder={currentBrandSeries.length > 0 ? '选择或输入系列名称' : '请输入系列名称'}
+                    list="series-options"
+                  />
+                  {currentBrandSeries.length > 0 && (
+                    <datalist id="series-options">
                       {currentBrandSeries.map((s) => (
-                        <option key={s} value={s}>{s}</option>
+                        <option key={s} value={s} />
                       ))}
-                    </select>
-                  ) : (
-                    <input className="detail-input" value={form.series} onChange={(e) => setForm({ ...form, series: e.target.value })} placeholder="请输入系列名称" />
+                    </datalist>
                   )}
                 </div>
               </div>

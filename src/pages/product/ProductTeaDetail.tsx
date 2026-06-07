@@ -371,15 +371,20 @@ export default function ProductTeaDetail() {
                   </select>
                 </EditRow>
                 <EditRow label="系列">
-                  {brandSeriesOptions.length > 0 ? (
-                    <select className="detail-input" value={f.series || ''} onChange={(e) => setForm({ ...form, series: e.target.value })} style={selectStyle}>
-                      <option value="">请选择系列</option>
+                  <input
+                    className="detail-input"
+                    value={f.series || ''}
+                    onChange={(e) => setForm({ ...form, series: e.target.value })}
+                    style={inputStyle}
+                    placeholder={brandSeriesOptions.length > 0 ? '选择或输入系列名称' : '请输入系列名称'}
+                    list="edit-series-options"
+                  />
+                  {brandSeriesOptions.length > 0 && (
+                    <datalist id="edit-series-options">
                       {brandSeriesOptions.map((s) => (
-                        <option key={s} value={s}>{s}</option>
+                        <option key={s} value={s} />
                       ))}
-                    </select>
-                  ) : (
-                    <input className="detail-input" value={f.series || ''} onChange={(e) => setForm({ ...form, series: e.target.value })} style={inputStyle} placeholder="请输入系列名称" />
+                    </datalist>
                   )}
                 </EditRow>
                 <EditRow label="品级">
