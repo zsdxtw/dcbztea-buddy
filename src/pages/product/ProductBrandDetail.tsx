@@ -203,11 +203,7 @@ export default function ProductBrandDetail() {
                 <DetailRow label="品牌编号"><span className="mono">{brand.code}</span></DetailRow>
                 <DetailRow label="品牌名称"><span style={{ fontWeight: 'var(--font-medium)' }}>{brand.name}</span></DetailRow>
                 <DetailRow label="品牌所属">{brand.owner}</DetailRow>
-                <DetailRow label="主营品类">
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                    {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
-                  </div>
-                </DetailRow>
+                <DetailRow label="主营品类">{brand.mainCategories.join(' | ')}</DetailRow>
                 <DetailRow label="商标证书" span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     {brand.trademarkCert.map((file, i) => (
