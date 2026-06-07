@@ -35,9 +35,13 @@ import InventoryOutboundRecord from './pages/inventory/InventoryOutboundRecord';
 import InventoryAlertSettings from './pages/inventory/InventoryAlertSettings';
 
 import ProductOverview from './pages/product/ProductOverview';
-import ProductList from './pages/product/ProductList';
 import ProductTeaCategory from './pages/product/ProductTeaCategory';
 import ProductTeaList from './pages/product/ProductTeaList';
+import ProductManageTea from './pages/product/ProductManageTea';
+import ProductManageTeaware from './pages/product/ProductManageTeaware';
+import ProductManagePeripheral from './pages/product/ProductManagePeripheral';
+import ProductManageOther from './pages/product/ProductManageOther';
+import ProductTeaDetail from './pages/product/ProductTeaDetail';
 import ProductCategoryTea from './pages/product/ProductCategoryTea';
 import ProductCategoryTeaware from './pages/product/ProductCategoryTeaware';
 import ProductCategoryPeripheral from './pages/product/ProductCategoryPeripheral';
@@ -115,7 +119,11 @@ export const router = createBrowserRouter([
       /* ── 商品 ── */
       { path: 'product', element: <ProductOverview /> },
       { path: 'product/product-overview', element: <ProductOverview /> },
-      { path: 'product/product-list', element: <ProductList /> },
+      { path: 'product/product-manage-tea', element: <ProductManageTea /> },
+      { path: 'product/product-manage-teaware', element: <ProductManageTeaware /> },
+      { path: 'product/product-manage-peripheral', element: <ProductManagePeripheral /> },
+      { path: 'product/product-manage-other', element: <ProductManageOther /> },
+      { path: 'product/product-tea-detail/:id', element: <ProductTeaDetail /> },
       { path: 'product/product-tea-category', element: <ProductTeaCategory /> },
       { path: 'product/product-tea-seven', element: <ProductTeaCategory /> },
       { path: 'product/product-tea-list', element: <ProductTeaList /> },

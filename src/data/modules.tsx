@@ -246,7 +246,12 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '商品',
     menus: [
       { key: 'product-overview', label: '商品概览', icon: <OverviewIcon /> },
-      { key: 'product-list', label: '商品列表', icon: <ProductListIcon /> },
+      { key: 'product-manage', label: '商品管理', icon: <ProductListIcon />, children: [
+        { key: 'product-manage-tea', label: '茶叶', icon: <ProductListIcon /> },
+        { key: 'product-manage-teaware', label: '茶具', icon: <ProductListIcon /> },
+        { key: 'product-manage-peripheral', label: '茶周边', icon: <ProductListIcon /> },
+        { key: 'product-manage-other', label: '其他', icon: <ProductListIcon /> },
+      ] },
       { key: 'product-tea-category', label: '茶类档案', icon: <CategoryIcon />, children: [
         { key: 'product-tea-seven', label: '六大茶类', icon: <CategoryIcon /> },
         { key: 'product-tea-list', label: '茶种大全', icon: <CategoryIcon /> },

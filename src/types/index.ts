@@ -346,3 +346,37 @@ export interface BrandItem {
   website: string;
   cooperationDate: string;
 }
+
+/** 茶叶商品 */
+export interface TeaProduct {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+  brand: string;
+  series: string;
+  packageUnit: string;
+  barcode69: string;
+  model: string;
+  spec: string;
+  weight: number;
+  volume: { length: number; width: number; height: number };
+  quantityPerUnit: number;
+  grade: string;
+  origin: string;
+  shelfLife: number;
+  taxRate: number;
+  packageList: string;
+  marketPrice: number;
+  tmallPrice: number;
+  tmallUrl: string;
+  jdPrice: number;
+  jdUrl: string;
+  shelfStatus: 'on' | 'off';
+  purchaseStatus: 'available' | 'stopped';
+  productionStatus: 'producing' | 'stopped';
+  mainImages: string[];
+  detailImages: string[];
+  stockAlert: number;
+  remark: string;
+}
