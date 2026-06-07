@@ -669,3 +669,21 @@ tbody tr:last-child td { border-bottom: none; }
 @media (max-width: 1023px) {
   .category-layout { grid-template-columns: 1fr; }
 }
+
+/* ── 抽屉面板 ── */
+.drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1000; display: flex; justify-content: flex-end; animation: fadeIn 0.2s ease; }
+.drawer-panel { background: var(--color-neutral-0); width: 520px; max-width: 90vw; height: 100vh; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,0.1); animation: slideInRight 0.25s ease; }
+.drawer-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--color-neutral-200); flex-shrink: 0; }
+.drawer-title { font-size: var(--text-lg); font-weight: var(--font-semibold); color: var(--color-neutral-800); }
+.drawer-close { background: none; border: none; cursor: pointer; color: var(--color-neutral-400); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); transition: var(--transition-fast); }
+.drawer-close:hover { background: var(--color-neutral-100); color: var(--color-neutral-600); }
+.drawer-close svg { width: 16px; height: 16px; }
+.drawer-body { flex: 1; overflow-y: auto; padding: var(--space-6); }
+.drawer-footer { display: flex; justify-content: flex-end; gap: var(--space-3); padding: var(--space-4) var(--space-6); border-top: 1px solid var(--color-neutral-200); flex-shrink: 0; }
+.drawer-section-title { font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--color-neutral-700); margin: var(--space-5) 0 var(--space-3); padding-bottom: var(--space-2); border-bottom: 1px solid var(--color-neutral-100); }
+.drawer-section-title:first-child { margin-top: 0; }
+.drawer-label { display: block; font-size: var(--text-sm); font-weight: var(--font-medium); color: var(--color-neutral-600); margin-bottom: var(--space-1); }
+.drawer-form-row { display: flex; gap: var(--space-4); margin-bottom: var(--space-4); }
+.drawer-form-field { flex: 1; min-width: 0; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }

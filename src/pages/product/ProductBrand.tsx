@@ -250,11 +250,23 @@ const brandItems: BrandItem[] = [
   },
 ];
 
+/** 新增品牌表单初始值 */
+const emptyForm = {
+  name: '', owner: '', introduction: '', requirements: '', policy: '',
+  mainCategories: [] as string[], series: [] as string[],
+  jdStoreUrl: '', tmallStoreUrl: '', website: '',
+  contactPerson: '', contactPhone: '', address: '',
+};
+
 export default function ProductBrand() {
   const navigate = useNavigate();
   const [filterKeyword, setFilterKeyword] = useState('');
   const [filterCategory, setFilterCategory] = useState('主营品类');
   const [rankPeriod, setRankPeriod] = useState<RankPeriod>('month');
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [form, setForm] = useState({ ...emptyForm });
+  const [newSeries, setNewSeries] = useState('');
+  const [showSeriesInput, setShowSeriesInput] = useState(false);
 
   const filteredItems = brandItems.filter((b) => {
     if (filterKeyword && !b.name.includes(filterKeyword) && !b.code.toLowerCase().includes(filterKeyword.toLowerCase()) && !b.owner.includes(filterKeyword)) return false;
@@ -265,6 +277,46 @@ export default function ProductBrand() {
   const handleRowClick = (id: string) => {
     navigate(`/product/product-brand/${id}`);
   };
+
+  const handleOpenDrawer = () => {
+    setForm({ ...emptyForm });
+    setNewSeries('');
+    setShowSeriesInput(false);
+    setShowDrawer(true);
+  };
+
+  const handleCloseDrawer = () => {
+    setShowDrawer(false);
+  };
+
+  const handleToggleCategory = (cat: string) => {
+    setForm((prev) => ({
+      ...prev,
+      mainCategories: prev.mainCategories.includes(cat)
+        ? prev.mainCategories.filter((c) => c !== cat)
+        : [...prev.mainCategories, cat],
+    }));
+  };
+
+  const handleAddSeries = () => {
+    if (newSeries.trim()) {
+      setForm((prev) => ({ ...prev, series: [...prev.series, newSeries.trim()] }));
+      setNewSeries('');
+      setShowSeriesInput(false);
+    }
+  };
+
+  const handleRemoveSeries = (idx: number) => {
+    setForm((prev) => ({ ...prev, series: prev.series.filter((_, i) => i !== idx) }));
+  };
+
+  const handleSubmit = () => {
+    // 模拟提交
+    setShowDrawer(false);
+  };
+
+  /** 生成下一个品牌编号 */
+  const nextCode = String(brandItems.length + 1).padStart(3, '0');
 
   return (
     <>
@@ -293,7 +345,7 @@ export default function ProductBrand() {
               {SECOND_LEVEL_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </select>
           </FilterBar>
-          <Button><PlusIcon />新增品牌</Button>
+          <Button onClick={handleOpenDrawer}><PlusIcon />新增品牌</Button>
         </div>
         <Card>
           <Table
@@ -323,6 +375,157 @@ export default function ProductBrand() {
           />
         </Card>
       </div>
+
+      {/* 右侧滑出抽屉 - 新增品牌 */}
+      {showDrawer && (
+        <div className="drawer-overlay" onClick={handleCloseDrawer}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-header">
+              <span className="drawer-title">新增品牌</span>
+              <button className="drawer-close" onClick={handleCloseDrawer}>
+                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              {/* LOGO 上传 */}
+              <div style={{ marginBottom: 'var(--space-5)' }}>
+                <label className="drawer-label">品牌LOGO</label>
+                <div style={{ width: 75, height: 75, border: '2px dashed var(--color-neutral-300)', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--color-neutral-400)', fontSize: 'var(--text-xs)', gap: '2px', transition: 'var(--transition-fast)' }}>
+                  <svg viewBox="0 0 20 20" fill="none" style={{ width: 20, height: 20 }}><path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  上传LOGO
+                  <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" style={{ display: 'none' }} />
+                </div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginTop: '4px' }}>正方形，最大500×500像素</div>
+              </div>
+
+              {/* 基本信息 */}
+              <div className="drawer-section-title">基本信息</div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">品牌编号</label>
+                  <input className="detail-input" value={nextCode} readOnly style={{ background: 'var(--color-neutral-100)', color: 'var(--color-neutral-500)' }} />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">品牌名称 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <input className="detail-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="请输入品牌名称" />
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">品牌所属 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <input className="detail-input" value={form.owner} onChange={(e) => setForm({ ...form, owner: e.target.value })} placeholder="请输入所属公司" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">主营品类</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginTop: '4px' }}>
+                    {SECOND_LEVEL_CATEGORIES.map((cat) => (
+                      <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
+                        <input type="checkbox" checked={form.mainCategories.includes(cat)} onChange={() => handleToggleCategory(cat)} />
+                        {cat}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">品牌介绍</label>
+                  <textarea className="detail-textarea" value={form.introduction} onChange={(e) => setForm({ ...form, introduction: e.target.value })} placeholder="请输入品牌介绍" rows={3} />
+                </div>
+              </div>
+
+              {/* 联系信息 */}
+              <div className="drawer-section-title">联系信息</div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">联系人</label>
+                  <input className="detail-input" value={form.contactPerson} onChange={(e) => setForm({ ...form, contactPerson: e.target.value })} placeholder="请输入联系人" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">联系电话</label>
+                  <input className="detail-input" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="请输入联系电话" />
+                </div>
+              </div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">地址</label>
+                  <input className="detail-input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="请输入地址" />
+                </div>
+              </div>
+
+              {/* 网络地址 */}
+              <div className="drawer-section-title">网络地址</div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">品牌官网</label>
+                  <input className="detail-input" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} placeholder="https://" />
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">京东店地址</label>
+                  <input className="detail-input" value={form.jdStoreUrl} onChange={(e) => setForm({ ...form, jdStoreUrl: e.target.value })} placeholder="https://" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">天猫店地址</label>
+                  <input className="detail-input" value={form.tmallStoreUrl} onChange={(e) => setForm({ ...form, tmallStoreUrl: e.target.value })} placeholder="https://" />
+                </div>
+              </div>
+
+              {/* 品牌政策与要求 */}
+              <div className="drawer-section-title">品牌政策与要求</div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">品牌要求</label>
+                  <textarea className="detail-textarea" value={form.requirements} onChange={(e) => setForm({ ...form, requirements: e.target.value })} placeholder="请输入品牌要求" rows={2} />
+                </div>
+              </div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">品牌政策</label>
+                  <textarea className="detail-textarea" value={form.policy} onChange={(e) => setForm({ ...form, policy: e.target.value })} placeholder="请输入品牌政策" rows={2} />
+                </div>
+              </div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">品牌系列</label>
+                  <div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                      {form.series.map((s, i) => (
+                        <span key={i} className="brand-series-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          {s}
+                          <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-neutral-400)', fontSize: 'var(--text-xs)', padding: 0, lineHeight: 1 }} onClick={() => handleRemoveSeries(i)}>✕</button>
+                        </span>
+                      ))}
+                    </div>
+                    {showSeriesInput ? (
+                      <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                        <input className="detail-input" value={newSeries} onChange={(e) => setNewSeries(e.target.value)} placeholder="输入系列名称" style={{ flex: 1 }} onKeyDown={(e) => { if (e.key === 'Enter') handleAddSeries(); }} />
+                        <Button variant="ghost" size="sm" onClick={() => { setShowSeriesInput(false); setNewSeries(''); }} style={{ color: 'var(--color-neutral-400)' }}>取消</Button>
+                        <Button size="sm" onClick={handleAddSeries}>确认</Button>
+                      </div>
+                    ) : (
+                      <Button variant="ghost" size="sm" onClick={() => setShowSeriesInput(true)}>+ 添加系列</Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 商标证书 */}
+              <div className="drawer-section-title">商标证书</div>
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <Button variant="ghost" size="sm">+ 上传文件</Button>
+                </div>
+              </div>
+            </div>
+            <div className="drawer-footer">
+              <Button variant="ghost" onClick={handleCloseDrawer}>取消</Button>
+              <Button onClick={handleSubmit}>确认新增</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
