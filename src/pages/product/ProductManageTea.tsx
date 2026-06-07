@@ -176,6 +176,7 @@ export default function ProductManageTea() {
             <button style={filterBtnStyle(quickFilter === 'lowStock')} onClick={() => handleQuickFilter('lowStock')}>库存紧张</button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>条件：</span>
             <select
               value={shelfFilter}
               onChange={(e) => handleShelfChange(e.target.value)}
@@ -209,7 +210,7 @@ export default function ProductManageTea() {
               placeholder="最低价"
               value={priceMin}
               onChange={(e) => handlePriceMinChange(e.target.value)}
-              style={{ width: 80, textAlign: 'center' }}
+              style={{ width: 40, textAlign: 'center' }}
               type="number"
             />
             <span style={{ color: 'var(--color-neutral-400)' }}>—</span>
@@ -217,8 +218,12 @@ export default function ProductManageTea() {
               className="filter-input"
               placeholder="最高价"
               value={priceMax}
-              onChange={(e) => handlePriceMaxChange(e.target.value)}
-              style={{ width: 80, textAlign: 'center' }}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v && priceMin && Number(v) < Number(priceMin)) return;
+                handlePriceMaxChange(v);
+              }}
+              style={{ width: 40, textAlign: 'center' }}
               type="number"
             />
           </div>
@@ -226,10 +231,10 @@ export default function ProductManageTea() {
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>排序：</span>
             <button style={filterBtnStyle(sortBy === 'default')} onClick={() => handleSortChange('default')}>默认</button>
             <button style={filterBtnStyle(sortBy === 'price-desc' || sortBy === 'price-asc')} onClick={() => handleSortChange(sortBy === 'price-desc' ? 'price-asc' : 'price-desc')}>
-              价格{sortBy === 'price-asc' ? ' ↑' : ' ↓'}
+              价格{(sortBy === 'price-asc' || sortBy === 'price-desc') ? (sortBy === 'price-asc' ? ' ↑' : ' ↓') : ''}
             </button>
             <button style={filterBtnStyle(sortBy === 'sales-desc' || sortBy === 'sales-asc')} onClick={() => handleSortChange(sortBy === 'sales-desc' ? 'sales-asc' : 'sales-desc')}>
-              销量{sortBy === 'sales-asc' ? ' ↑' : ' ↓'}
+              销量{(sortBy === 'sales-asc' || sortBy === 'sales-desc') ? (sortBy === 'sales-asc' ? ' ↑' : ' ↓') : ''}
             </button>
             <Button onClick={() => { /* TODO: 新增商品 */ }}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
