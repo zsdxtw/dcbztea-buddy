@@ -209,11 +209,9 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
         <div className="category-layout">
           {/* 左侧分类树 - 直接展示二级分类 */}
           <Card title={`${label}分类`} className="category-tree-card" headerRight={
-            depth < 2 ? (
-              <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedId, depth)}>
-                <PlusIcon /> 添加子分类
-              </Button>
-            ) : undefined
+            <Button variant="ghost" size="sm" onClick={() => handleAddChild(categories.id, 0)}>
+              <PlusIcon /> 添加子分类
+            </Button>
           }>
             <div className="category-tree">
               {categories.children?.map((child) => renderTreeNode(child, 0))}
