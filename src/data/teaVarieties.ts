@@ -9,6 +9,13 @@ export interface TeaVariety {
   characteristics: string; // 特点
   brands: string[];       // 代表品牌
   popularity: number;     // 知名度 1-100，越高越知名
+  image?: string;         // 茶种图片URL，为空时根据名称自动生成
+}
+
+/** 根据茶种名称生成默认图片URL */
+export function getTeaImageUrl(name: string): string {
+  const prompt = encodeURIComponent(`${name}茶叶 干茶特写 中国名茶 高清摄影`);
+  return `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${prompt}&image_size=square`;
 }
 
 export const teaVarieties: TeaVariety[] = [

@@ -3,7 +3,7 @@ import ContentHeader from '../../components/layout/ContentHeader';
 import Card from '../../components/common/Card';
 import Tag from '../../components/common/Tag';
 import Button from '../../components/common/Button';
-import { teaVarieties as initialData } from '../../data/teaVarieties';
+import { teaVarieties as initialData, getTeaImageUrl } from '../../data/teaVarieties';
 import { getTeaCategoryLabel } from '../../data/teaCategories';
 import { TeaCategory } from '../../types';
 import type { TeaVariety } from '../../data/teaVarieties';
@@ -20,7 +20,7 @@ const ALL_PROVINCES = [
 
 const emptyForm = {
   name: '', category: TeaCategory.GREEN, origin: [] as string[], originDetail: '',
-  introduction: '', characteristics: '', brands: [] as string[],
+  introduction: '', characteristics: '', brands: [] as string[], image: '',
 };
 
 /** 茶种大全页面 */
@@ -83,7 +83,7 @@ export default function ProductTeaList() {
     const tea = filtered[idx];
     const globalIdx = teas.indexOf(tea);
     setDrawerMode('edit');
-    setForm({ ...tea, origin: [tea.origin], brands: [...tea.brands] });
+    setForm({ ...tea, origin: [tea.origin], brands: [...tea.brands], image: tea.image || '' });
     setEditIndex(globalIdx);
     setShowDrawer(true);
   };
@@ -91,7 +91,7 @@ export default function ProductTeaList() {
   // 保存
   const handleSave = () => {
     if (!form.name.trim()) return;
-    const data: TeaVariety = { ...form, origin: form.origin[0] || '', brands: form.brands.filter(Boolean), popularity: 50 };
+    const data: TeaVariety = { ...form, origin: form.origin[0] || '', brands: form.brands.filter(Boolean), popularity: 50, image: form.image || undefined };
     if (drawerMode === 'add') {
       setTeas((prev) => [...prev, data]);
     } else if (editIndex !== null) {
@@ -228,6 +228,15 @@ export default function ProductTeaList() {
                   </div>
                 )}
                 <Card style={isSelected ? { outline: '2px solid #FD742D', borderRadius: 'var(--radius-lg)' } : undefined}>
+                  {/* 茶种图片 */}
+                  <div style={{ width: '100%', aspectRatio: '1 / 1', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: 'var(--space-3)', background: 'var(--color-neutral-100)', position: 'relative' }}>
+                    <img
+                      src={tea.image || getTeaImageUrl(tea.name)}
+                      alt={tea.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(tea.name.charAt(0) + ' 茶字 书法 水墨')}&image_size=square`; }}
+                    />
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
                     <span style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', lineHeight: 1.3 }}>{tea.name}</span>
                     <Tag category={tea.category} />
@@ -315,6 +324,51 @@ export default function ProductTeaList() {
               </button>
             </div>
             <div className="drawer-body">
+              {/* 茶种图片 */}
+              <div className="drawer-form-row" style={{ flexDirection: 'column', alignItems: 'center' }}>
+                <div className="drawer-form-field" style={{ width: 'auto', alignItems: 'center' }}>
+                  <label className="drawer-label" style={{ textAlign: 'center' }}>茶种图片</label>
+                  <div style={{ position: 'relative', width: 160, height: 160, borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--color-neutral-100)', border: '1px dashed var(--color-neutral-300)', cursor: 'pointer' }}
+                    onClick={() => { const input = document.getElementById('tea-image-upload') as HTMLInputElement; if (input) input.click(); }}
+                  >
+                    <img
+                      src={form.image || getTeaImageUrl(form.name || '茶')}
+                      alt="茶种图片"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent((form.name || '茶').charAt(0) + ' 茶字 书法 水墨')}&image_size=square`; }}
+                    />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.5)', color: 'white', textAlign: 'center', padding: '4px 0', fontSize: 'var(--text-xs)' }}>
+                      点击修改图片
+                    </div>
+                    <input
+                      id="tea-image-upload"
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        // 校验图片尺寸不超过500x500
+                        const img = new Image();
+                        const url = URL.createObjectURL(file);
+                        img.onload = () => {
+                          if (img.width > 500 || img.height > 500) {
+                            alert('图片尺寸不能超过500×500像素，请重新选择');
+                            URL.revokeObjectURL(url);
+                            return;
+                          }
+                          setForm({ ...form, image: url });
+                          URL.revokeObjectURL(url);
+                        };
+                        img.src = url;
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', textAlign: 'center', marginTop: '4px' }}>
+                    正方形图片，最大500×500像素
+                  </div>
+                </div>
+              </div>
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
                   <label className="drawer-label">茶种名称 <span style={{ color: '#FD742D' }}>*</span></label>
