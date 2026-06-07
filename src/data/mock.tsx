@@ -192,6 +192,7 @@ export const lineChartData = {
     { name: '青茶', color: 'var(--color-tea-oolong)', data: [165, 155, 148, 138, 132, 125, 115] },
     { name: '黑茶', color: 'var(--color-tea-dark)', data: [180, 175, 168, 162, 155, 148, 140] },
     { name: '黄茶', color: 'var(--color-tea-yellow)', data: [175, 168, 162, 158, 150, 142, 135] },
+    { name: '花草茶', color: 'var(--color-tea-flower)', data: [95, 88, 105, 115, 98, 85, 78] },
   ],
 };
 
@@ -330,15 +331,8 @@ export const gradeItems: GradeItem[] = [
   { id: '5', name: '等外', applicableCategories: [TeaCategory.DARK], pricingFactor: 0.4, sensoryStandard: '外形粗松/汤色暗淡/香气低弱/滋味粗涩/叶底粗硬', productCount: 5, active: false },
 ];
 
-/* ── 茶类详情数据 ── */
-export const teaCategoryDetails: TeaCategoryDetail[] = [
-  { category: TeaCategory.GREEN, process: '不发酵，杀青→揉捻→干燥', storage: '冷藏0-5°C，避光防潮', flavor: '清汤绿叶，鲜爽甘醇', subCategories: ['炒青绿茶', '烘青绿茶', '晒青绿茶', '蒸青绿茶'], productCount: 42 },
-  { category: TeaCategory.WHITE, process: '微发酵，萎凋→干燥', storage: '常温避光干燥，可长期陈化', flavor: '汤色杏黄，毫香蜜韵', subCategories: ['白毫银针', '白牡丹', '贡眉', '寿眉'], productCount: 18 },
-  { category: TeaCategory.YELLOW, process: '轻发酵，杀青→揉捻→闷黄→干燥', storage: '冷藏密封，避光防潮', flavor: '黄汤黄叶，甜香持久', subCategories: ['黄芽茶', '黄小茶', '黄大茶'], productCount: 8 },
-  { category: TeaCategory.OOLONG, process: '半发酵，做青→炒青→揉捻→烘焙', storage: '常温密封避光，防潮防异味', flavor: '绿叶红镶边，花香果韵', subCategories: ['闽北乌龙', '闽南乌龙', '广东乌龙', '台湾乌龙'], productCount: 35 },
-  { category: TeaCategory.RED, process: '全发酵，萎凋→揉捻→发酵→干燥', storage: '常温密封避光，防潮', flavor: '红汤红叶，醇厚甜香', subCategories: ['小种红茶', '工夫红茶', '红碎茶'], productCount: 26 },
-  { category: TeaCategory.DARK, process: '后发酵，杀青→揉捻→渥堆→干燥', storage: '常温通风干燥，可长期陈化', flavor: '汤色红浓，陈香醇厚', subCategories: ['湖南黑茶', '四川边茶', '云南普洱', '广西六堡茶'], productCount: 22 },
-];
+/* ── 茶类详情数据（从 teaCategories 共享数据源导入） ── */
+export { teaCategories as teaCategoryDetails } from './teaCategories';
 
 /* ── 茶类分析饼图数据 ── */
 export const teaCategoryPieData = [
@@ -348,6 +342,7 @@ export const teaCategoryPieData = [
   { name: '白茶', value: 12, color: 'var(--color-tea-white)' },
   { name: '黑茶', value: 11, color: 'var(--color-tea-dark)' },
   { name: '黄茶', value: 7, color: 'var(--color-tea-yellow)' },
+  { name: '花草茶', value: 8, color: 'var(--color-tea-flower)' },
 ];
 
 /* ── 茶类分析折线图数据 ── */
@@ -356,5 +351,6 @@ export const teaCategoryLineData = {
   series: [
     { name: '绿茶', color: 'var(--color-tea-green)', data: [85, 72, 130, 145, 98, 65, 55, 60, 88, 95, 78, 90] },
     { name: '红茶', color: 'var(--color-tea-red)', data: [65, 58, 70, 85, 92, 78, 72, 68, 95, 110, 88, 82] },
+    { name: '花草茶', color: 'var(--color-tea-flower)', data: [45, 38, 52, 60, 72, 55, 48, 42, 58, 65, 50, 55] },
   ],
 };

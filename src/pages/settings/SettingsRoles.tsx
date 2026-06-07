@@ -15,7 +15,7 @@ export default function SettingsRoles() {
 
   return (
     <>
-      <ContentHeader title="角色权限" breadcrumbs={['设置', '角色权限']} actions={<Button><PlusIcon />新增角色</Button>} />
+      <ContentHeader title="角色权限" breadcrumbs={['系统', '角色权限']} actions={<Button><PlusIcon />新增角色</Button>} />
       <div className="content-body">
         <Card>
           <Table

@@ -45,7 +45,7 @@ function backupStatusLabel(status: string) {
 export default function SettingsDataBackup() {
   return (
     <>
-      <ContentHeader title="数据备份" breadcrumbs={['设置', '数据备份']} actions={<><Button variant="ghost">备份设置</Button><Button><PlusIcon />立即备份</Button></>} />
+      <ContentHeader title="数据备份" breadcrumbs={['系统', '数据备份']} actions={<><Button variant="ghost">备份设置</Button><Button><PlusIcon />立即备份</Button></>} />
       <div className="content-body">
         <div className="stat-cards">
           {stats.map((s, i) => <StatCard key={i} data={s} />)}
@@ -61,7 +61,7 @@ export default function SettingsDataBackup() {
               <StatusTag variant={backupStatusToVariant(b.status)} label={backupStatusLabel(b.status)} />,
               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                 <Button variant="ghost" size="sm">恢复</Button>
-                <Button variant="ghost" size="sm" style={{ color: 'var(--color-semantic-error)' }}>删除</Button>
+                <Button variant="ghost" size="sm" style={{ color: '#FD742D' }}>删除</Button>
               </div>,
             ])}
           />

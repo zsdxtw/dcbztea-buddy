@@ -18,6 +18,7 @@ export enum TeaCategory {
   OOLONG = 'oolong',
   RED = 'red',
   DARK = 'dark',
+  FLOWER = 'flower',
 }
 
 /** 订单状态 */
@@ -41,6 +42,7 @@ export interface MenuItem {
   key: string;
   label: string;
   icon: React.ReactNode;
+  children?: MenuItem[];
 }
 
 /** 模块配置 */
@@ -215,10 +217,11 @@ export interface GradeItem {
 /** 茶类详情 */
 export interface TeaCategoryDetail {
   category: TeaCategory;
+  introduction: string;
   process: string;
   storage: string;
   flavor: string;
-  subCategories: string[];
+  representativeTeas: string[];
   productCount: number;
 }
 
@@ -304,4 +307,42 @@ export enum UserStatus {
 export enum BackupStatus {
   SUCCESS = 'success',
   FAILED = 'failed',
+}
+
+/** 品牌等级 */
+export enum BrandLevel {
+  S = 'S',
+  A = 'A',
+  B = 'B',
+  C = 'C',
+}
+
+/** 品牌状态 */
+export enum BrandStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
+
+/** 品牌项 */
+export interface BrandItem {
+  id: string;
+  code: string;
+  name: string;
+  logo: string;
+  owner: string;
+  introduction: string;
+  requirements: string;
+  policy: string;
+  series: string[];
+  trademarkCert: string[];
+  jdStoreUrl: string;
+  tmallStoreUrl: string;
+  contactPerson: string;
+  contactPhone: string;
+  address: string;
+  mainCategories: string[];
+  productCount: number;
+  supplierCount: number;
+  website: string;
+  cooperationDate: string;
 }

@@ -247,10 +247,13 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     menus: [
       { key: 'product-overview', label: '商品概览', icon: <OverviewIcon /> },
       { key: 'product-list', label: '商品列表', icon: <ProductListIcon /> },
-      { key: 'product-tea-category', label: '茶类管理', icon: <CategoryIcon /> },
+      { key: 'product-tea-category', label: '茶类档案', icon: <CategoryIcon />, children: [
+        { key: 'product-tea-seven', label: '六大茶类', icon: <CategoryIcon /> },
+        { key: 'product-tea-list', label: '茶种大全', icon: <CategoryIcon /> },
+      ] },
       { key: 'product-grade', label: '品级管理', icon: <GradeIcon /> },
       { key: 'product-specs', label: '规格管理', icon: <SpecsIcon /> },
-      { key: 'product-category', label: '商品分类', icon: <ProductCategoryIcon /> },
+      { key: 'product-category', label: '分类管理', icon: <ProductCategoryIcon /> },
       { key: 'product-brand', label: '品牌管理', icon: <BrandIcon /> },
       { key: 'product-unit', label: '单位管理', icon: <UnitIcon /> },
     ],
@@ -284,7 +287,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
   },
   [ModuleKey.SETTINGS]: {
     key: ModuleKey.SETTINGS,
-    label: '设置',
+    label: '系统',
     menus: [
       { key: 'settings-system', label: '系统设置', icon: <SystemSettingsIcon /> },
       { key: 'settings-roles', label: '角色权限', icon: <RolesIcon /> },
@@ -310,5 +313,5 @@ export const TOPNAV_TABS: Array<{ key: ModuleKey; label: string; icon: React.Rea
   { key: ModuleKey.PRODUCT, label: '商品', icon: <ProductTabIcon /> },
   { key: ModuleKey.FINANCE, label: '财务', icon: <FinanceTabIcon /> },
   { key: ModuleKey.STATISTICS, label: '统计', icon: <StatisticsTabIcon /> },
-  { key: ModuleKey.SETTINGS, label: '设置', icon: <SettingsTabIcon /> },
+  { key: ModuleKey.SETTINGS, label: '系统', icon: <SettingsTabIcon /> },
 ];

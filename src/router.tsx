@@ -37,10 +37,12 @@ import InventoryAlertSettings from './pages/inventory/InventoryAlertSettings';
 import ProductOverview from './pages/product/ProductOverview';
 import ProductList from './pages/product/ProductList';
 import ProductTeaCategory from './pages/product/ProductTeaCategory';
+import ProductTeaList from './pages/product/ProductTeaList';
 import ProductGrade from './pages/product/ProductGrade';
 import ProductSpecs from './pages/product/ProductSpecs';
 import ProductCategory from './pages/product/ProductCategory';
 import ProductBrand from './pages/product/ProductBrand';
+import ProductBrandDetail from './pages/product/ProductBrandDetail';
 import ProductUnit from './pages/product/ProductUnit';
 
 import FinanceOverview from './pages/finance/FinanceOverview';
@@ -114,10 +116,13 @@ export const router = createBrowserRouter([
       { path: 'product/product-overview', element: <ProductOverview /> },
       { path: 'product/product-list', element: <ProductList /> },
       { path: 'product/product-tea-category', element: <ProductTeaCategory /> },
+      { path: 'product/product-tea-seven', element: <ProductTeaCategory /> },
+      { path: 'product/product-tea-list', element: <ProductTeaList /> },
       { path: 'product/product-grade', element: <ProductGrade /> },
       { path: 'product/product-specs', element: <ProductSpecs /> },
       { path: 'product/product-category', element: <ProductCategory /> },
       { path: 'product/product-brand', element: <ProductBrand /> },
+      { path: 'product/product-brand/:id', element: <ProductBrandDetail /> },
       { path: 'product/product-unit', element: <ProductUnit /> },
       /* ── 财务 ── */
       { path: 'finance', element: <FinanceOverview /> },
@@ -138,7 +143,7 @@ export const router = createBrowserRouter([
       { path: 'statistics/statistics-finance', element: <StatisticsFinance /> },
       { path: 'statistics/statistics-tea-category', element: <StatisticsTeaCategory /> },
       { path: 'statistics/statistics-year-on-year', element: <StatisticsYearOnYear /> },
-      /* ── 设置 ── */
+      /* ── 系统 ── */
       { path: 'settings', element: <SettingsSystem /> },
       { path: 'settings/settings-system', element: <SettingsSystem /> },
       { path: 'settings/settings-roles', element: <SettingsRoles /> },

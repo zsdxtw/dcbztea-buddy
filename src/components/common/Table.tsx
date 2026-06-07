@@ -1,19 +1,70 @@
-import type { ReactNode } from 'react';
+import { useState, useCallback, useRef, useEffect, type ReactNode } from 'react';
 
 interface TableProps {
   headers: ReactNode[];
   rows: ReactNode[][];
 }
 
-/** 表格组件 */
+/** 可调整列宽的表格组件 */
 export default function Table({ headers, rows }: TableProps) {
+  const [colWidths, setColWidths] = useState<number[]>([]);
+  const tableRef = useRef<HTMLTableElement>(null);
+  const dragging = useRef<{ colIndex: number; startX: number; startWidth: number } | null>(null);
+
+  // 初始化列宽
+  useEffect(() => {
+    if (colWidths.length === 0 && tableRef.current) {
+      const ths = tableRef.current.querySelectorAll('th');
+      const widths = Array.from(ths).map((th) => th.offsetWidth);
+      setColWidths(widths);
+    }
+  }, [headers]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent, colIndex: number) => {
+    e.preventDefault();
+    const th = (e.target as HTMLElement).parentElement;
+    if (!th) return;
+    dragging.current = { colIndex, startX: e.clientX, startWidth: th.offsetWidth };
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!dragging.current) return;
+      const diff = moveEvent.clientX - dragging.current.startX;
+      setColWidths((prev) => {
+        const next = [...prev];
+        next[dragging.current!.colIndex] = Math.max(40, dragging.current!.startWidth + diff);
+        return next;
+      });
+    };
+    const handleMouseUp = () => {
+      dragging.current = null;
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, []);
+
   return (
     <div className="table-wrapper">
-      <table>
+      <table ref={tableRef}>
         <thead>
           <tr>
             {headers.map((h, i) => (
-              <th key={i}>{h}</th>
+              <th key={i} style={colWidths[i] ? { width: colWidths[i], minWidth: colWidths[i] } : undefined}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>{h}</span>
+                  <div
+                    onMouseDown={(e) => handleMouseDown(e, i)}
+                    style={{
+                      width: 6,
+                      height: 20,
+                      cursor: 'col-resize',
+                      flexShrink: 0,
+                      position: 'relative',
+                      right: -3,
+                    }}
+                  />
+                </div>
+              </th>
             ))}
           </tr>
         </thead>
@@ -21,7 +72,7 @@ export default function Table({ headers, rows }: TableProps) {
           {rows.map((row, ri) => (
             <tr key={ri}>
               {row.map((cell, ci) => (
-                <td key={ci}>{cell}</td>
+                <td key={ci} style={colWidths[ci] ? { width: colWidths[ci], minWidth: colWidths[ci] } : undefined}>{cell}</td>
               ))}
             </tr>
           ))}

@@ -14,7 +14,7 @@ export default function SettingsLogs() {
 
   return (
     <>
-      <ContentHeader title="操作日志" breadcrumbs={['设置', '操作日志']} />
+      <ContentHeader title="操作日志" breadcrumbs={['系统', '操作日志']} />
       <div className="content-body">
         <Card>
           <Table
