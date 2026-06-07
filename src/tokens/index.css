@@ -609,11 +609,11 @@ tbody tr:last-child td { border-bottom: none; }
 .rank-chart { display: flex; flex-direction: column; gap: var(--space-3); }
 .rank-chart-row { display: flex; align-items: center; gap: var(--space-3); }
 .rank-chart-rank { width: 20px; height: 20px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: var(--text-xs); font-weight: var(--font-semibold); flex-shrink: 0; color: var(--color-neutral-0); }
-.rank-chart-row:nth-child(1) .rank-chart-rank { background: #CB405D; }
-.rank-chart-row:nth-child(2) .rank-chart-rank { background: #F18F4D; }
-.rank-chart-row:nth-child(3) .rank-chart-rank { background: #0DAFC6; }
-.rank-chart-row:nth-child(4) .rank-chart-rank { background: #27254B; }
-.rank-chart-row:nth-child(5) .rank-chart-rank { background: #5F4027; }
+.rank-chart-row:nth-child(1) .rank-chart-rank { background: #CB405D !important; }
+.rank-chart-row:nth-child(2) .rank-chart-rank { background: #F18F4D !important; }
+.rank-chart-row:nth-child(3) .rank-chart-rank { background: #0DAFC6 !important; }
+.rank-chart-row:nth-child(4) .rank-chart-rank { background: #27254B !important; }
+.rank-chart-row:nth-child(5) .rank-chart-rank { background: #5F4027 !important; }
 .rank-chart-name { width: 56px; flex-shrink: 0; font-size: var(--text-sm); color: var(--color-neutral-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rank-chart-bar-wrap { flex: 1; height: 18px; background: var(--color-neutral-100); border-radius: var(--radius-full); overflow: hidden; }
 .rank-chart-bar { height: 100%; border-radius: var(--radius-full); transition: width var(--duration-normal) var(--ease-default); min-width: 4px; }
