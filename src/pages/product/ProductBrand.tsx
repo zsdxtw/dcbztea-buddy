@@ -285,7 +285,7 @@ export default function ProductBrand() {
         </div>
         <Card>
           <Table
-            headers={['品牌LOGO', '品牌名称', '品牌编号', '品牌所属', '主营品类', '商品数量', '供应商数量', '联系电话', '操作']}
+            headers={['品牌LOGO', '品牌名称', '品牌编号', '品牌所属', '主营品类', '商品数量', '供应商数量', '联系人', '联系电话', '操作']}
             rows={filteredItems.map((b) => [
               <div className="brand-logo-cell" onClick={() => handleRowClick(b.id)} style={{ cursor: 'pointer' }}>
                 {b.logo ? <img src={b.logo} alt={b.name} className="brand-logo-img" /> : <div className="brand-logo-placeholder">{b.name[0]}</div>}
@@ -300,6 +300,7 @@ export default function ProductBrand() {
               </div>,
               <span className="mono">{b.productCount}</span>,
               <span className="mono">{b.supplierCount}</span>,
+              <span>{b.contactPerson}</span>,
               <span className="mono">{b.contactPhone}</span>,
               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                 <Button variant="ghost" size="sm" onClick={() => handleRowClick(b.id)}>详情</Button>
