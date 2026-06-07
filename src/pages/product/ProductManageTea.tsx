@@ -688,9 +688,19 @@ export default function ProductManageTea() {
                     marginTop: 'var(--space-2)',
                     gap: 'var(--space-1)',
                   }}>
-                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: '#FD742D', flexShrink: 0 }}>
-                      ¥{product.marketPrice}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-1)', flexShrink: 0, minWidth: 0 }}>
+                      <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: '#FD742D', flexShrink: 0 }}>
+                        ¥{product.marketPrice}
+                      </span>
+                      {product.spec && (
+                        <>
+                          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-300)', flexShrink: 0 }}>|</span>
+                          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={product.spec}>
+                            {product.spec}
+                          </span>
+                        </>
+                      )}
+                    </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                       <StatusTag
                         variant={product.shelfStatus === 'on' ? 'success' : 'default'}
