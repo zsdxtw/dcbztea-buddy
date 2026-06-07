@@ -166,7 +166,7 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
       <div className="content-body">
         <div className="category-layout">
           {/* 左侧分类树 - 直接展示二级分类 */}
-          <Card title={`${label}分类结构`} className="category-tree-card" headerRight={
+          <Card title={`${label}分类`} className="category-tree-card" headerRight={
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>可管理二三级分类</div>
           }>
             <div className="category-tree">
