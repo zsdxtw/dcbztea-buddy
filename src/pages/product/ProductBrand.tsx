@@ -324,17 +324,15 @@ export default function ProductBrand() {
       <div className="content-body">
         {/* 品牌排名 */}
         <div className="rank-section">
-          <div className="rank-section-header">
-            <div className="rank-period-toggle">
-              <button className={`rank-period-btn${rankPeriod === 'month' ? ' active' : ''}`} onClick={() => setRankPeriod('month')}>当月</button>
-              <button className={`rank-period-btn${rankPeriod === 'year' ? ' active' : ''}`} onClick={() => setRankPeriod('year')}>当年</button>
-              <button className={`rank-period-btn${rankPeriod === 'oneYear' ? ' active' : ''}`} onClick={() => setRankPeriod('oneYear')}>一年内</button>
-            </div>
-          </div>
           <div className="rank-charts-grid">
             <RankBarChart title="销售金额 TOP5" data={rankData[rankPeriod].salesAmount} />
             <RankBarChart title="利润总额 TOP5" data={rankData[rankPeriod].profitTotal} />
             <RankBarChart title="销售数量 TOP5" data={rankData[rankPeriod].salesQuantity} />
+          </div>
+          <div className="rank-period-toggle">
+            <button className={`rank-period-btn${rankPeriod === 'month' ? ' active' : ''}`} onClick={() => setRankPeriod('month')}>当月</button>
+            <button className={`rank-period-btn${rankPeriod === 'year' ? ' active' : ''}`} onClick={() => setRankPeriod('year')}>当年</button>
+            <button className={`rank-period-btn${rankPeriod === 'oneYear' ? ' active' : ''}`} onClick={() => setRankPeriod('oneYear')}>一年内</button>
           </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
