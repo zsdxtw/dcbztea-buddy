@@ -18,7 +18,7 @@ export default function ProductCard({ data }: ProductCardProps) {
         <div className="product-card-name">{data.name} — {data.spec}</div>
         <div className="product-card-meta">
           <div className="product-card-price">
-            ¥{data.price} <span>{data.unit}</span> <span className="product-card-spec">{data.spec}</span>
+            ¥{data.price} <span>{data.unit}</span>
           </div>
           <Tag category={data.teaCategory} />
         </div>

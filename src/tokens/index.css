@@ -500,7 +500,6 @@ tbody tr:last-child td { border-bottom: none; }
 .product-card-meta { display: flex; align-items: center; justify-content: space-between; }
 .product-card-price { font-family: var(--font-family-mono); font-size: var(--text-lg); font-weight: var(--font-semibold); color: var(--color-neutral-800); }
 .product-card-price span { font-size: var(--text-sm); font-weight: var(--font-regular); color: var(--color-neutral-500); }
-.product-card-spec { font-size: var(--text-xs) !important; color: var(--color-neutral-500) !important; }
 
 /* ── 筛选栏 ── */
 .filter-bar { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; flex: 1; }
