@@ -291,10 +291,14 @@ export default function ProductManageTea() {
                   }}>
                     SKU {product.code}
                   </div>
-                  {/* 茶类色条 */}
+                  {/* 茶类标签 + 色条 */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-1)' }}>
+                    <div style={{ flex: 1 }} />
+                    {teaCat && <Tag category={teaCat} />}
+                  </div>
                   <div style={{
-                    height: 4,
-                    borderRadius: 2,
+                    height: 2,
+                    borderRadius: 1,
                     background: (() => {
                       const topCat = product.category.split('-')[0];
                       const color = CATEGORY_COLORS[topCat];
@@ -325,7 +329,6 @@ export default function ProductManageTea() {
                       }}>
                         {product.brand}
                       </span>
-                      {teaCat && <Tag category={teaCat} />}
                       <StatusTag
                         variant={product.shelfStatus === 'on' ? 'success' : 'error'}
                         label={getShelfStatusLabel(product.shelfStatus)}
