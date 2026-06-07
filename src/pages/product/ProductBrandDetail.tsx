@@ -237,7 +237,7 @@ export default function ProductBrandDetail() {
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                         <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, color: 'var(--color-semantic-info)', flexShrink: 0 }}><rect x="3" y="1.5" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M6 5h4M6 7.5h4M6 10h3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/></svg>
                         <span className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>{file}</span>
-                        <Button variant="ghost" size="sm" style={{ color: 'var(--color-semantic-error)' }}>删除</Button>
+                        <Button variant="ghost" size="sm" style={{ color: '#FD742D' }}>删除</Button>
                       </div>
                     ))}
                     <Button variant="ghost" size="sm">+ 上传文件</Button>
