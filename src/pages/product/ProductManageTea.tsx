@@ -44,6 +44,8 @@ export default function ProductManageTea() {
   const [keyword, setKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [shelfFilter, setShelfFilter] = useState('');
+  const [purchaseFilter, setPurchaseFilter] = useState('');
+  const [productionFilter, setProductionFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'sales'>('default');
   const [priceMin, setPriceMin] = useState('');
@@ -65,6 +67,8 @@ export default function ProductManageTea() {
         if (prefix !== categoryFilter) return false;
       }
       if (shelfFilter && p.shelfStatus !== shelfFilter) return false;
+      if (purchaseFilter && p.purchaseStatus !== purchaseFilter) return false;
+      if (productionFilter && p.productionStatus !== productionFilter) return false;
       if (brandFilter && p.brand !== brandFilter) return false;
       if (keyword) {
         const kw = keyword.toLowerCase();
@@ -90,7 +94,7 @@ export default function ProductManageTea() {
       result = [...result].sort((a, b) => b.totalSales - a.totalSales);
     }
     return result;
-  }, [keyword, categoryFilter, shelfFilter, brandFilter, sortBy, priceMin, priceMax]);
+  }, [keyword, categoryFilter, shelfFilter, purchaseFilter, productionFilter, brandFilter, sortBy, priceMin, priceMax]);
 
   // 分页
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -101,6 +105,8 @@ export default function ProductManageTea() {
 
   const handleCategoryChange = (value: string) => { setCategoryFilter(value); setCurrentPage(1); };
   const handleShelfChange = (value: string) => { setShelfFilter(value); setCurrentPage(1); };
+  const handlePurchaseChange = (value: string) => { setPurchaseFilter(value); setCurrentPage(1); };
+  const handleProductionChange = (value: string) => { setProductionFilter(value); setCurrentPage(1); };
   const handleBrandChange = (value: string) => { setBrandFilter(value); setCurrentPage(1); };
   const handleSearch = (kw: string) => { setKeyword(kw); setCurrentPage(1); };
   const handleSortChange = (sort: 'default' | 'price-asc' | 'price-desc' | 'sales') => { setSortBy(sort); setCurrentPage(1); };
@@ -176,9 +182,45 @@ export default function ProductManageTea() {
                 cursor: 'pointer',
               }}
             >
-              <option value="">全部状态</option>
+              <option value="">上下架状态</option>
               <option value="on">上架</option>
               <option value="off">下架</option>
+            </select>
+            <select
+              value={purchaseFilter}
+              onChange={(e) => handlePurchaseChange(e.target.value)}
+              style={{
+                padding: '4px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-neutral-200)',
+                background: 'var(--color-neutral-0)',
+                color: 'var(--color-neutral-600)',
+                fontSize: 'var(--text-sm)',
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">采购状态</option>
+              <option value="available">可采</option>
+              <option value="stopped">停采</option>
+            </select>
+            <select
+              value={productionFilter}
+              onChange={(e) => handleProductionChange(e.target.value)}
+              style={{
+                padding: '4px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-neutral-200)',
+                background: 'var(--color-neutral-0)',
+                color: 'var(--color-neutral-600)',
+                fontSize: 'var(--text-sm)',
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">生产状态</option>
+              <option value="producing">生产</option>
+              <option value="stopped">停产</option>
             </select>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', flexShrink: 0 }}>价格：</span>
             <input
