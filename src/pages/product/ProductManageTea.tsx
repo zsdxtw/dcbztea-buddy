@@ -279,7 +279,7 @@ export default function ProductManageTea() {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: 2,
+                    height: 4,
                     background: (() => {
                       const topCat = product.category.split('-')[0];
                       const color = CATEGORY_COLORS[topCat];
