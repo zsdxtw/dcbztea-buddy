@@ -154,22 +154,8 @@ export default function ProductBrandDetail() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-2)' }}>
                 <span><span className="mono">{brand.code}</span> · {brand.owner}</span>
                 <span style={{ color: 'var(--color-neutral-400)' }}>|</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                  <span style={{ color: 'var(--color-neutral-500)', flexShrink: 0 }}>主营品类</span>
-                  {editing ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                      {SECOND_LEVEL_CATEGORIES.map((cat) => (
-                        <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
-                          <input type="checkbox" defaultChecked={brand.mainCategories.includes(cat)} />
-                          {cat}
-                        </label>
-                      ))}
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                      {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
-                    </div>
-                  )}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
                 </div>
               </div>
               {editing ? (
@@ -188,7 +174,22 @@ export default function ProductBrandDetail() {
               <div className="detail-grid">
                 <EditRow label="品牌编号"><input className="detail-input" defaultValue={brand.code} readOnly style={{ background: 'var(--color-neutral-100)', color: 'var(--color-neutral-500)' }} /></EditRow>
                 <EditRow label="品牌名称"><input className="detail-input" defaultValue={brand.name} /></EditRow>
-                <EditRow label="品牌所属"><input className="detail-input" defaultValue={brand.owner} /></EditRow>
+                <EditRow label="品牌所属" span>
+                  <div>
+                    <input className="detail-input" defaultValue={brand.owner} style={{ marginBottom: 'var(--space-2)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', flexShrink: 0 }}>主营品类</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                        {SECOND_LEVEL_CATEGORIES.map((cat) => (
+                          <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
+                            <input type="checkbox" defaultChecked={brand.mainCategories.includes(cat)} />
+                            {cat}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </EditRow>
                 <EditRow label="商标证书" span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     {brand.trademarkCert.map((file, i) => (
@@ -206,7 +207,16 @@ export default function ProductBrandDetail() {
               <div className="detail-grid">
                 <DetailRow label="品牌编号"><span className="mono">{brand.code}</span></DetailRow>
                 <DetailRow label="品牌名称"><span style={{ fontWeight: 'var(--font-medium)' }}>{brand.name}</span></DetailRow>
-                <DetailRow label="品牌所属">{brand.owner}</DetailRow>
+                <DetailRow label="品牌所属">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                    <span>{brand.owner}</span>
+                    <span style={{ color: 'var(--color-neutral-400)' }}>|</span>
+                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', flexShrink: 0 }}>主营品类</span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                      {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
+                    </div>
+                  </div>
+                </DetailRow>
                 <DetailRow label="商标证书" span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     {brand.trademarkCert.map((file, i) => (
