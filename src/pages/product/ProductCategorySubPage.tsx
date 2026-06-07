@@ -29,6 +29,7 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
   const [selectedId, setSelectedId] = useState<string>(categories.id);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(categories.children?.map((c) => c.id) ?? []));
   const [editing, setEditing] = useState(false);
+  const [editData, setEditData] = useState<{ name: string; description: string; origin: string } | null>(null);
   const [showAddDialog, setShowAddDialog] = useState<{ parentId: string; level: number } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -63,12 +64,53 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
   };
   const selectedPath = selectedId ? getPath(selectedId) : null;
 
+  // 当前显示的数据：编辑模式用 editData，否则用 selectedNode
+  const d = editing && editData ? editData : selectedNode;
+
+  // 获取描述字段的标签
+  const getDescriptionLabel = () => {
+    if (categoryType === 'tea' && depth === 1) return '茶类介绍';
+    if (categoryType === 'tea' && depth === 2) return '茶叶特点';
+    if (categoryType !== 'tea' && depth === 1) return '分类说明';
+    if (depth === 2) return '商品说明';
+    return '描述';
+  };
+
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
+  };
+
+  const handleStartEdit = () => {
+    if (!selectedNode) return;
+    setEditData({
+      name: selectedNode.name,
+      description: selectedNode.description || '',
+      origin: selectedNode.origin || '',
+    });
+    setEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditing(false);
+    setEditData(null);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editData || !selectedId) return;
+    const updateNode = (node: CategoryNode): CategoryNode => {
+      if (node.id === selectedId) {
+        return { ...node, name: editData.name, description: editData.description || undefined, origin: editData.origin || undefined };
+      }
+      if (node.children) return { ...node, children: node.children.map(updateNode) };
+      return node;
+    };
+    setCategories(updateNode(categories));
+    setEditing(false);
+    setEditData(null);
   };
 
   const handleAddChild = (parentId: string, level: number) => {
@@ -198,7 +240,11 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
                   <div className="detail-row">
                     <div className="detail-label">分类名称</div>
                     <div className="detail-value">
-                      {editing && !isRoot ? <input className="detail-input" defaultValue={selectedNode.name} /> : <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedNode.name}</span>}
+                      {editing && editData ? (
+                        <input className="detail-input" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} />
+                      ) : (
+                        <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedNode.name}</span>
+                      )}
                     </div>
                   </div>
                   <div className="detail-row">
@@ -214,7 +260,7 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
                     </div>
                   </div>
 
-                  {/* 茶叶二级分类：显示发酵种类和茶类介绍 */}
+                  {/* 茶叶二级分类：发酵种类 */}
                   {categoryType === 'tea' && depth === 1 && selectedNode.fermentation && (
                     <div className="detail-row">
                       <div className="detail-label">发酵种类</div>
@@ -223,41 +269,42 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
                       </div>
                     </div>
                   )}
-                  {categoryType === 'tea' && depth === 1 && (() => {
-                    const teaCatEnum = getTeaCategoryByName(selectedNode.name);
-                    const teaDetail = teaCatEnum ? getTeaCategoryDetail(teaCatEnum) : undefined;
-                    const intro = teaDetail?.introduction || selectedNode.description;
-                    return intro ? (
-                      <div className="detail-row detail-row-span">
-                        <div className="detail-label">茶类介绍</div>
-                        <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{intro}</div>
-                      </div>
-                    ) : null;
-                  })()}
 
-                  {/* 茶叶三级分类：显示产地和茶叶特点 */}
-                  {categoryType === 'tea' && depth === 2 && selectedNode.origin && (
+                  {/* 茶叶三级分类：产地 */}
+                  {categoryType === 'tea' && depth === 2 && (
                     <div className="detail-row">
                       <div className="detail-label">产地</div>
                       <div className="detail-value">
-                        <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedNode.origin}</span>
+                        {editing && editData ? (
+                          <input className="detail-input" value={editData.origin} onChange={(e) => setEditData({ ...editData, origin: e.target.value })} placeholder="请输入产地" />
+                        ) : (
+                          selectedNode.origin ? <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedNode.origin}</span> : <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>
+                        )}
                       </div>
                     </div>
                   )}
 
-                  {/* 非茶叶分类的二级分类描述 */}
-                  {categoryType !== 'tea' && depth === 1 && selectedNode.description && (
+                  {/* 描述字段：二级/三级分类均可编辑 */}
+                  {depth >= 1 && (
                     <div className="detail-row detail-row-span">
-                      <div className="detail-label">分类说明</div>
-                      <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{selectedNode.description}</div>
-                    </div>
-                  )}
-
-                  {/* 三级分类描述（茶叶为茶叶特点，其他为商品说明） */}
-                  {depth === 2 && selectedNode.description && (
-                    <div className="detail-row detail-row-span">
-                      <div className="detail-label">{categoryType === 'tea' ? '茶叶特点' : '商品说明'}</div>
-                      <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{selectedNode.description}</div>
+                      <div className="detail-label">{getDescriptionLabel()}</div>
+                      <div className="detail-value">
+                        {editing && editData ? (
+                          <textarea
+                            className="detail-textarea"
+                            value={editData.description}
+                            onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                            placeholder={`请输入${getDescriptionLabel()}`}
+                            rows={3}
+                          />
+                        ) : (
+                          d?.description ? (
+                            <span style={{ lineHeight: 'var(--leading-relaxed)' }}>{d.description}</span>
+                          ) : (
+                            <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>
+                          )
+                        )}
+                      </div>
                     </div>
                   )}
 
@@ -285,12 +332,12 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
                   <div style={{ marginTop: 'var(--space-5)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-neutral-200)', display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
                     {editing ? (
                       <>
-                        <Button variant="ghost" onClick={() => setEditing(false)}>取消</Button>
-                        <Button onClick={() => setEditing(false)}>保存</Button>
+                        <Button variant="ghost" onClick={handleCancelEdit}>取消</Button>
+                        <Button onClick={handleSaveEdit}>保存</Button>
                       </>
                     ) : (
                       <>
-                        <Button size="sm" onClick={() => setEditing(true)}>编辑</Button>
+                        <Button size="sm" onClick={handleStartEdit}>编辑</Button>
                         <Button size="sm" style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
                       </>
                     )}
