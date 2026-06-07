@@ -348,6 +348,16 @@ export default function ProductManageTea() {
                   }}>
                     SKU {product.code}
                   </div>
+                  {/* 茶类色条 */}
+                  <div style={{
+                    height: 4,
+                    borderRadius: 2,
+                    background: (() => {
+                      const topCat = product.category.split('-')[0];
+                      const color = CATEGORY_COLORS[topCat];
+                      return color || 'var(--color-neutral-200)';
+                    })(),
+                  }} />
                 </div>
 
                 {/* 底部数据栏 */}
