@@ -343,18 +343,18 @@ export default function ProductManageTea() {
                   padding: 'var(--space-2) 0',
                 }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>库存</div>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>总销量</div>
+                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>{product.totalSales}</div>
+                  </div>
+                  <div style={{ width: 1, background: 'var(--color-neutral-100)' }} />
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>自有库存</div>
                     <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>{product.stock}</div>
                   </div>
                   <div style={{ width: 1, background: 'var(--color-neutral-100)' }} />
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>预占</div>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>订单预占</div>
                     <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>{product.reservedStock}</div>
-                  </div>
-                  <div style={{ width: 1, background: 'var(--color-neutral-100)' }} />
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>销量</div>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>{product.totalSales}</div>
                   </div>
                 </div>
               </div>
