@@ -239,25 +239,12 @@ export default function ProductManageTea() {
                 }}
               >
                 {/* 商品主图 */}
-                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)', position: 'relative' }}>
+                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)' }}>
                   <img
                     src={mainImage}
                     alt={product.name}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   />
-                  {/* 茶类色条 */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 4,
-                    background: (() => {
-                      const topCat = product.category.split('-')[0];
-                      const color = CATEGORY_COLORS[topCat];
-                      return color || 'var(--color-neutral-200)';
-                    })(),
-                  }} />
                 </div>
 
                 {/* 商品信息 */}
