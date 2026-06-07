@@ -3,12 +3,20 @@ import ContentHeader from '../../components/layout/ContentHeader';
 import Card from '../../components/common/Card';
 import Tag from '../../components/common/Tag';
 import Button from '../../components/common/Button';
-import { teaVarieties as initialData, getAllOrigins } from '../../data/teaVarieties';
+import { teaVarieties as initialData } from '../../data/teaVarieties';
 import { getTeaCategoryLabel } from '../../data/teaCategories';
 import { TeaCategory } from '../../types';
 import type { TeaVariety } from '../../data/teaVarieties';
 
 const PAGE_SIZE = 16;
+
+/** 全国所有省份 */
+const ALL_PROVINCES = [
+  '安徽','北京','重庆','福建','甘肃','广东','广西','贵州','海南','河北',
+  '河南','黑龙江','湖北','湖南','吉林','江苏','江西','辽宁','内蒙古','宁夏',
+  '青海','山东','山西','陕西','上海','四川','台湾','天津','西藏','香港',
+  '新疆','云南','浙江',
+];
 
 const emptyForm = {
   name: '', category: TeaCategory.GREEN, origin: [] as string[], originDetail: '',
@@ -33,7 +41,11 @@ export default function ProductTeaList() {
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedForDelete, setSelectedForDelete] = useState<Set<number>>(new Set());
 
-  const allOrigins = useMemo(() => getAllOrigins(), []);
+  const allOrigins = useMemo(() => {
+    const origins = new Set<string>();
+    teas.forEach((t) => origins.add(t.origin));
+    return Array.from(origins).sort();
+  }, [teas]);
 
   const filtered = useMemo(() => {
     return teas.filter((t) => {
@@ -304,7 +316,7 @@ export default function ProductTeaList() {
                 <div className="drawer-form-field" style={{ width: '100%' }}>
                   <label className="drawer-label">产地（支持多选）</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginTop: '4px' }}>
-                    {allOrigins.map((o) => (
+                    {ALL_PROVINCES.map((o) => (
                       <label key={o} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
                         <input type="checkbox" checked={form.origin.includes(o)} onChange={() => handleToggleFormOrigin(o)} />
                         {o}
