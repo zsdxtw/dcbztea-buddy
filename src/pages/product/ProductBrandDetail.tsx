@@ -145,6 +145,11 @@ export default function ProductBrandDetail() {
             <div className="brand-detail-header-info">
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
                 <span style={{ fontFamily: 'var(--font-family-serif)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{brand.name}</span>
+                <div style={{ display: 'flex', gap: 'var(--space-3)', fontSize: 'var(--text-sm)' }}>
+                  {brand.website && <a href={brand.website} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>官网</a>}
+                  {brand.jdStoreUrl && <a href={brand.jdStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>京东店</a>}
+                  {brand.tmallStoreUrl && <a href={brand.tmallStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>天猫店</a>}
+                </div>
               </div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-2)' }}>
                 <span className="mono">{brand.code}</span> · {brand.owner} · {brand.mainCategories.join('、')}
@@ -153,23 +158,6 @@ export default function ProductBrandDetail() {
                 <textarea className="detail-textarea" defaultValue={brand.introduction} rows={2} style={{ fontSize: 'var(--text-sm)' }} />
               ) : (
                 <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-md)' }}>{brand.introduction}</div>
-              )}
-              {editing ? (
-                <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: '2px' }}>京东店地址</div>
-                    <input className="detail-input" defaultValue={brand.jdStoreUrl} placeholder="https://" style={{ fontSize: 'var(--text-sm)' }} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: '2px' }}>天猫店地址</div>
-                    <input className="detail-input" defaultValue={brand.tmallStoreUrl} placeholder="https://" style={{ fontSize: 'var(--text-sm)' }} />
-                  </div>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                  {brand.jdStoreUrl && <a href={brand.jdStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)', display: 'flex', alignItems: 'center', gap: '4px' }}><span>京东店</span></a>}
-                  {brand.tmallStoreUrl && <a href={brand.tmallStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)', display: 'flex', alignItems: 'center', gap: '4px' }}><span>天猫店</span></a>}
-                </div>
               )}
             </div>
           </div>
@@ -196,7 +184,6 @@ export default function ProductBrandDetail() {
                     </div>
                   </div>
                 </EditRow>
-                <EditRow label="品牌官网"><input className="detail-input" defaultValue={brand.website} /></EditRow>
                 <EditRow label="商标证书" span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     {brand.trademarkCert.map((file, i) => (
@@ -224,7 +211,6 @@ export default function ProductBrandDetail() {
                     </div>
                   </div>
                 </DetailRow>
-                <DetailRow label="品牌官网">{brand.website ? <a href={brand.website} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>{brand.website}</a> : <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>}</DetailRow>
                 <DetailRow label="商标证书" span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     {brand.trademarkCert.map((file, i) => (
