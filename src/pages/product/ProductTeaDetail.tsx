@@ -57,7 +57,7 @@ export default function ProductTeaDetail() {
 
   const topCategory = getTopCategory(product.category);
   const teaCat = nameToTeaCategory(topCategory);
-  const mainPreview = previewImage ?? product.mainImages[0];
+  const mainPreview = previewImage ?? product.mainImages[0] ?? '';
 
   const shelfVariant = product.shelfStatus === 'on' ? 'success' : 'error';
   const purchaseVariant = product.purchaseStatus === 'available' ? 'success' : 'warning';

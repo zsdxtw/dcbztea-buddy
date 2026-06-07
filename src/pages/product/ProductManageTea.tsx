@@ -4,8 +4,7 @@ import ContentHeader from '../../components/layout/ContentHeader';
 import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
-import { teaProducts } from '../../data/teaProducts';
-import { getShelfStatusLabel, getPurchaseStatusLabel } from '../../data/teaProducts';
+import { teaProducts, getShelfStatusLabel } from '../../data/teaProducts';
 import { TeaCategory } from '../../types';
 
 const PAGE_SIZE = 12;

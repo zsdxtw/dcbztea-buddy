@@ -119,6 +119,8 @@ export const router = createBrowserRouter([
       /* ── 商品 ── */
       { path: 'product', element: <ProductOverview /> },
       { path: 'product/product-overview', element: <ProductOverview /> },
+      { path: 'product/product-manage', element: <Navigate to="product-manage-tea" replace /> },
+      { path: 'product/product-category', element: <Navigate to="product-category-tea" replace /> },
       { path: 'product/product-manage-tea', element: <ProductManageTea /> },
       { path: 'product/product-manage-teaware', element: <ProductManageTeaware /> },
       { path: 'product/product-manage-peripheral', element: <ProductManagePeripheral /> },
