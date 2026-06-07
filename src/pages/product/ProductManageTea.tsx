@@ -145,14 +145,6 @@ export default function ProductManageTea() {
       <ContentHeader
         title="茶叶商品"
         breadcrumbs={['商品', '商品管理', '茶叶']}
-        actions={
-          <Button>
-            <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
-              <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            新增商品
-          </Button>
-        }
       />
       <div className="content-body">
         {/* 筛选区 */}
@@ -177,17 +169,11 @@ export default function ProductManageTea() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>快捷：</span>
+            <button style={filterBtnStyle(!quickFilter)} onClick={() => setQuickFilter('')}>全部</button>
             <button style={filterBtnStyle(quickFilter === 'teaware')} onClick={() => handleQuickFilter('teaware')}>带茶具</button>
             <button style={filterBtnStyle(quickFilter === 'lowStock')} onClick={() => handleQuickFilter('lowStock')}>库存紧张</button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-            <input
-              className="filter-input"
-              placeholder="搜索商品名称、品牌、编号..."
-              value={keyword}
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ maxWidth: 280 }}
-            />
             <select
               value={shelfFilter}
               onChange={(e) => handleShelfChange(e.target.value)}
@@ -233,16 +219,40 @@ export default function ProductManageTea() {
               style={{ width: 80, textAlign: 'center' }}
               type="number"
             />
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginLeft: 'auto' }}>
-              共 {filtered.length} 件商品
-            </span>
+            <Button onClick={() => { /* TODO: 新增商品 */ }}>
+              <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
+                <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              新增
+            </Button>
+            <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={() => { /* TODO: 删除 */ }}>
+              <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
+                <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              删除
+            </Button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>排序：</span>
             <button style={filterBtnStyle(sortBy === 'default')} onClick={() => handleSortChange('default')}>默认</button>
-            <button style={filterBtnStyle(sortBy === 'price-desc')} onClick={() => handleSortChange('price-desc')}>价格从高到低</button>
-            <button style={filterBtnStyle(sortBy === 'price-asc')} onClick={() => handleSortChange('price-asc')}>价格从低到高</button>
-            <button style={filterBtnStyle(sortBy === 'sales')} onClick={() => handleSortChange('sales')}>按销量排序</button>
+            <button style={filterBtnStyle(sortBy === 'price-desc' || sortBy === 'price-asc')} onClick={() => handleSortChange(sortBy === 'price-desc' ? 'price-asc' : 'price-desc')}>
+              价格{sortBy === 'price-asc' ? ' ↑' : ' ↓'}
+            </button>
+            <button style={filterBtnStyle(sortBy === 'sales')} onClick={() => handleSortChange('sales')}>
+              销量{sortBy === 'sales' ? ' ↓' : ''}
+            </button>
+            <span style={{ marginLeft: 'auto' }}>
+              <input
+                className="filter-input"
+                placeholder="搜索商品名称、品牌、编号..."
+                value={keyword}
+                onChange={(e) => handleSearch(e.target.value)}
+                style={{ maxWidth: 280 }}
+              />
+            </span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', flexShrink: 0 }}>
+              共 {filtered.length} 件商品
+            </span>
           </div>
         </Card>
 
