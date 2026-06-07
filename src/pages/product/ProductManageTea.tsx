@@ -34,6 +34,9 @@ export default function ProductManageTea() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [shelfFilter, setShelfFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
+  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'sales'>('default');
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   // 提取所有品牌
@@ -43,9 +46,9 @@ export default function ProductManageTea() {
     return Array.from(brands).sort();
   }, []);
 
-  // 筛选
+  // 筛选 + 排序
   const filtered = useMemo(() => {
-    return teaProducts.filter((p) => {
+    let result = teaProducts.filter((p) => {
       if (categoryFilter) {
         const prefix = p.category.split('-')[0];
         if (prefix !== categoryFilter) return false;
@@ -62,9 +65,21 @@ export default function ProductManageTea() {
         )
           return false;
       }
+      // 价格区间筛选
+      if (priceMin && p.marketPrice < Number(priceMin)) return false;
+      if (priceMax && p.marketPrice > Number(priceMax)) return false;
       return true;
     });
-  }, [keyword, categoryFilter, shelfFilter, brandFilter]);
+    // 排序
+    if (sortBy === 'price-asc') {
+      result = [...result].sort((a, b) => a.marketPrice - b.marketPrice);
+    } else if (sortBy === 'price-desc') {
+      result = [...result].sort((a, b) => b.marketPrice - a.marketPrice);
+    } else if (sortBy === 'sales') {
+      result = [...result].sort((a, b) => b.totalSales - a.totalSales);
+    }
+    return result;
+  }, [keyword, categoryFilter, shelfFilter, brandFilter, sortBy, priceMin, priceMax]);
 
   // 分页
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -77,6 +92,9 @@ export default function ProductManageTea() {
   const handleShelfChange = (value: string) => { setShelfFilter(value); setCurrentPage(1); };
   const handleBrandChange = (value: string) => { setBrandFilter(value); setCurrentPage(1); };
   const handleSearch = (kw: string) => { setKeyword(kw); setCurrentPage(1); };
+  const handleSortChange = (sort: 'default' | 'price-asc' | 'price-desc' | 'sales') => { setSortBy(sort); setCurrentPage(1); };
+  const handlePriceMinChange = (v: string) => { setPriceMin(v); setCurrentPage(1); };
+  const handlePriceMaxChange = (v: string) => { setPriceMax(v); setCurrentPage(1); };
 
   const filterBtnStyle = (active: boolean): React.CSSProperties => ({
     padding: '4px 12px',
@@ -125,13 +143,13 @@ export default function ProductManageTea() {
               </button>
             ))}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
             <input
               className="filter-input"
               placeholder="搜索商品名称、品牌、编号..."
               value={keyword}
               onChange={(e) => handleSearch(e.target.value)}
-              style={{ maxWidth: 320 }}
+              style={{ maxWidth: 280 }}
             />
             <select
               value={shelfFilter}
@@ -151,9 +169,34 @@ export default function ProductManageTea() {
               <option value="on">上架</option>
               <option value="off">下架</option>
             </select>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', flexShrink: 0 }}>价格：</span>
+            <input
+              className="filter-input"
+              placeholder="最低价"
+              value={priceMin}
+              onChange={(e) => handlePriceMinChange(e.target.value)}
+              style={{ width: 80, textAlign: 'center' }}
+              type="number"
+            />
+            <span style={{ color: 'var(--color-neutral-400)' }}>—</span>
+            <input
+              className="filter-input"
+              placeholder="最高价"
+              value={priceMax}
+              onChange={(e) => handlePriceMaxChange(e.target.value)}
+              style={{ width: 80, textAlign: 'center' }}
+              type="number"
+            />
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginLeft: 'auto' }}>
               共 {filtered.length} 件商品
             </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>排序：</span>
+            <button style={filterBtnStyle(sortBy === 'default')} onClick={() => handleSortChange('default')}>默认</button>
+            <button style={filterBtnStyle(sortBy === 'price-desc')} onClick={() => handleSortChange('price-desc')}>价格从高到低</button>
+            <button style={filterBtnStyle(sortBy === 'price-asc')} onClick={() => handleSortChange('price-asc')}>价格从低到高</button>
+            <button style={filterBtnStyle(sortBy === 'sales')} onClick={() => handleSortChange('sales')}>按销量排序</button>
           </div>
         </Card>
 
@@ -216,6 +259,12 @@ export default function ProductManageTea() {
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={product.brand}>{product.brand}</span>
                     <span style={{ color: 'var(--color-neutral-300)' }}>|</span>
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={product.spec}>{product.spec}</span>
+                  </div>
+
+                  {/* 库存 + 销量 */}
+                  <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>
+                    <span>库存：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.stock}</span></span>
+                    <span>销量：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.totalSales}</span></span>
                   </div>
 
                   {/* 价格 + 状态 */}

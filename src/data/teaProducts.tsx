@@ -45,6 +45,8 @@ export const teaProducts: TeaProduct[] = [
       img('西湖龙井叶底嫩匀成朵，高清特写'),
     ],
     stockAlert: 50,
+    stock: 320,
+    totalSales: 1280,
     remark: '明前头采，豆花香显著',
   },
   {
@@ -84,6 +86,8 @@ export const teaProducts: TeaProduct[] = [
       img('碧螺春揉捻工艺展示，传统手工制茶'),
     ],
     stockAlert: 40,
+    stock: 580,
+    totalSales: 2350,
     remark: '花果香显著，条索卷曲',
   },
   {
@@ -123,6 +127,8 @@ export const teaProducts: TeaProduct[] = [
       img('竹叶青制茶工艺，杀青揉捻流程展示'),
     ],
     stockAlert: 35,
+    stock: 150,
+    totalSales: 680,
     remark: '清香馥郁，扁平光滑',
   },
   {
@@ -162,6 +168,8 @@ export const teaProducts: TeaProduct[] = [
       img('黄山毛峰传统手工炒制工艺展示'),
     ],
     stockAlert: 30,
+    stock: 420,
+    totalSales: 1920,
     remark: '兰花香显著，芽头肥壮',
   },
   {
@@ -201,6 +209,8 @@ export const teaProducts: TeaProduct[] = [
       img('太平猴魁传统理条压扁工艺展示'),
     ],
     stockAlert: 25,
+    stock: 90,
+    totalSales: 320,
     remark: '两叶抱芽，花香高爽带猴韵',
   },
 
@@ -243,6 +253,8 @@ export const teaProducts: TeaProduct[] = [
       img('正山小种叶底红亮软匀特写'),
     ],
     stockAlert: 40,
+    stock: 260,
+    totalSales: 1450,
     remark: '松烟香显著，桂圆汤味',
   },
   {
@@ -283,6 +295,8 @@ export const teaProducts: TeaProduct[] = [
       img('金骏眉萎凋发酵工艺流程展示'),
     ],
     stockAlert: 20,
+    stock: 780,
+    totalSales: 3100,
     remark: '全芽头制作，蜜香花果香交融',
   },
   {
@@ -322,6 +336,8 @@ export const teaProducts: TeaProduct[] = [
       img('滇红发酵工艺展示，传统工夫红茶制作'),
     ],
     stockAlert: 50,
+    stock: 45,
+    totalSales: 180,
     remark: '金毫显露，蜜香浓郁',
   },
   {
@@ -361,6 +377,8 @@ export const teaProducts: TeaProduct[] = [
       img('祁门红茶传统工夫发酵工艺展示'),
     ],
     stockAlert: 35,
+    stock: 310,
+    totalSales: 1560,
     remark: '祁门香独特，似花似果似蜜',
   },
 
@@ -403,6 +421,8 @@ export const teaProducts: TeaProduct[] = [
       img('大红袍叶底绿叶红镶边特写'),
     ],
     stockAlert: 30,
+    stock: 670,
+    totalSales: 2780,
     remark: '岩骨花香，七泡有余香',
   },
   {
@@ -442,6 +462,8 @@ export const teaProducts: TeaProduct[] = [
       img('铁观音摇青做青工艺展示'),
     ],
     stockAlert: 45,
+    stock: 200,
+    totalSales: 890,
     remark: '兰花香馥郁，七泡有余香',
   },
   {
@@ -481,6 +503,8 @@ export const teaProducts: TeaProduct[] = [
       img('凤凰单丛单株采摘制作工艺展示'),
     ],
     stockAlert: 25,
+    stock: 530,
+    totalSales: 2100,
     remark: '蜜兰香型，山韵蜜味',
   },
 
@@ -523,6 +547,8 @@ export const teaProducts: TeaProduct[] = [
       img('白毫银针叶底嫩匀明亮特写'),
     ],
     stockAlert: 15,
+    stock: 85,
+    totalSales: 410,
     remark: '满披白毫，毫香清鲜',
   },
   {
@@ -562,6 +588,8 @@ export const teaProducts: TeaProduct[] = [
       img('白牡丹压饼工艺展示，蒸压成型流程'),
     ],
     stockAlert: 30,
+    stock: 410,
+    totalSales: 1780,
     remark: '一芽两叶，花香清雅',
   },
   {
@@ -601,6 +629,8 @@ export const teaProducts: TeaProduct[] = [
       img('寿眉煮茶场景展示，陶壶煮茶'),
     ],
     stockAlert: 40,
+    stock: 290,
+    totalSales: 1320,
     remark: '陈年寿眉，枣香药香，可煮可泡',
   },
 
@@ -642,6 +672,8 @@ export const teaProducts: TeaProduct[] = [
       img('君山银针闷黄工艺展示，传统黄茶制作'),
     ],
     stockAlert: 15,
+    stock: 160,
+    totalSales: 620,
     remark: '金镶玉美称，芽尖三起三落',
   },
   {
@@ -681,6 +713,8 @@ export const teaProducts: TeaProduct[] = [
       img('蒙顶黄芽闷黄工艺展示，传统黄茶闷制'),
     ],
     stockAlert: 20,
+    stock: 720,
+    totalSales: 2950,
     remark: '甜香鲜嫩，甘醇鲜爽',
   },
 
@@ -723,6 +757,8 @@ export const teaProducts: TeaProduct[] = [
       img('大益7572叶底褐红软匀特写'),
     ],
     stockAlert: 60,
+    stock: 55,
+    totalSales: 230,
     remark: '熟普标杆，陈香顺滑',
   },
   {
@@ -762,6 +798,8 @@ export const teaProducts: TeaProduct[] = [
       img('白沙溪天尖茯砖金花菌特写，冠突散囊菌'),
     ],
     stockAlert: 30,
+    stock: 380,
+    totalSales: 1650,
     remark: '天尖等级，金花茂盛',
   },
   {
@@ -801,6 +839,8 @@ export const teaProducts: TeaProduct[] = [
       img('澜沧古茶古树茶采摘展示，千年古茶树'),
     ],
     stockAlert: 20,
+    stock: 640,
+    totalSales: 2560,
     remark: '景迈山古树，陈香浓郁',
   },
 
@@ -842,6 +882,8 @@ export const teaProducts: TeaProduct[] = [
       img('茉莉花茶窨制工艺展示，鲜花与茶坯拌和'),
     ],
     stockAlert: 45,
+    stock: 110,
+    totalSales: 530,
     remark: '窨得茉莉无上味，列作人间第一香',
   },
   {
@@ -881,6 +923,8 @@ export const teaProducts: TeaProduct[] = [
       img('碧潭飘雪冲泡细节，花瓣在杯中舒展'),
     ],
     stockAlert: 35,
+    stock: 470,
+    totalSales: 1980,
     remark: '碧潭飘雪，花形茶味兼备',
   },
   {
@@ -920,6 +964,8 @@ export const teaProducts: TeaProduct[] = [
       img('杭白菊采摘烘干工艺展示'),
     ],
     stockAlert: 60,
+    stock: 230,
+    totalSales: 1050,
     remark: '清热解毒，明目降火',
   },
   {
@@ -959,6 +1005,8 @@ export const teaProducts: TeaProduct[] = [
       img('玫瑰花茶采摘烘干工艺展示'),
     ],
     stockAlert: 40,
+    stock: 350,
+    totalSales: 1480,
     remark: '美容养颜，疏肝理气',
   },
 
@@ -1001,6 +1049,8 @@ export const teaProducts: TeaProduct[] = [
       img('老班章石磨压饼传统工艺展示'),
     ],
     stockAlert: 5,
+    stock: 180,
+    totalSales: 780,
     remark: '普洱之王，茶气霸道，回甘生津',
   },
   {
@@ -1039,6 +1089,8 @@ export const teaProducts: TeaProduct[] = [
       img('老同志普洱茶渥堆发酵工艺展示'),
     ],
     stockAlert: 50,
+    stock: 560,
+    totalSales: 2200,
     remark: '性价比之选，陈香醇厚',
   },
   {
@@ -1077,6 +1129,8 @@ export const teaProducts: TeaProduct[] = [
       img('桂花乌龙窨制工艺展示，桂花与乌龙茶拌和'),
     ],
     stockAlert: 35,
+    stock: 75,
+    totalSales: 350,
     remark: '桂花甜香与乌龙醇厚交融',
   },
   {
@@ -1116,6 +1170,8 @@ export const teaProducts: TeaProduct[] = [
       img('小罐茶充氮保鲜技术说明'),
     ],
     stockAlert: 25,
+    stock: 490,
+    totalSales: 2050,
     remark: '大师之作，一罐一泡，充氮保鲜',
   },
   {
@@ -1155,6 +1211,8 @@ export const teaProducts: TeaProduct[] = [
       img('祁红毛峰发酵工艺展示'),
     ],
     stockAlert: 30,
+    stock: 300,
+    totalSales: 1350,
     remark: '祁门香，似花似果似蜜',
   },
   {
@@ -1195,6 +1253,8 @@ export const teaProducts: TeaProduct[] = [
       img('赛珍珠铁观音叶底绿叶红镶边特写'),
     ],
     stockAlert: 20,
+    stock: 820,
+    totalSales: 3420,
     remark: '浓香型铁观音标杆，焦糖香回甘迅猛',
   },
   {
@@ -1234,6 +1294,8 @@ export const teaProducts: TeaProduct[] = [
       img('霍山黄芽闷黄工艺展示'),
     ],
     stockAlert: 25,
+    stock: 140,
+    totalSales: 670,
     remark: '黄绿披毫，清甜柔和',
   },
   {
@@ -1273,6 +1335,8 @@ export const teaProducts: TeaProduct[] = [
       img('贡眉陈化仓储环境展示'),
     ],
     stockAlert: 35,
+    stock: 610,
+    totalSales: 2480,
     remark: '陈年贡眉，野花蜜韵，枣香渐显',
   },
   {
@@ -1312,6 +1376,8 @@ export const teaProducts: TeaProduct[] = [
       img('六堡茶传统双蒸双压工艺展示'),
     ],
     stockAlert: 25,
+    stock: 95,
+    totalSales: 440,
     remark: '槟榔香显著，祛湿养胃',
   },
   {
@@ -1351,6 +1417,8 @@ export const teaProducts: TeaProduct[] = [
       img('小罐茶大红袍大师制茶工艺展示'),
     ],
     stockAlert: 15,
+    stock: 370,
+    totalSales: 1580,
     remark: '大师之作，岩骨花香，一罐一泡',
   },
   {
@@ -1390,6 +1458,8 @@ export const teaProducts: TeaProduct[] = [
       img('春伦茉莉银针窨制工艺展示，八窨一提'),
     ],
     stockAlert: 20,
+    stock: 250,
+    totalSales: 1120,
     remark: '八窨一提，毫香与花香交融',
   },
 ];
