@@ -201,12 +201,12 @@ export default function ProductBrandDetail() {
               {/* 统计数字 */}
               <div style={{ display: 'flex', gap: 'var(--space-8)', marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-neutral-200)' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
-                  <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#FD742D' }}>{associatedProducts.length}</span>
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>商品数量</span>
+                  <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#FD742D' }}>{associatedProducts.length}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>供应商数量</span>
                   <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#FD742D' }}>{associatedSuppliers.length}</span>
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>供应商</span>
                 </div>
               </div>
             </div>
