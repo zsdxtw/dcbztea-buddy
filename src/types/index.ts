@@ -382,5 +382,6 @@ export interface TeaProduct {
   reservedStock: number;
   totalSales: number;
   features: string;
+  includesTeaware: boolean;
   remark: string;
 }

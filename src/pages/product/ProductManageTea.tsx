@@ -47,6 +47,7 @@ export default function ProductManageTea() {
   const [purchaseFilter, setPurchaseFilter] = useState('');
   const [productionFilter, setProductionFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
+  const [quickFilter, setQuickFilter] = useState<'' | 'teaware' | 'lowStock'>('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'sales'>('default');
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
@@ -70,6 +71,8 @@ export default function ProductManageTea() {
       if (purchaseFilter && p.purchaseStatus !== purchaseFilter) return false;
       if (productionFilter && p.productionStatus !== productionFilter) return false;
       if (brandFilter && p.brand !== brandFilter) return false;
+      if (quickFilter === 'teaware' && !p.includesTeaware) return false;
+      if (quickFilter === 'lowStock' && p.stock >= p.stockAlert) return false;
       if (keyword) {
         const kw = keyword.toLowerCase();
         if (
@@ -94,7 +97,7 @@ export default function ProductManageTea() {
       result = [...result].sort((a, b) => b.totalSales - a.totalSales);
     }
     return result;
-  }, [keyword, categoryFilter, shelfFilter, purchaseFilter, productionFilter, brandFilter, sortBy, priceMin, priceMax]);
+  }, [keyword, categoryFilter, shelfFilter, purchaseFilter, productionFilter, brandFilter, quickFilter, sortBy, priceMin, priceMax]);
 
   // 分页
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -108,6 +111,7 @@ export default function ProductManageTea() {
   const handlePurchaseChange = (value: string) => { setPurchaseFilter(value); setCurrentPage(1); };
   const handleProductionChange = (value: string) => { setProductionFilter(value); setCurrentPage(1); };
   const handleBrandChange = (value: string) => { setBrandFilter(value); setCurrentPage(1); };
+  const handleQuickFilter = (value: '' | 'teaware' | 'lowStock') => { setQuickFilter(quickFilter === value ? '' : value); setCurrentPage(1); };
   const handleSearch = (kw: string) => { setKeyword(kw); setCurrentPage(1); };
   const handleSortChange = (sort: 'default' | 'price-asc' | 'price-desc' | 'sales') => { setSortBy(sort); setCurrentPage(1); };
   const handlePriceMinChange = (v: string) => { setPriceMin(v); setCurrentPage(1); };
@@ -123,6 +127,17 @@ export default function ProductManageTea() {
     fontSize: 'var(--text-sm)',
     transition: 'var(--transition-fast)',
     whiteSpace: 'nowrap',
+  });
+
+  const selectStyle = (hasValue: boolean): React.CSSProperties => ({
+    padding: '4px 12px',
+    borderRadius: 'var(--radius-md)',
+    border: `1px solid ${hasValue ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+    background: hasValue ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+    color: hasValue ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+    fontSize: 'var(--text-sm)',
+    outline: 'none',
+    cursor: 'pointer',
   });
 
   return (
@@ -160,6 +175,11 @@ export default function ProductManageTea() {
               </button>
             ))}
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>快捷：</span>
+            <button style={filterBtnStyle(quickFilter === 'teaware')} onClick={() => handleQuickFilter('teaware')}>带茶具</button>
+            <button style={filterBtnStyle(quickFilter === 'lowStock')} onClick={() => handleQuickFilter('lowStock')}>库存紧张</button>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
             <input
               className="filter-input"
@@ -171,16 +191,7 @@ export default function ProductManageTea() {
             <select
               value={shelfFilter}
               onChange={(e) => handleShelfChange(e.target.value)}
-              style={{
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-neutral-200)',
-                background: 'var(--color-neutral-0)',
-                color: 'var(--color-neutral-600)',
-                fontSize: 'var(--text-sm)',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
+              style={selectStyle(!!shelfFilter)}
             >
               <option value="">上下架状态</option>
               <option value="on">上架</option>
@@ -189,16 +200,7 @@ export default function ProductManageTea() {
             <select
               value={purchaseFilter}
               onChange={(e) => handlePurchaseChange(e.target.value)}
-              style={{
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-neutral-200)',
-                background: 'var(--color-neutral-0)',
-                color: 'var(--color-neutral-600)',
-                fontSize: 'var(--text-sm)',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
+              style={selectStyle(!!purchaseFilter)}
             >
               <option value="">采购状态</option>
               <option value="available">可采</option>
@@ -207,16 +209,7 @@ export default function ProductManageTea() {
             <select
               value={productionFilter}
               onChange={(e) => handleProductionChange(e.target.value)}
-              style={{
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-neutral-200)',
-                background: 'var(--color-neutral-0)',
-                color: 'var(--color-neutral-600)',
-                fontSize: 'var(--text-sm)',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
+              style={selectStyle(!!productionFilter)}
             >
               <option value="">生产状态</option>
               <option value="producing">生产</option>
