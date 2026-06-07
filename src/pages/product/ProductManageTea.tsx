@@ -267,6 +267,21 @@ export default function ProductManageTea() {
     }));
   };
 
+  // 当前品牌下的系列选项
+  const currentBrandSeries = useMemo(() => {
+    const brand = brandItems.find(b => b.name === form.brand);
+    return brand?.series || [];
+  }, [form.brand]);
+
+  // 将新系列同步到品牌管理数据
+  const syncSeriesToBrand = (brandName: string, seriesName: string) => {
+    if (!seriesName.trim()) return;
+    const brand = brandItems.find(b => b.name === brandName);
+    if (brand && !brand.series.includes(seriesName.trim())) {
+      brand.series.push(seriesName.trim());
+    }
+  };
+
   // 新增商品
   const handleOpenAdd = () => {
     setForm({ ...emptyForm });
@@ -312,6 +327,11 @@ export default function ProductManageTea() {
 
     const existingCount = products.filter(p => p.brand === form.brand).length;
     const code = generateProductCode(l1Name, l2Name, form.brand, existingCount + 1);
+
+    // 同步新系列到品牌管理
+    if (form.series) {
+      syncSeriesToBrand(form.brand, form.series);
+    }
 
     const newProduct: TeaProduct = {
       id: String(Date.now()),
@@ -928,7 +948,20 @@ export default function ProductManageTea() {
                 </div>
                 <div className="drawer-form-field">
                   <label className="drawer-label">系列</label>
-                  <input className="detail-input" value={form.series} onChange={(e) => setForm({ ...form, series: e.target.value })} placeholder="请输入系列" />
+                  {currentBrandSeries.length > 0 ? (
+                    <select
+                      className="detail-input"
+                      value={form.series}
+                      onChange={(e) => setForm({ ...form, series: e.target.value })}
+                    >
+                      <option value="">请选择系列</option>
+                      {currentBrandSeries.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input className="detail-input" value={form.series} onChange={(e) => setForm({ ...form, series: e.target.value })} placeholder="请输入系列名称" />
+                  )}
                 </div>
               </div>
 

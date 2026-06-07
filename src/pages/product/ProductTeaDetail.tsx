@@ -136,10 +136,14 @@ export default function ProductTeaDetail() {
   const handleSaveEdit = () => {
     // 更新分类
     if (editComputedCategories.length > 0) {
-      (form as any).category = editComputedCategories[0];
+      form.category = editComputedCategories[0];
     }
     // 更新含茶具标记
-    (form as any).includesTeaware = computedIncludesTeaware;
+    form.includesTeaware = computedIncludesTeaware;
+    // 同步新系列到品牌管理
+    if (form.series && form.brand) {
+      syncSeriesToBrand(form.brand, form.series);
+    }
     // 更新商品数据（实际项目中应调用API）
     Object.assign(product, form);
     setEditMode(false);
@@ -150,10 +154,19 @@ export default function ProductTeaDetail() {
 
   // 编辑模式下：品牌对应的系列选项
   const brandSeriesOptions = useMemo(() => {
-    const brandName = f.brand || '';
+    const brandName = (editMode ? form.brand : product.brand) || '';
     const brand = brandItems.find(b => b.name === brandName);
     return brand?.series || [];
-  }, [f.brand]);
+  }, [editMode, form.brand, product.brand]);
+
+  // 将新系列同步到品牌管理数据
+  const syncSeriesToBrand = (brandName: string, seriesName: string) => {
+    if (!seriesName.trim()) return;
+    const brand = brandItems.find(b => b.name === brandName);
+    if (brand && !brand.series.includes(seriesName.trim())) {
+      brand.series.push(seriesName.trim());
+    }
+  };
 
   // 编辑模式下：分类联动
   const editL1Type = useMemo(() => {
@@ -358,15 +371,16 @@ export default function ProductTeaDetail() {
                   </select>
                 </EditRow>
                 <EditRow label="系列">
-                  <select className="detail-input" value={f.series || ''} onChange={(e) => setForm({ ...form, series: e.target.value })} style={selectStyle}>
-                    <option value="">请选择系列</option>
-                    {brandSeriesOptions.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                    {f.series && !brandSeriesOptions.includes(f.series) && (
-                      <option value={f.series}>{f.series}</option>
-                    )}
-                  </select>
+                  {brandSeriesOptions.length > 0 ? (
+                    <select className="detail-input" value={f.series || ''} onChange={(e) => setForm({ ...form, series: e.target.value })} style={selectStyle}>
+                      <option value="">请选择系列</option>
+                      {brandSeriesOptions.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input className="detail-input" value={f.series || ''} onChange={(e) => setForm({ ...form, series: e.target.value })} style={inputStyle} placeholder="请输入系列名称" />
+                  )}
                 </EditRow>
                 <EditRow label="品级">
                   <select className="detail-input" value={f.grade || ''} onChange={(e) => setForm({ ...form, grade: e.target.value })} style={selectStyle}>
