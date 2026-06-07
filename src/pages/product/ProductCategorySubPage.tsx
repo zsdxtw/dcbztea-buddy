@@ -180,14 +180,14 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
               <button className="category-tree-action-btn" title="新增子分类" onClick={() => handleAddChild(node.id, 1)}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
               </button>
-              <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
+              <button className="category-tree-action-btn category-tree-action-delete" title={node.productCount > 0 ? '该分类下有商品，不可删除' : '删除'} disabled={node.productCount > 0} style={node.productCount > 0 ? { opacity: 0.3, cursor: 'not-allowed' } : undefined} onClick={() => { if (node.productCount === 0) handleDelete(node.id); }}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M3 4h8M5 4V3h4v1M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 4l.7 7h4.6l.7-7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
               </button>
             </span>
           )}
           {treeDepth >= 1 && (
             <span className="category-tree-actions" onClick={(e) => e.stopPropagation()}>
-              <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
+              <button className="category-tree-action-btn category-tree-action-delete" title={node.productCount > 0 ? '该分类下有商品，不可删除' : '删除'} disabled={node.productCount > 0} style={node.productCount > 0 ? { opacity: 0.3, cursor: 'not-allowed' } : undefined} onClick={() => { if (node.productCount === 0) handleDelete(node.id); }}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M3 4h8M5 4V3h4v1M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 4l.7 7h4.6l.7-7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
               </button>
             </span>
@@ -336,7 +336,9 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
                     ) : (
                       <>
                         <Button size="sm" onClick={handleStartEdit}>编辑</Button>
-                        <Button size="sm" style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
+                        {selectedNode.productCount === 0 && (
+                          <Button size="sm" style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
+                        )}
                       </>
                     )}
                   </div>
@@ -371,11 +373,19 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
             <div className="category-dialog" onClick={(e) => e.stopPropagation()}>
               <div className="category-dialog-title">确认删除</div>
               <div style={{ marginBottom: 'var(--space-5)', fontSize: 'var(--text-base)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-md)' }}>
-                确定要删除分类「<span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{selectedNode.name}</span>」吗？{selectedNode.children && selectedNode.children.length > 0 && <span style={{ color: '#FD742D', display: 'block', marginTop: 'var(--space-2)' }}>该分类下还有子分类，删除后将一并移除。</span>}
+                {selectedNode.productCount > 0 ? (
+                  <span style={{ color: '#FD742D' }}>分类「<span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{selectedNode.name}</span>」下存在 {selectedNode.productCount} 件商品，不允许删除。请先移除或转移该分类下的所有商品。</span>
+                ) : (
+                  <>
+                    确定要删除分类「<span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{selectedNode.name}</span>」吗？{selectedNode.children && selectedNode.children.length > 0 && <span style={{ color: '#FD742D', display: 'block', marginTop: 'var(--space-2)' }}>该分类下还有子分类，删除后将一并移除。</span>}
+                  </>
+                )}
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
-                <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-                <Button style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => { handleDelete(selectedNode.id); setShowDeleteConfirm(false); }}>确认删除</Button>
+                <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>{selectedNode.productCount > 0 ? '关闭' : '取消'}</Button>
+                {selectedNode.productCount === 0 && (
+                  <Button style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => { handleDelete(selectedNode.id); setShowDeleteConfirm(false); }}>确认删除</Button>
+                )}
               </div>
             </div>
           </div>

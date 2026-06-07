@@ -9,7 +9,7 @@ export const teaProducts: TeaProduct[] = [
   // ── 绿茶 ──
   {
     id: '1',
-    code: 'CP001',
+    code: '10101000019',
     name: '西湖龙井·明前特级',
     category: '绿茶-西湖龙井',
     brand: '西湖牌',
@@ -53,7 +53,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '2',
-    code: 'CP002',
+    code: '10102000017',
     name: '碧螺春·一级',
     category: '绿茶-碧螺春',
     brand: '卢正浩',
@@ -96,7 +96,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '3',
-    code: 'CP003',
+    code: '10103000012',
     name: '竹叶青·品味级',
     category: '绿茶-峨眉竹叶青',
     brand: '竹叶青',
@@ -139,7 +139,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '4',
-    code: 'CP004',
+    code: '10104000014',
     name: '黄山毛峰·特级',
     category: '绿茶-黄山毛峰',
     brand: '谢裕大',
@@ -182,7 +182,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '5',
-    code: 'CP005',
+    code: '10105000011',
     name: '太平猴魁·特级',
     category: '绿茶-太平猴魁',
     brand: '猴坑',
@@ -227,7 +227,7 @@ export const teaProducts: TeaProduct[] = [
   // ── 红茶 ──
   {
     id: '6',
-    code: 'CP006',
+    code: '10206000017',
     name: '正山小种·特级',
     category: '红茶-正山小种',
     brand: '正山堂',
@@ -271,7 +271,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '7',
-    code: 'CP007',
+    code: '10206000024',
     name: '金骏眉·特级',
     category: '红茶-金骏眉',
     brand: '正山堂',
@@ -315,7 +315,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '8',
-    code: 'CP008',
+    code: '10207000010',
     name: '滇红·金芽特级',
     category: '红茶-滇红',
     brand: '凤牌',
@@ -358,7 +358,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '9',
-    code: 'CP009',
+    code: '10208000015',
     name: '祁门红茶·特级',
     category: '红茶-祁门红茶',
     brand: '天之红',
@@ -403,7 +403,7 @@ export const teaProducts: TeaProduct[] = [
   // ── 青茶 ──
   {
     id: '10',
-    code: 'CP010',
+    code: '10309000013',
     name: '大红袍·特级',
     category: '青茶-大红袍',
     brand: '武夷星',
@@ -447,7 +447,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '11',
-    code: 'CP011',
+    code: '10310000016',
     name: '铁观音·清香一级',
     category: '青茶-铁观音',
     brand: '八马',
@@ -490,7 +490,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '12',
-    code: 'CP012',
+    code: '10311000012',
     name: '凤凰单丛·蜜兰香',
     category: '青茶-凤凰单丛',
     brand: '海堤',
@@ -535,7 +535,7 @@ export const teaProducts: TeaProduct[] = [
   // ── 白茶 ──
   {
     id: '13',
-    code: 'CP013',
+    code: '10412000018',
     name: '白毫银针·特级',
     category: '白茶-白毫银针',
     brand: '品品香',
@@ -579,7 +579,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '14',
-    code: 'CP014',
+    code: '10413000019',
     name: '白牡丹·一级',
     category: '白茶-白牡丹',
     brand: '绿雪芽',
@@ -622,7 +622,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '15',
-    code: 'CP015',
+    code: '10412000025',
     name: '寿眉·2019年陈',
     category: '白茶-寿眉',
     brand: '品品香',
@@ -667,7 +667,7 @@ export const teaProducts: TeaProduct[] = [
   // ── 黄茶 ──
   {
     id: '16',
-    code: 'CP016',
+    code: '10514000012',
     name: '君山银针·特级',
     category: '黄茶-君山银针',
     brand: '君山',
@@ -710,7 +710,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '17',
-    code: 'CP017',
+    code: '10515000019',
     name: '蒙顶黄芽·特级',
     category: '黄茶-蒙顶黄芽',
     brand: '蒙顶山茶',
@@ -755,7 +755,7 @@ export const teaProducts: TeaProduct[] = [
   // ── 黑茶 ──
   {
     id: '18',
-    code: 'CP018',
+    code: '10616000016',
     name: '大益7572·熟普',
     category: '黑茶-普洱茶',
     brand: '大益',
@@ -799,7 +799,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '19',
-    code: 'CP019',
+    code: '10617000019',
     name: '白沙溪·天尖',
     category: '黑茶-安化黑茶',
     brand: '白沙溪',
@@ -842,7 +842,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '20',
-    code: 'CP020',
+    code: '10618000011',
     name: '澜沧古茶·001',
     category: '黑茶-普洱茶',
     brand: '澜沧古茶',
@@ -887,7 +887,7 @@ export const teaProducts: TeaProduct[] = [
   // ── 花草茶 ──
   {
     id: '21',
-    code: 'CP021',
+    code: '10719000019',
     name: '茉莉花茶·特级',
     category: '花草茶-茉莉花茶',
     brand: '张一元',
@@ -930,7 +930,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '22',
-    code: 'CP022',
+    code: '10720000014',
     name: '茉莉花茶·碧潭飘雪',
     category: '花草茶-茉莉花茶',
     brand: '吴裕泰',
@@ -973,7 +973,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '23',
-    code: 'CP023',
+    code: '10721000017',
     name: '菊花茶·杭白菊特级',
     category: '花草茶-菊花茶',
     brand: '春伦',
@@ -1016,7 +1016,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '24',
-    code: 'CP024',
+    code: '10722000012',
     name: '玫瑰花茶·平阴重瓣红玫瑰',
     category: '花草茶-玫瑰花茶',
     brand: '中茶',
@@ -1061,7 +1061,7 @@ export const teaProducts: TeaProduct[] = [
   // ── 更多品类补充 ──
   {
     id: '25',
-    code: 'CP025',
+    code: '10623000014',
     name: '陈升号·老班章',
     category: '黑茶-普洱茶',
     brand: '陈升号',
@@ -1105,7 +1105,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '26',
-    code: 'CP026',
+    code: '10624000012',
     name: '老同志·普洱熟茶',
     category: '黑茶-普洱茶',
     brand: '老同志',
@@ -1147,7 +1147,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '27',
-    code: 'CP027',
+    code: '10325000017',
     name: '天福茗茶·桂花乌龙',
     category: '青茶-铁观音',
     brand: '天福茗茶',
@@ -1189,7 +1189,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '28',
-    code: 'CP028',
+    code: '10126000013',
     name: '小罐茶·龙井',
     category: '绿茶-西湖龙井',
     brand: '小罐茶',
@@ -1232,7 +1232,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '29',
-    code: 'CP029',
+    code: '10227000010',
     name: '祥源茶·祁红毛峰',
     category: '红茶-祁门红茶',
     brand: '祥源茶',
@@ -1275,7 +1275,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '30',
-    code: 'CP030',
+    code: '10310000026',
     name: '八马·赛珍珠铁观音',
     category: '青茶-铁观音',
     brand: '八马',
@@ -1319,7 +1319,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '31',
-    code: 'CP031',
+    code: '10515000027',
     name: '霍山黄芽·一级',
     category: '黄茶-霍山黄芽',
     brand: '蒙顶山茶',
@@ -1362,7 +1362,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '32',
-    code: 'CP032',
+    code: '10413000021',
     name: '贡眉·2018年陈',
     category: '白茶-贡眉',
     brand: '绿雪芽',
@@ -1405,7 +1405,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '33',
-    code: 'CP033',
+    code: '10622000026',
     name: '六堡茶·特级',
     category: '黑茶-六堡茶',
     brand: '中茶',
@@ -1448,7 +1448,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '34',
-    code: 'CP034',
+    code: '10326000023',
     name: '小罐茶·大红袍',
     category: '青茶-大红袍',
     brand: '小罐茶',
@@ -1491,7 +1491,7 @@ export const teaProducts: TeaProduct[] = [
   },
   {
     id: '35',
-    code: 'CP035',
+    code: '10721000023',
     name: '春伦·茉莉银针',
     category: '花草茶-茉莉花茶',
     brand: '春伦',
