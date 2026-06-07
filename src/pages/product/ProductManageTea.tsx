@@ -719,7 +719,7 @@ export default function ProductManageTea() {
       {/* 新增商品抽屉 */}
       {showDrawer && (
         <div className="drawer-overlay" onClick={() => setShowDrawer(false)}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 560 }}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">新增商品</span>
               <button className="drawer-close" onClick={() => setShowDrawer(false)}>
