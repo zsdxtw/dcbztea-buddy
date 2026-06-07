@@ -251,19 +251,13 @@ export default function ProductManageTea() {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: 2,
+                    height: 4,
                     background: (() => {
                       const topCat = product.category.split('-')[0];
                       const color = CATEGORY_COLORS[topCat];
                       return color || 'var(--color-neutral-200)';
                     })(),
                   }} />
-                  {/* 茶类标签 */}
-                  {teaCat && (
-                    <div style={{ position: 'absolute', bottom: 6, right: 'var(--space-2)' }}>
-                      <Tag category={teaCat} />
-                    </div>
-                  )}
                 </div>
 
                 {/* 商品信息 */}
@@ -310,6 +304,16 @@ export default function ProductManageTea() {
                   }}>
                     SKU {product.code}
                   </div>
+                  {/* 茶类色条 */}
+                  <div style={{
+                    height: 4,
+                    borderRadius: 2,
+                    background: (() => {
+                      const topCat = product.category.split('-')[0];
+                      const color = CATEGORY_COLORS[topCat];
+                      return color || 'var(--color-neutral-200)';
+                    })(),
+                  }} />
                   {/* 价格 + 标签 */}
                   <div style={{
                     display: 'flex',
@@ -334,6 +338,7 @@ export default function ProductManageTea() {
                       }}>
                         {product.brand}
                       </span>
+                      {teaCat && <Tag category={teaCat} />}
                       <StatusTag
                         variant={product.shelfStatus === 'on' ? 'success' : 'error'}
                         label={getShelfStatusLabel(product.shelfStatus)}
