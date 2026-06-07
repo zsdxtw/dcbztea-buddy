@@ -136,6 +136,7 @@ export default function ProductTeaDetail() {
                 <DetailRow label="税率">{product.taxRate}%</DetailRow>
                 <DetailRow label="69码"><span className="mono">{product.barcode69}</span></DetailRow>
                 <DetailRow label="型号"><span className="mono">{product.model}</span></DetailRow>
+                <DetailRow label="产品特点" span>{product.features}</DetailRow>
               </div>
             </div>
           </div>

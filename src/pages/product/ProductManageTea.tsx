@@ -216,80 +216,136 @@ export default function ProductManageTea() {
                   border: '1px solid var(--color-neutral-100)',
                   overflow: 'hidden',
                   cursor: 'pointer',
-                  transition: 'box-shadow var(--transition-fast)',
+                  transition: 'box-shadow var(--transition-fast), transform var(--transition-fast)',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)';
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
                 }}
               >
-                {/* 商品主图 */}
-                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)' }}>
+                {/* 商品主图 + 价格角标 */}
+                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)', position: 'relative' }}>
                   <img
                     src={mainImage}
                     alt={product.name}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   />
-                </div>
-
-                {/* 商品信息 */}
-                <div style={{ padding: 'var(--space-3)' }}>
-                  {/* 名称 + 茶类标签 */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 'var(--space-2)', gap: 'var(--space-2)' }}>
-                    <span style={{
-                      fontSize: 'var(--text-base)',
-                      fontWeight: 'var(--font-semibold)',
-                      color: 'var(--color-neutral-800)',
-                      lineHeight: 1.3,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      flex: 1,
-                      minWidth: 0,
-                    }} title={product.name}>
-                      {product.name}
+                  {/* 价格角标 */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.55))',
+                    padding: 'var(--space-4) var(--space-3) var(--space-2)',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
+                  }}>
+                    <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}>
+                      ¥{product.marketPrice}
                     </span>
                     {teaCat && <Tag category={teaCat} />}
                   </div>
-
-                  {/* 品牌 + 规格 */}
-                  <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={product.brand}>{product.brand}</span>
-                    <span style={{ color: 'var(--color-neutral-300)' }}>|</span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={product.spec}>{product.spec}</span>
-                  </div>
-
-                  {/* SKU + 预占 */}
-                  <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>
-                    <span>SKU：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.code}</span></span>
-                    <span>预占：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.reservedStock}</span></span>
-                  </div>
-
-                  {/* 库存 + 销量 */}
-                  <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>
-                    <span>库存：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.stock}</span></span>
-                    <span>销量：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.totalSales}</span></span>
-                  </div>
-
-                  {/* 价格 + 状态 */}
+                  {/* 上架状态角标 */}
                   <div style={{
-                    borderTop: '1px solid var(--color-neutral-100)',
-                    paddingTop: 'var(--space-2)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
+                    position: 'absolute',
+                    top: 'var(--space-2)',
+                    right: 'var(--space-2)',
                   }}>
-                    <div>
-                      <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: '#FD742D' }}>
-                        ¥{product.marketPrice}
-                      </span>
-                    </div>
                     <StatusTag
                       variant={product.shelfStatus === 'on' ? 'success' : 'error'}
                       label={getShelfStatusLabel(product.shelfStatus)}
                     />
+                  </div>
+                </div>
+
+                {/* 商品信息 */}
+                <div style={{ padding: 'var(--space-3) var(--space-3) var(--space-2)' }}>
+                  {/* 品牌突出展示 */}
+                  <div style={{ marginBottom: 'var(--space-1)' }}>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '1px 8px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--color-module-current-lightest)',
+                      color: 'var(--color-module-current-base)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-semibold)',
+                      lineHeight: '20px',
+                    }}>
+                      {product.brand}
+                    </span>
+                  </div>
+
+                  {/* 商品名称 */}
+                  <div style={{
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-semibold)',
+                    color: 'var(--color-neutral-800)',
+                    lineHeight: 1.4,
+                    marginBottom: 'var(--space-2)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }} title={product.name}>
+                    {product.name}
+                  </div>
+
+                  {/* 产品特点 */}
+                  <div style={{
+                    fontSize: 'var(--text-xs)',
+                    color: 'var(--color-neutral-500)',
+                    lineHeight: 1.5,
+                    marginBottom: 'var(--space-2)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }} title={product.features}>
+                    {product.features}
+                  </div>
+
+                  {/* SKU编号突出展示 */}
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '1px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--color-neutral-100)',
+                    fontSize: 'var(--text-xs)',
+                    fontFamily: 'var(--font-family-mono, monospace)',
+                    color: 'var(--color-neutral-600)',
+                    fontWeight: 'var(--font-medium)',
+                    marginBottom: 'var(--space-2)',
+                  }}>
+                    SKU {product.code}
+                  </div>
+                </div>
+
+                {/* 底部数据栏 */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                  borderTop: '1px solid var(--color-neutral-100)',
+                  padding: 'var(--space-2) 0',
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>库存</div>
+                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>{product.stock}</div>
+                  </div>
+                  <div style={{ width: 1, background: 'var(--color-neutral-100)' }} />
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>预占</div>
+                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>{product.reservedStock}</div>
+                  </div>
+                  <div style={{ width: 1, background: 'var(--color-neutral-100)' }} />
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>销量</div>
+                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)' }}>{product.totalSales}</div>
                   </div>
                 </div>
               </div>

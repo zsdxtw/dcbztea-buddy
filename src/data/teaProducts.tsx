@@ -48,6 +48,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 320,
   reservedStock: 26,
     totalSales: 1280,
+  features: '明前头采·豆花香·扁平挺直',
     remark: '明前头采，豆花香显著',
   },
   {
@@ -90,6 +91,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 580,
   reservedStock: 68,
     totalSales: 2350,
+  features: '卷曲成螺·白毫显露·花果香',
     remark: '花果香显著，条索卷曲',
   },
   {
@@ -132,6 +134,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 150,
   reservedStock: 29,
     totalSales: 680,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '清香馥郁，扁平光滑',
   },
   {
@@ -174,6 +177,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 420,
   reservedStock: 53,
     totalSales: 1920,
+  features: '峰显毫露·鱼叶金黄·兰花香',
     remark: '兰花香显著，芽头肥壮',
   },
   {
@@ -216,6 +220,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 90,
   reservedStock: 7,
     totalSales: 320,
+  features: '两叶抱芽·扁平挺直·猴韵独特',
     remark: '两叶抱芽，花香高爽带猴韵',
   },
 
@@ -261,6 +266,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 260,
   reservedStock: 35,
     totalSales: 1450,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '松烟香显著，桂圆汤味',
   },
   {
@@ -304,6 +310,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 780,
   reservedStock: 66,
     totalSales: 3100,
+  features: '单芽制作·花果蜜香·金毫满披',
     remark: '全芽头制作，蜜香花果香交融',
   },
   {
@@ -346,6 +353,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 45,
   reservedStock: 3,
     totalSales: 180,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '金毫显露，蜜香浓郁',
   },
   {
@@ -388,6 +396,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 310,
   reservedStock: 34,
     totalSales: 1560,
+  features: '祁门香·金毫显露·蜜糖香',
     remark: '祁门香独特，似花似果似蜜',
   },
 
@@ -433,6 +442,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 670,
   reservedStock: 79,
     totalSales: 2780,
+  features: '岩骨花香·岩韵悠长·传统焙火',
     remark: '岩骨花香，七泡有余香',
   },
   {
@@ -475,6 +485,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 200,
   reservedStock: 20,
     totalSales: 890,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '兰花香馥郁，七泡有余香',
   },
   {
@@ -517,6 +528,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 530,
   reservedStock: 82,
     totalSales: 2100,
+  features: '蜜兰香型·山韵独特·单株采摘',
     remark: '蜜兰香型，山韵蜜味',
   },
 
@@ -562,6 +574,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 85,
   reservedStock: 8,
     totalSales: 410,
+  features: '全芽制作·白毫密披·毫香蜜韵',
     remark: '满披白毫，毫香清鲜',
   },
   {
@@ -604,6 +617,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 410,
   reservedStock: 30,
     totalSales: 1780,
+  features: '一芽一两叶·花香清雅·自然萎凋',
     remark: '一芽两叶，花香清雅',
   },
   {
@@ -646,6 +660,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 290,
   reservedStock: 56,
     totalSales: 1320,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '陈年寿眉，枣香药香，可煮可泡',
   },
 
@@ -690,6 +705,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 160,
   reservedStock: 11,
     totalSales: 620,
+  features: '金镶玉·芽头肥壮·杏黄透亮',
     remark: '金镶玉美称，芽尖三起三落',
   },
   {
@@ -732,6 +748,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 720,
   reservedStock: 90,
     totalSales: 2950,
+  features: '芽头肥壮·黄汤黄叶·甜香清雅',
     remark: '甜香鲜嫩，甘醇鲜爽',
   },
 
@@ -777,6 +794,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 55,
   reservedStock: 4,
     totalSales: 230,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '熟普标杆，陈香顺滑',
   },
   {
@@ -819,6 +837,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 380,
   reservedStock: 23,
     totalSales: 1650,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '天尖等级，金花茂盛',
   },
   {
@@ -861,6 +880,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 640,
   reservedStock: 49,
     totalSales: 2560,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '景迈山古树，陈香浓郁',
   },
 
@@ -905,6 +925,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 110,
   reservedStock: 13,
     totalSales: 530,
+  features: '窨制六次·茉莉花香·鲜灵持久',
     remark: '窨得茉莉无上味，列作人间第一香',
   },
   {
@@ -947,6 +968,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 470,
   reservedStock: 45,
     totalSales: 1980,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '碧潭飘雪，花形茶味兼备',
   },
   {
@@ -989,6 +1011,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 230,
   reservedStock: 17,
     totalSales: 1050,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '清热解毒，明目降火',
   },
   {
@@ -1031,6 +1054,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 350,
   reservedStock: 50,
     totalSales: 1480,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '美容养颜，疏肝理气',
   },
 
@@ -1076,6 +1100,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 180,
   reservedStock: 21,
     totalSales: 780,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '普洱之王，茶气霸道，回甘生津',
   },
   {
@@ -1117,6 +1142,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 560,
   reservedStock: 60,
     totalSales: 2200,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '性价比之选，陈香醇厚',
   },
   {
@@ -1158,6 +1184,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 75,
   reservedStock: 11,
     totalSales: 350,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '桂花甜香与乌龙醇厚交融',
   },
   {
@@ -1200,6 +1227,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 490,
   reservedStock: 80,
     totalSales: 2050,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '大师之作，一罐一泡，充氮保鲜',
   },
   {
@@ -1242,6 +1270,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 300,
   reservedStock: 18,
     totalSales: 1350,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '祁门香，似花似果似蜜',
   },
   {
@@ -1285,6 +1314,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 820,
   reservedStock: 64,
     totalSales: 3420,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '浓香型铁观音标杆，焦糖香回甘迅猛',
   },
   {
@@ -1327,6 +1357,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 140,
   reservedStock: 26,
     totalSales: 670,
+  features: '形似雀舌·黄汤黄叶·栗香持久',
     remark: '黄绿披毫，清甜柔和',
   },
   {
@@ -1369,6 +1400,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 610,
   reservedStock: 56,
     totalSales: 2480,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '陈年贡眉，野花蜜韵，枣香渐显',
   },
   {
@@ -1411,6 +1443,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 95,
   reservedStock: 6,
     totalSales: 440,
+  features: '红浓陈醇·槟榔香·越陈越香',
     remark: '槟榔香显著，祛湿养胃',
   },
   {
@@ -1453,6 +1486,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 370,
   reservedStock: 53,
     totalSales: 1580,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '大师之作，岩骨花香，一罐一泡',
   },
   {
@@ -1495,6 +1529,7 @@ export const teaProducts: TeaProduct[] = [
     stock: 250,
   reservedStock: 27,
     totalSales: 1120,
+  features: '品质优良·口感醇厚·传统工艺',
     remark: '八窨一提，毫香与花香交融',
   },
 ];
