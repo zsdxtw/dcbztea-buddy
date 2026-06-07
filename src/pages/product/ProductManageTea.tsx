@@ -276,26 +276,24 @@ export default function ProductManageTea() {
                     {product.features}
                   </div>
 
-                  {/* SKU编号突出展示 */}
-                  <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '1px 8px',
-                    borderRadius: 'var(--radius-sm)',
-                    background: 'var(--color-neutral-100)',
-                    fontSize: 'var(--text-xs)',
-                    fontFamily: 'var(--font-family-mono, monospace)',
-                    color: 'var(--color-neutral-600)',
-                    fontWeight: 'var(--font-medium)',
-                    marginBottom: 'var(--space-2)',
-                  }}>
-                    SKU {product.code}
-                  </div>
-                  {/* 茶类标签 + 色条 */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-1)' }}>
-                    <div style={{ flex: 1 }} />
+                  {/* SKU + 茶类标签 */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '1px 8px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--color-neutral-100)',
+                      fontSize: 'var(--text-xs)',
+                      fontFamily: 'var(--font-family-mono, monospace)',
+                      color: 'var(--color-neutral-600)',
+                      fontWeight: 'var(--font-medium)',
+                    }}>
+                      SKU {product.code}
+                    </div>
                     {teaCat && <Tag category={teaCat} />}
                   </div>
+                  {/* 茶类色条 */}
                   <div style={{
                     height: 2,
                     borderRadius: 1,
