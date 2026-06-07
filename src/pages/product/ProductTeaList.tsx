@@ -37,9 +37,10 @@ export default function ProductTeaList() {
   const [form, setForm] = useState({ ...emptyForm });
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
-  // 批量删除模式
+  // 批量删除
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedForDelete, setSelectedForDelete] = useState<Set<number>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const allOrigins = useMemo(() => {
     const origins = new Set<string>();
@@ -186,7 +187,7 @@ export default function ProductTeaList() {
             {deleteMode ? (
               <>
                 <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
-                <Button onClick={handleConfirmDelete} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+                <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
                   <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   删除所选({selectedForDelete.size})
                 </Button>
@@ -286,6 +287,22 @@ export default function ProductTeaList() {
           </div>
         )}
       </div>
+
+      {/* 删除确认弹窗 */}
+      {showDeleteConfirm && (
+        <div className="category-dialog-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="category-dialog" onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-3)' }}>确认删除</div>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', marginBottom: 'var(--space-5)' }}>
+              确定要删除选中的 {selectedForDelete.size} 个茶种吗？此操作不可撤销。
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
+              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 新增/编辑抽屉 */}
       {showDrawer && (
