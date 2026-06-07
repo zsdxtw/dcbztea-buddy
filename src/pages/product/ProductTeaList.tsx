@@ -186,11 +186,11 @@ export default function ProductTeaList() {
             <Button onClick={handleOpenAdd}><svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>新增</Button>
             {deleteMode ? (
               <>
-                <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
                 <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
                   <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   删除所选({selectedForDelete.size})
                 </Button>
+                <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
               </>
             ) : (
               <Button onClick={handleEnterDeleteMode} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
