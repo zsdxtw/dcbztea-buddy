@@ -108,6 +108,11 @@ export default function ProductManageTea() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [form, setForm] = useState({ ...emptyForm });
 
+  // 批量删除
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [selectedForDelete, setSelectedForDelete] = useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   // 提取所有品牌
   const allBrands = useMemo(() => {
     const brands = new Set<string>();
@@ -266,6 +271,33 @@ export default function ProductManageTea() {
   const handleOpenAdd = () => {
     setForm({ ...emptyForm });
     setShowDrawer(true);
+  };
+
+  // 批量删除
+  const handleEnterDeleteMode = () => {
+    setDeleteMode(true);
+    setSelectedForDelete(new Set());
+  };
+
+  const handleCancelDeleteMode = () => {
+    setDeleteMode(false);
+    setSelectedForDelete(new Set());
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedForDelete((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    const next = products.filter((p) => !selectedForDelete.has(p.id));
+    setProducts(next);
+    setDeleteMode(false);
+    setSelectedForDelete(new Set());
   };
 
   // 保存商品
@@ -456,12 +488,24 @@ export default function ProductManageTea() {
               </svg>
               新增
             </Button>
-            <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={() => { /* TODO: 删除 */ }}>
-              <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
-                <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              删除
-            </Button>
+            {deleteMode ? (
+              <>
+                <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+                  <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
+                    <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  删除所选({selectedForDelete.size})
+                </Button>
+                <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
+              </>
+            ) : (
+              <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleEnterDeleteMode}>
+                <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
+                  <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                删除
+              </Button>
+            )}
             <span style={{ marginLeft: 'auto' }}>
               <input
                 className="filter-input"
@@ -482,28 +526,56 @@ export default function ProductManageTea() {
           {paged.map((product) => {
             const teaCat = parseCategory(product.category);
             const mainImage = product.mainImages[0] || '';
+            const isSelected = selectedForDelete.has(product.id);
             return (
               <div
                 key={product.id}
                 className="product-manage-card"
-                onClick={() => navigate(`/product/product-tea-detail/${product.id}`)}
                 style={{
                   background: 'var(--color-neutral-0)',
                   borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--color-neutral-100)',
+                  border: `1px solid ${isSelected ? '#FD742D' : 'var(--color-neutral-100)'}`,
+                  outline: isSelected ? '2px solid #FD742D' : undefined,
                   overflow: 'hidden',
-                  cursor: 'pointer',
+                  cursor: deleteMode ? 'default' : 'pointer',
                   transition: 'box-shadow var(--transition-fast), transform var(--transition-fast)',
+                  position: 'relative',
+                }}
+                onClick={() => {
+                  if (deleteMode) {
+                    handleToggleSelect(product.id);
+                  } else {
+                    navigate(`/product/product-tea-detail/${product.id}`);
+                  }
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)';
-                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                  if (!deleteMode) {
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)';
+                    (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                  }
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
                   (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
                 }}
               >
+                {/* 删除模式复选框 */}
+                {deleteMode && (
+                  <div
+                    style={{ position: 'absolute', top: 'var(--space-2)', right: 'var(--space-2)', zIndex: 10, cursor: 'pointer' }}
+                    onClick={(e) => { e.stopPropagation(); handleToggleSelect(product.id); }}
+                  >
+                    <div style={{
+                      width: 18, height: 18, borderRadius: 'var(--radius-sm)',
+                      border: `2px solid ${isSelected ? '#FD742D' : 'var(--color-neutral-300)'}`,
+                      background: isSelected ? '#FD742D' : 'var(--color-neutral-0)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'var(--transition-fast)',
+                    }}>
+                      {isSelected && <svg viewBox="0 0 12 12" fill="none" style={{ width: 10, height: 10 }}><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </div>
+                  </div>
+                )}
                 {/* 商品主图 */}
                 <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)', position: 'relative' }}>
                   <img
@@ -715,6 +787,22 @@ export default function ProductManageTea() {
           </div>
         )}
       </div>
+
+      {/* 删除确认弹窗 */}
+      {showDeleteConfirm && (
+        <div className="category-dialog-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="category-dialog" onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-3)' }}>确认删除</div>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', marginBottom: 'var(--space-5)' }}>
+              确定要删除选中的 {selectedForDelete.size} 件商品吗？此操作不可撤销。
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
+              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 新增商品抽屉 */}
       {showDrawer && (
