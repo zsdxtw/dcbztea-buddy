@@ -40,7 +40,10 @@ import ProductTeaCategory from './pages/product/ProductTeaCategory';
 import ProductTeaList from './pages/product/ProductTeaList';
 import ProductGrade from './pages/product/ProductGrade';
 import ProductSpecs from './pages/product/ProductSpecs';
-import ProductCategory from './pages/product/ProductCategory';
+import ProductCategoryTea from './pages/product/ProductCategoryTea';
+import ProductCategoryTeaware from './pages/product/ProductCategoryTeaware';
+import ProductCategoryPeripheral from './pages/product/ProductCategoryPeripheral';
+import ProductCategoryOther from './pages/product/ProductCategoryOther';
 import ProductBrand from './pages/product/ProductBrand';
 import ProductBrandDetail from './pages/product/ProductBrandDetail';
 import ProductUnit from './pages/product/ProductUnit';
@@ -120,7 +123,10 @@ export const router = createBrowserRouter([
       { path: 'product/product-tea-list', element: <ProductTeaList /> },
       { path: 'product/product-grade', element: <ProductGrade /> },
       { path: 'product/product-specs', element: <ProductSpecs /> },
-      { path: 'product/product-category', element: <ProductCategory /> },
+      { path: 'product/product-category-tea', element: <ProductCategoryTea /> },
+      { path: 'product/product-category-teaware', element: <ProductCategoryTeaware /> },
+      { path: 'product/product-category-peripheral', element: <ProductCategoryPeripheral /> },
+      { path: 'product/product-category-other', element: <ProductCategoryOther /> },
       { path: 'product/product-brand', element: <ProductBrand /> },
       { path: 'product/product-brand/:id', element: <ProductBrandDetail /> },
       { path: 'product/product-unit', element: <ProductUnit /> },
