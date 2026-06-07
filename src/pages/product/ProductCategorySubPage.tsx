@@ -72,7 +72,7 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
     if (categoryType === 'tea' && depth === 1) return '茶类介绍';
     if (categoryType === 'tea' && depth === 2) return '茶叶特点';
     if (categoryType !== 'tea' && depth === 1) return '分类说明';
-    if (depth === 2) return '商品说明';
+    if (depth === 2) return categoryType === 'tea' ? '茶叶特点' : '分类说明';
     return '描述';
   };
 
