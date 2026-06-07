@@ -6,10 +6,12 @@
  *
  * 一级分类：茶叶=1, 茶具=2, 茶周边=3, 其他=4
  * 二级分类：按各一级分类下的顺序从01开始编号
- * 品牌编号：按品牌建档顺序从01开始编号
+ * 品牌编号：联动品牌管理中的品牌编号（取后2位）
  * 顺序号：每个品牌下从00001开始按建档顺序编号
  * 校验位：0-9随机数字
  */
+
+import { BRAND_SHORT_CODE_MAP } from '../data/brands';
 
 /** 一级分类编号映射 */
 export const L1_CATEGORY_CODES: Record<string, string> = {
@@ -30,36 +32,8 @@ export const TEA_L2_CATEGORY_CODES: Record<string, string> = {
   '花草茶': '07',
 };
 
-/** 品牌编号映射（按建档顺序） */
-export const BRAND_CODES: Record<string, string> = {
-  '西湖牌': '01',
-  '卢正浩': '02',
-  '竹叶青': '03',
-  '谢裕大': '04',
-  '猴坑': '05',
-  '正山堂': '06',
-  '凤牌': '07',
-  '天之红': '08',
-  '武夷星': '09',
-  '八马': '10',
-  '海堤': '11',
-  '品品香': '12',
-  '绿雪芽': '13',
-  '君山': '14',
-  '蒙顶山茶': '15',
-  '大益': '16',
-  '白沙溪': '17',
-  '澜沧古茶': '18',
-  '张一元': '19',
-  '吴裕泰': '20',
-  '春伦': '21',
-  '中茶': '22',
-  '陈升号': '23',
-  '老同志': '24',
-  '天福茗茶': '25',
-  '小罐茶': '26',
-  '祥源茶': '27',
-};
+/** 品牌编号映射（联动品牌管理，取品牌编号后2位） */
+export const BRAND_CODES: Record<string, string> = BRAND_SHORT_CODE_MAP;
 
 /** 反向映射：品牌编号 -> 品牌名 */
 export const BRAND_CODE_TO_NAME: Record<string, string> = Object.fromEntries(
