@@ -317,13 +317,14 @@ export default function ProductManageTea() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                       <span style={{
                         display: 'inline-block',
-                        padding: '1px 6px',
-                        borderRadius: 'var(--radius-sm)',
-                        background: 'var(--color-module-current-lightest)',
-                        color: 'var(--color-module-current-base)',
+                        padding: '2px 10px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'var(--color-module-current-base)',
+                        color: '#fff',
                         fontSize: 'var(--text-xs)',
-                        fontWeight: 'var(--font-semibold)',
-                        lineHeight: '18px',
+                        fontWeight: 'var(--font-bold)',
+                        lineHeight: '20px',
+                        letterSpacing: '0.5px',
                       }}>
                         {product.brand}
                       </span>
