@@ -318,7 +318,7 @@ export default function ProductBrandDetail() {
           </Card>
 
           {/* 热销商品TOP5 */}
-          <Card title="热销商品TOP5" headerRight={<span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>共 {associatedProducts.length} 个</span>}>
+          <Card title="热销商品TOP5" headerRight={<span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>商品数量共 {associatedProducts.length} 个</span>}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {associatedProducts.map((p, i) => (
                 <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
