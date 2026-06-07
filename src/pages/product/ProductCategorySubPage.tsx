@@ -167,7 +167,11 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
         <div className="category-layout">
           {/* 左侧分类树 - 直接展示二级分类 */}
           <Card title={`${label}分类`} className="category-tree-card" headerRight={
-            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>可管理二三级分类</div>
+            depth < 2 ? (
+              <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedId, depth)}>
+                <PlusIcon /> 添加子分类
+              </Button>
+            ) : undefined
           }>
             <div className="category-tree">
               {categories.children?.map((child) => renderTreeNode(child, 0))}
@@ -265,28 +269,13 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
                     <div className="detail-row detail-row-span">
                       <div className="detail-label">子分类</div>
                       <div className="detail-value">
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                           {selectedNode.children.map((child) => (
                             <span key={child.id} className="brand-series-tag" style={{ cursor: 'pointer' }} onClick={() => { setSelectedId(child.id); setEditing(false); }}>
                               {child.name} ({child.productCount})
                             </span>
                           ))}
                         </div>
-                        {depth < 2 && (
-                          <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, depth)}>
-                            <PlusIcon /> 添加子分类
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {!selectedNode.children && depth < 2 && (
-                    <div className="detail-row detail-row-span">
-                      <div className="detail-label">子分类</div>
-                      <div className="detail-value">
-                        <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, depth)}>
-                          <PlusIcon /> 添加子分类
-                        </Button>
                       </div>
                     </div>
                   )}
