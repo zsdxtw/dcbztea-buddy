@@ -10,7 +10,6 @@ import {
   productCategoryLabels,
   productCategoryBreadcrumbs,
   getTeaCategoryByName,
-  findPath,
   findNode,
   getLevelLabel,
 } from '../../data/productCategories';
@@ -26,17 +25,43 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
   const breadcrumb = productCategoryBreadcrumbs[categoryType];
 
   const [categories, setCategories] = useState<CategoryNode>(rootNode);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // 默认选中一级分类，右侧直接展示一级分类详情
+  const [selectedId, setSelectedId] = useState<string>(categories.id);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(categories.children?.map((c) => c.id) ?? []));
   const [editing, setEditing] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState<{ parentId: string; level: number } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const allNodes = [categories, ...(categories.children ?? [])];
-  const selectedNode = selectedId ? findNode(allNodes, selectedId) : null;
-  const selectedPath = selectedId ? findPath(allNodes, selectedId) : null;
+  // 在整棵树中查找节点
+  const selectedNode = selectedId ? findNode([categories], selectedId) : null;
   const isRoot = selectedId === categories.id;
-  const depth = selectedPath ? selectedPath.length - 1 : 0;
+
+  // 计算选中节点的深度（一级=0，二级=1，三级=2）
+  const getDepth = (id: string, nodes: CategoryNode[] = [categories], d: number = 0): number => {
+    for (const n of nodes) {
+      if (n.id === id) return d;
+      if (n.children) {
+        const found = getDepth(id, n.children, d + 1);
+        if (found >= 0) return found;
+      }
+    }
+    return -1;
+  };
+  const depth = selectedId ? getDepth(selectedId) : 0;
+
+  // 获取面包屑路径
+  const getPath = (id: string, nodes: CategoryNode[] = [categories], path: CategoryNode[] = []): CategoryNode[] | null => {
+    for (const n of nodes) {
+      const cur = [...path, n];
+      if (n.id === id) return cur;
+      if (n.children) {
+        const found = getPath(id, n.children, cur);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  const selectedPath = selectedId ? getPath(selectedId) : null;
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
@@ -81,20 +106,20 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
       children: node.children?.filter((n) => n.id !== id).map((n) => removeNode(n)),
     });
     setCategories(removeNode(categories));
-    if (selectedId === id) setSelectedId(null);
+    if (selectedId === id) setSelectedId(categories.id);
   };
 
-  const renderTreeNode = (node: CategoryNode, nodeDepth: number) => {
+  /** 渲染树节点（从二级分类开始，depth 0 对应实际二级分类） */
+  const renderTreeNode = (node: CategoryNode, treeDepth: number) => {
     const hasChildren = node.children && node.children.length > 0;
     const isExpanded = expandedIds.has(node.id);
     const isSelected = selectedId === node.id;
-    const isRootNode = node.id === categories.id;
 
     return (
       <div key={node.id}>
         <div
           className={`category-tree-node${isSelected ? ' selected' : ''}`}
-          style={{ paddingLeft: nodeDepth * 20 + 8 }}
+          style={{ paddingLeft: treeDepth * 20 + 8 }}
           onClick={() => { setSelectedId(node.id); setEditing(false); }}
         >
           <span
@@ -105,13 +130,12 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
               <svg viewBox="0 0 12 12" fill="none"><path d="M4.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
             )}
           </span>
-          {node.icon && <span className="category-tree-icon" style={{ width: 18, height: 18, flexShrink: 0, color: 'var(--color-module-product-base)' }}>{node.icon}</span>}
           <span className="category-tree-name">{node.name}</span>
           <span className="category-tree-count">{node.productCount}</span>
-          {/* 一级分类不可删除，但可新增子分类；二三级可新增/删除 */}
-          {!isRootNode && nodeDepth < 2 && (
+          {/* 二级分类可新增子分类和删除；三级分类只能删除 */}
+          {treeDepth === 0 && (
             <span className="category-tree-actions" onClick={(e) => e.stopPropagation()}>
-              <button className="category-tree-action-btn" title="新增子分类" onClick={() => handleAddChild(node.id, nodeDepth)}>
+              <button className="category-tree-action-btn" title="新增子分类" onClick={() => handleAddChild(node.id, 1)}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
               </button>
               <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
@@ -119,7 +143,7 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
               </button>
             </span>
           )}
-          {(!isRootNode && nodeDepth >= 2) && (
+          {treeDepth >= 1 && (
             <span className="category-tree-actions" onClick={(e) => e.stopPropagation()}>
               <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M3 4h8M5 4V3h4v1M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 4l.7 7h4.6l.7-7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
@@ -129,7 +153,7 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
         </div>
         {hasChildren && isExpanded && (
           <div className="category-tree-children">
-            {node.children!.map((child) => renderTreeNode(child, nodeDepth + 1))}
+            {node.children!.map((child) => renderTreeNode(child, treeDepth + 1))}
           </div>
         )}
       </div>
@@ -141,156 +165,148 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
       <ContentHeader title={breadcrumb} breadcrumbs={['商品', '分类管理', breadcrumb]} />
       <div className="content-body">
         <div className="category-layout">
-          {/* 左侧分类树 */}
+          {/* 左侧分类树 - 直接展示二级分类 */}
           <Card title={`${label}分类结构`} className="category-tree-card" headerRight={
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>可管理二三级分类</div>
           }>
             <div className="category-tree">
-              {renderTreeNode(categories, 0)}
+              {categories.children?.map((child) => renderTreeNode(child, 0))}
             </div>
           </Card>
 
           {/* 右侧详情 */}
           <div className="category-detail-area">
-            {selectedNode ? (
-              <>
-                <Card title="分类详情">
-                  {/* 面包屑路径 */}
-                  {selectedPath && (
-                    <div className="category-breadcrumb">
-                      {selectedPath.map((p, i) => (
-                        <span key={p.id}>
-                          {i > 0 && <span className="category-breadcrumb-sep">/</span>}
-                          <span className={i === selectedPath.length - 1 ? 'category-breadcrumb-current' : 'category-breadcrumb-item'}>{p.name}</span>
-                        </span>
-                      ))}
+            {selectedNode && (
+              <Card title="分类详情">
+                {/* 面包屑路径 */}
+                {selectedPath && (
+                  <div className="category-breadcrumb">
+                    {selectedPath.map((p, i) => (
+                      <span key={p.id}>
+                        {i > 0 && <span className="category-breadcrumb-sep">/</span>}
+                        <span className={i === selectedPath.length - 1 ? 'category-breadcrumb-current' : 'category-breadcrumb-item'}>{p.name}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="detail-grid">
+                  <div className="detail-row">
+                    <div className="detail-label">分类名称</div>
+                    <div className="detail-value">
+                      {editing && !isRoot ? <input className="detail-input" defaultValue={selectedNode.name} /> : <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedNode.name}</span>}
                     </div>
-                  )}
-
-                  <div className="detail-grid">
-                    <div className="detail-row">
-                      <div className="detail-label">分类名称</div>
-                      <div className="detail-value">
-                        {editing && !isRoot ? <input className="detail-input" defaultValue={selectedNode.name} /> : <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedNode.name}</span>}
-                      </div>
+                  </div>
+                  <div className="detail-row">
+                    <div className="detail-label">分类层级</div>
+                    <div className="detail-value">
+                      <StatusTag variant="info" label={getLevelLabel(depth)} />
                     </div>
-                    <div className="detail-row">
-                      <div className="detail-label">分类层级</div>
-                      <div className="detail-value">
-                        <StatusTag variant="info" label={getLevelLabel(depth)} />
-                      </div>
+                  </div>
+                  <div className="detail-row">
+                    <div className="detail-label">上级分类</div>
+                    <div className="detail-value">
+                      {selectedPath && selectedPath.length > 1 ? selectedPath[selectedPath.length - 2].name : <span style={{ color: 'var(--color-neutral-400)' }}>无（顶级分类）</span>}
                     </div>
-                    <div className="detail-row">
-                      <div className="detail-label">上级分类</div>
-                      <div className="detail-value">
-                        {selectedPath && selectedPath.length > 1 ? selectedPath[selectedPath.length - 2].name : <span style={{ color: 'var(--color-neutral-400)' }}>无（顶级分类）</span>}
-                      </div>
-                    </div>
-
-                    {/* 茶叶二级分类：显示发酵种类和茶类介绍 */}
-                    {categoryType === 'tea' && depth === 1 && selectedNode.fermentation && (
-                      <div className="detail-row">
-                        <div className="detail-label">发酵种类</div>
-                        <div className="detail-value">
-                          <StatusTag variant="success" label={selectedNode.fermentation} />
-                        </div>
-                      </div>
-                    )}
-                    {categoryType === 'tea' && depth === 1 && (() => {
-                      const teaCatEnum = getTeaCategoryByName(selectedNode.name);
-                      const teaDetail = teaCatEnum ? getTeaCategoryDetail(teaCatEnum) : undefined;
-                      const intro = teaDetail?.introduction || selectedNode.description;
-                      return intro ? (
-                        <div className="detail-row detail-row-span">
-                          <div className="detail-label">茶类介绍</div>
-                          <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{intro}</div>
-                        </div>
-                      ) : null;
-                    })()}
-
-                    {/* 茶叶三级分类：显示产地和茶叶特点 */}
-                    {categoryType === 'tea' && depth === 2 && selectedNode.origin && (
-                      <div className="detail-row">
-                        <div className="detail-label">产地</div>
-                        <div className="detail-value">
-                          <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedNode.origin}</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 非茶叶分类的二级分类描述 */}
-                    {categoryType !== 'tea' && depth === 1 && selectedNode.description && (
-                      <div className="detail-row detail-row-span">
-                        <div className="detail-label">分类说明</div>
-                        <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{selectedNode.description}</div>
-                      </div>
-                    )}
-
-                    {/* 三级分类描述（茶叶为茶叶特点，其他为商品说明） */}
-                    {depth === 2 && selectedNode.description && (
-                      <div className="detail-row detail-row-span">
-                        <div className="detail-label">{categoryType === 'tea' ? '茶叶特点' : '商品说明'}</div>
-                        <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{selectedNode.description}</div>
-                      </div>
-                    )}
-
-                    <div className="detail-row">
-                      <div className="detail-label">商品数量</div>
-                      <div className="detail-value"><span className="mono">{selectedNode.productCount}</span></div>
-                    </div>
-                    {selectedNode.children && (
-                      <div className="detail-row detail-row-span">
-                        <div className="detail-label">子分类</div>
-                        <div className="detail-value">
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-                            {selectedNode.children.map((child) => (
-                              <span key={child.id} className="brand-series-tag" style={{ cursor: 'pointer' }} onClick={() => { setSelectedId(child.id); setEditing(false); }}>
-                                {child.name} ({child.productCount})
-                              </span>
-                            ))}
-                          </div>
-                          {selectedPath && selectedPath.length < 3 && (
-                            <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, selectedPath ? selectedPath.length - 1 : 0)}>
-                              <PlusIcon /> 添加子分类
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    {!selectedNode.children && selectedPath && selectedPath.length < 3 && (
-                      <div className="detail-row detail-row-span">
-                        <div className="detail-label">子分类</div>
-                        <div className="detail-value">
-                          <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, selectedPath ? selectedPath.length - 1 : 0)}>
-                            <PlusIcon /> 添加子分类
-                          </Button>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
-                  {!isRoot && (
-                    <div style={{ marginTop: 'var(--space-5)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-neutral-200)', display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
-                      {editing ? (
-                        <>
-                          <Button variant="ghost" onClick={() => setEditing(false)}>取消</Button>
-                          <Button onClick={() => setEditing(false)}>保存</Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button size="sm" onClick={() => setEditing(true)}>编辑</Button>
-                          <Button size="sm" style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
-                        </>
-                      )}
+                  {/* 茶叶二级分类：显示发酵种类和茶类介绍 */}
+                  {categoryType === 'tea' && depth === 1 && selectedNode.fermentation && (
+                    <div className="detail-row">
+                      <div className="detail-label">发酵种类</div>
+                      <div className="detail-value">
+                        <StatusTag variant="success" label={selectedNode.fermentation} />
+                      </div>
                     </div>
                   )}
-                </Card>
-              </>
-            ) : (
-              <Card>
-                <div style={{ padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-neutral-400)' }}>
-                  请在左侧选择一个分类查看详情
+                  {categoryType === 'tea' && depth === 1 && (() => {
+                    const teaCatEnum = getTeaCategoryByName(selectedNode.name);
+                    const teaDetail = teaCatEnum ? getTeaCategoryDetail(teaCatEnum) : undefined;
+                    const intro = teaDetail?.introduction || selectedNode.description;
+                    return intro ? (
+                      <div className="detail-row detail-row-span">
+                        <div className="detail-label">茶类介绍</div>
+                        <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{intro}</div>
+                      </div>
+                    ) : null;
+                  })()}
+
+                  {/* 茶叶三级分类：显示产地和茶叶特点 */}
+                  {categoryType === 'tea' && depth === 2 && selectedNode.origin && (
+                    <div className="detail-row">
+                      <div className="detail-label">产地</div>
+                      <div className="detail-value">
+                        <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedNode.origin}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 非茶叶分类的二级分类描述 */}
+                  {categoryType !== 'tea' && depth === 1 && selectedNode.description && (
+                    <div className="detail-row detail-row-span">
+                      <div className="detail-label">分类说明</div>
+                      <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{selectedNode.description}</div>
+                    </div>
+                  )}
+
+                  {/* 三级分类描述（茶叶为茶叶特点，其他为商品说明） */}
+                  {depth === 2 && selectedNode.description && (
+                    <div className="detail-row detail-row-span">
+                      <div className="detail-label">{categoryType === 'tea' ? '茶叶特点' : '商品说明'}</div>
+                      <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{selectedNode.description}</div>
+                    </div>
+                  )}
+
+                  <div className="detail-row">
+                    <div className="detail-label">商品数量</div>
+                    <div className="detail-value"><span className="mono">{selectedNode.productCount}</span></div>
+                  </div>
+                  {selectedNode.children && (
+                    <div className="detail-row detail-row-span">
+                      <div className="detail-label">子分类</div>
+                      <div className="detail-value">
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                          {selectedNode.children.map((child) => (
+                            <span key={child.id} className="brand-series-tag" style={{ cursor: 'pointer' }} onClick={() => { setSelectedId(child.id); setEditing(false); }}>
+                              {child.name} ({child.productCount})
+                            </span>
+                          ))}
+                        </div>
+                        {depth < 2 && (
+                          <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, depth)}>
+                            <PlusIcon /> 添加子分类
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {!selectedNode.children && depth < 2 && (
+                    <div className="detail-row detail-row-span">
+                      <div className="detail-label">子分类</div>
+                      <div className="detail-value">
+                        <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, depth)}>
+                          <PlusIcon /> 添加子分类
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {!isRoot && (
+                  <div style={{ marginTop: 'var(--space-5)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-neutral-200)', display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+                    {editing ? (
+                      <>
+                        <Button variant="ghost" onClick={() => setEditing(false)}>取消</Button>
+                        <Button onClick={() => setEditing(false)}>保存</Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button size="sm" onClick={() => setEditing(true)}>编辑</Button>
+                        <Button size="sm" style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
+                      </>
+                    )}
+                  </div>
+                )}
               </Card>
             )}
           </div>
