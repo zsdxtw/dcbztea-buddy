@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ContentHeader from '../../components/layout/ContentHeader';
+import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
@@ -25,25 +26,6 @@ function parseCategory(category: string): TeaCategory | null {
   const prefix = category.split('-')[0];
   return CATEGORY_MAP[prefix] ?? null;
 }
-
-/** 茶类筛选选项 */
-const CATEGORY_OPTIONS = [
-  { label: '全部', value: '' },
-  { label: '绿茶', value: '绿茶' },
-  { label: '红茶', value: '红茶' },
-  { label: '青茶', value: '青茶' },
-  { label: '白茶', value: '白茶' },
-  { label: '黄茶', value: '黄茶' },
-  { label: '黑茶', value: '黑茶' },
-  { label: '花草茶', value: '花草茶' },
-];
-
-/** 上架状态选项 */
-const SHELF_OPTIONS = [
-  { label: '全部', value: '' },
-  { label: '上架', value: 'on' },
-  { label: '下架', value: 'off' },
-];
 
 /** 茶叶商品管理页面 */
 export default function ProductManageTea() {
@@ -91,33 +73,22 @@ export default function ProductManageTea() {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, currentPage]);
 
-  const handleFilterChange = (setter: (v: string) => void) => (value: string) => {
-    setter(value);
-    setCurrentPage(1);
-  };
+  const handleCategoryChange = (value: string) => { setCategoryFilter(value); setCurrentPage(1); };
+  const handleShelfChange = (value: string) => { setShelfFilter(value); setCurrentPage(1); };
+  const handleBrandChange = (value: string) => { setBrandFilter(value); setCurrentPage(1); };
+  const handleSearch = (kw: string) => { setKeyword(kw); setCurrentPage(1); };
 
-  const selectStyle: React.CSSProperties = {
-    padding: '6px 12px',
+  const filterBtnStyle = (active: boolean): React.CSSProperties => ({
+    padding: '4px 12px',
     borderRadius: 'var(--radius-md)',
-    border: '1px solid var(--color-neutral-200)',
-    background: 'var(--color-neutral-0)',
-    color: 'var(--color-neutral-700)',
-    fontSize: 'var(--text-sm)',
-    outline: 'none',
+    border: `1px solid ${active ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+    background: active ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+    color: active ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
     cursor: 'pointer',
-    minWidth: 100,
-  };
-
-  const inputStyle: React.CSSProperties = {
-    padding: '6px 12px',
-    borderRadius: 'var(--radius-md)',
-    border: '1px solid var(--color-neutral-200)',
-    background: 'var(--color-neutral-0)',
-    color: 'var(--color-neutral-700)',
     fontSize: 'var(--text-sm)',
-    outline: 'none',
-    minWidth: 200,
-  };
+    transition: 'var(--transition-fast)',
+    whiteSpace: 'nowrap',
+  });
 
   return (
     <>
@@ -134,60 +105,60 @@ export default function ProductManageTea() {
         }
       />
       <div className="content-body">
-        {/* 筛选栏 */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-3)',
-          flexWrap: 'wrap',
-          marginBottom: 'var(--space-4)',
-          padding: 'var(--space-4)',
-          background: 'var(--color-neutral-0)',
-          borderRadius: 'var(--radius-lg)',
-          border: '1px solid var(--color-neutral-100)',
-        }}>
-          <input
-            className="filter-input"
-            placeholder="搜索商品名称、品牌、编号..."
-            value={keyword}
-            onChange={(e) => handleFilterChange(setKeyword)(e.target.value)}
-            style={inputStyle}
-          />
-          <select
-            value={categoryFilter}
-            onChange={(e) => handleFilterChange(setCategoryFilter)(e.target.value)}
-            style={selectStyle}
-          >
-            {CATEGORY_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+        {/* 筛选区 */}
+        <Card>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>茶类：</span>
+            <button style={filterBtnStyle(!categoryFilter)} onClick={() => handleCategoryChange('')}>全部</button>
+            {Object.keys(CATEGORY_MAP).map((name) => (
+              <button key={name} style={filterBtnStyle(categoryFilter === name)} onClick={() => handleCategoryChange(categoryFilter === name ? '' : name)}>
+                {name}
+              </button>
             ))}
-          </select>
-          <select
-            value={shelfFilter}
-            onChange={(e) => handleFilterChange(setShelfFilter)(e.target.value)}
-            style={selectStyle}
-          >
-            {SHELF_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <select
-            value={brandFilter}
-            onChange={(e) => handleFilterChange(setBrandFilter)(e.target.value)}
-            style={selectStyle}
-          >
-            <option value="">全部品牌</option>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>品牌：</span>
+            <button style={filterBtnStyle(!brandFilter)} onClick={() => handleBrandChange('')}>全部</button>
             {allBrands.map((b) => (
-              <option key={b} value={b}>{b}</option>
+              <button key={b} style={filterBtnStyle(brandFilter === b)} onClick={() => handleBrandChange(brandFilter === b ? '' : b)}>
+                {b}
+              </button>
             ))}
-          </select>
-          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginLeft: 'auto' }}>
-            共 {filtered.length} 件商品
-          </span>
-        </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <input
+              className="filter-input"
+              placeholder="搜索商品名称、品牌、编号..."
+              value={keyword}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ maxWidth: 320 }}
+            />
+            <select
+              value={shelfFilter}
+              onChange={(e) => handleShelfChange(e.target.value)}
+              style={{
+                padding: '4px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-neutral-200)',
+                background: 'var(--color-neutral-0)',
+                color: 'var(--color-neutral-600)',
+                fontSize: 'var(--text-sm)',
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">全部状态</option>
+              <option value="on">上架</option>
+              <option value="off">下架</option>
+            </select>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginLeft: 'auto' }}>
+              共 {filtered.length} 件商品
+            </span>
+          </div>
+        </Card>
 
         {/* 商品卡片网格 */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
           {paged.map((product) => {
             const teaCat = parseCategory(product.category);
             const mainImage = product.mainImages[0] || '';
