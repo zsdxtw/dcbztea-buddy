@@ -202,11 +202,11 @@ export default function ProductBrandDetail() {
               <div style={{ display: 'flex', gap: 'var(--space-8)', marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-neutral-200)' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
                   <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#FD742D' }}>{associatedProducts.length}</span>
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>个关联商品</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>商品数量</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
                   <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: '#FD742D' }}>{associatedSuppliers.length}</span>
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>家供应商</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>供应商</span>
                 </div>
               </div>
             </div>
@@ -329,7 +329,7 @@ export default function ProductBrandDetail() {
           </Card>
 
           {/* 热销商品TOP5 */}
-          <Card title="热销商品TOP5" headerRight={<span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>商品数量共 {associatedProducts.length} 个</span>}>
+          <Card title="热销商品TOP5">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {associatedProducts.map((p, i) => (
                 <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
@@ -350,7 +350,7 @@ export default function ProductBrandDetail() {
           </Card>
 
           {/* 常采供应商TOP5 */}
-          <Card title="常采供应商TOP5" headerRight={<span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>供应商共 {associatedSuppliers.length} 家</span>}>
+          <Card title="常采供应商TOP5">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {associatedSuppliers.map((s, i) => (
                 <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
