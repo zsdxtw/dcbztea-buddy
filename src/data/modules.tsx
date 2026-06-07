@@ -248,7 +248,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'product-overview', label: '商品概览', icon: <OverviewIcon /> },
       { key: 'product-list', label: '商品列表', icon: <ProductListIcon /> },
       { key: 'product-tea-category', label: '茶类档案', icon: <CategoryIcon />, children: [
-        { key: 'product-tea-seven', label: '七大茶类', icon: <CategoryIcon /> },
+        { key: 'product-tea-seven', label: '六大茶类及花草茶', icon: <CategoryIcon /> },
         { key: 'product-tea-list', label: '茶种大全', icon: <CategoryIcon /> },
       ] },
       { key: 'product-grade', label: '品级管理', icon: <GradeIcon /> },

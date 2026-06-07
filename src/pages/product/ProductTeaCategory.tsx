@@ -35,9 +35,9 @@ export default function ProductTeaCategory() {
 
   return (
     <>
-      <ContentHeader title="七大茶类" breadcrumbs={['商品', '茶类档案', '七大茶类']} />
+      <ContentHeader title="六大茶类" breadcrumbs={['商品', '茶类档案', '六大茶类']} />
       <div className="content-body">
-        <Card title="七大茶类">
+        <Card title="六大茶类及花草茶">
           <Table
             headers={['茶类名称', '茶类介绍', '工艺特点', '存储条件', '风味描述', '代表茶种', '操作']}
             rows={categories.map((item, idx) => {
