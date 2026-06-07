@@ -444,6 +444,8 @@ tbody tr:last-child td { border-bottom: none; }
 .status-error .status-tag-dot { background: var(--color-semantic-error); }
 .status-info { background: var(--color-semantic-info-bg); color: var(--color-semantic-info); }
 .status-info .status-tag-dot { background: var(--color-semantic-info); }
+.status-default { background: var(--color-neutral-100); color: var(--color-neutral-500); }
+.status-default .status-tag-dot { background: var(--color-neutral-400); }
 
 /* ── 网格 ── */
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }

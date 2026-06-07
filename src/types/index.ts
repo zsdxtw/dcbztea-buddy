@@ -119,7 +119,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 export type ButtonSize = 'default' | 'sm';
 
 /** 状态标签变体 */
-export type StatusVariant = 'success' | 'warning' | 'error' | 'info';
+export type StatusVariant = 'success' | 'warning' | 'error' | 'info' | 'default';
 
 /** 通知类型 */
 export enum NotificationType {

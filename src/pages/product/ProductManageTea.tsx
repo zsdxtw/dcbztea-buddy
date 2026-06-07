@@ -5,7 +5,7 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
-import { teaProducts, getShelfStatusLabel } from '../../data/teaProducts';
+import { teaProducts, getShelfStatusLabel, getPurchaseStatusLabel, getProductionStatusLabel } from '../../data/teaProducts';
 import { TeaCategory } from '../../types';
 
 const PAGE_SIZE = 20;
@@ -249,7 +249,7 @@ export default function ProductManageTea() {
 
                 {/* 商品信息 */}
                 <div style={{ padding: 'var(--space-3) var(--space-3) var(--space-2)' }}>
-                  {/* 商品名称 */}
+                  {/* 品牌 + 商品名称 */}
                   <div style={{
                     fontSize: 'var(--text-sm)',
                     fontWeight: 'var(--font-semibold)',
@@ -259,8 +259,24 @@ export default function ProductManageTea() {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-1)',
                   }} title={product.name}>
-                    {product.name}
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '1px 6px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--color-module-current-lightest)',
+                      color: 'var(--color-module-current-base)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-semibold)',
+                      lineHeight: '18px',
+                      flexShrink: 0,
+                    }}>
+                      {product.brand}
+                    </span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</span>
                   </div>
 
                   {/* 产品特点 */}
@@ -315,21 +331,17 @@ export default function ProductManageTea() {
                       ¥{product.marketPrice}
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '1px 6px',
-                        borderRadius: 'var(--radius-sm)',
-                        background: 'var(--color-module-current-lightest)',
-                        color: 'var(--color-module-current-base)',
-                        fontSize: 'var(--text-xs)',
-                        fontWeight: 'var(--font-semibold)',
-                        lineHeight: '18px',
-                      }}>
-                        {product.brand}
-                      </span>
                       <StatusTag
-                        variant={product.shelfStatus === 'on' ? 'success' : 'error'}
+                        variant={product.shelfStatus === 'on' ? 'success' : 'default'}
                         label={getShelfStatusLabel(product.shelfStatus)}
+                      />
+                      <StatusTag
+                        variant={product.purchaseStatus === 'available' ? 'success' : 'default'}
+                        label={getPurchaseStatusLabel(product.purchaseStatus)}
+                      />
+                      <StatusTag
+                        variant={product.productionStatus === 'producing' ? 'success' : 'default'}
+                        label={getProductionStatusLabel(product.productionStatus)}
                       />
                     </div>
                   </div>
