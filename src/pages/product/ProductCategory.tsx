@@ -21,23 +21,35 @@ interface CategoryNode {
 }
 
 /* ── 一级分类图标 ── */
-const TeaCategoryIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none"><path d="M10 2C6 2 3 5 3 9c0 3 2 5.5 5 6.5V17h4v-1.5c3-1 5-3.5 5-6.5 0-4-3-7-7-7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><path d="M7 17h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><path d="M10 5v4M8 7h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+const NumberIcon1 = () => (
+  <svg viewBox="0 0 20 20" fill="none">
+    <circle cx="10" cy="10" r="8" fill="var(--color-module-product-base)"/>
+    <text x="10" y="14" textAnchor="middle" fill="white" fontSize="11" fontWeight="600">1</text>
+  </svg>
 );
-const TeawareCategoryIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none"><path d="M5 3h10v2a8 8 0 01-3 6.3V14H8v-2.7A8 8 0 015 5V3z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><path d="M7 14h6v2a1 1 0 01-1 1H8a1 1 0 01-1-1v-2z" stroke="currentColor" strokeWidth="1.3"/><path d="M15 6h2a1 1 0 011 1v1a2 2 0 01-2 2h-1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+const NumberIcon2 = () => (
+  <svg viewBox="0 0 20 20" fill="none">
+    <circle cx="10" cy="10" r="8" fill="var(--color-module-product-base)"/>
+    <text x="10" y="14" textAnchor="middle" fill="white" fontSize="11" fontWeight="600">2</text>
+  </svg>
 );
-const PeripheralCategoryIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.5 5 5.5.8-4 3.9.9 5.5L10 14.7 5.1 17.2l.9-5.5-4-3.9L7.5 7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>
+const NumberIcon3 = () => (
+  <svg viewBox="0 0 20 20" fill="none">
+    <circle cx="10" cy="10" r="8" fill="var(--color-module-product-base)"/>
+    <text x="10" y="14" textAnchor="middle" fill="white" fontSize="11" fontWeight="600">3</text>
+  </svg>
 );
-const OtherCategoryIcon = () => (
-  <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg>
+const NumberIcon4 = () => (
+  <svg viewBox="0 0 20 20" fill="none">
+    <circle cx="10" cy="10" r="8" fill="var(--color-module-product-base)"/>
+    <text x="10" y="14" textAnchor="middle" fill="white" fontSize="11" fontWeight="600">4</text>
+  </svg>
 );
 
 /* ── Mock 数据 ── */
 const initialCategories: CategoryNode[] = [
   {
-    id: 'tea', name: '茶叶', icon: <TeaCategoryIcon />, sort: 1, productCount: 151,
+    id: 'tea', name: '茶叶', icon: <NumberIcon1 />, sort: 1, productCount: 151,
     children: [
       {
         id: 'green-tea', name: '绿茶', sort: 1, productCount: 42,
@@ -125,7 +137,7 @@ const initialCategories: CategoryNode[] = [
     ],
   },
   {
-    id: 'teaware', name: '茶具', icon: <TeawareCategoryIcon />, sort: 2, productCount: 45,
+    id: 'teaware', name: '茶具', icon: <NumberIcon2 />, sort: 2, productCount: 45,
     children: [
       {
         id: 'teapot', name: '茶壶', sort: 1, productCount: 15,
@@ -161,7 +173,7 @@ const initialCategories: CategoryNode[] = [
     ],
   },
   {
-    id: 'tea-peripheral', name: '茶周边', icon: <PeripheralCategoryIcon />, sort: 3, productCount: 38,
+    id: 'tea-peripheral', name: '茶周边', icon: <NumberIcon3 />, sort: 3, productCount: 38,
     children: [
       {
         id: 'tea-food', name: '茶食品', sort: 1, productCount: 15,
@@ -190,7 +202,7 @@ const initialCategories: CategoryNode[] = [
     ],
   },
   {
-    id: 'other', name: '其他', icon: <OtherCategoryIcon />, sort: 4, productCount: 12,
+    id: 'other', name: '其他', icon: <NumberIcon4 />, sort: 4, productCount: 12,
     children: [
       {
         id: 'tea-water', name: '泡茶水', sort: 1, productCount: 6,
