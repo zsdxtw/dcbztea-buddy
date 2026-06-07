@@ -337,13 +337,8 @@ export interface BrandItem {
   contactPerson: string;
   contactPhone: string;
   address: string;
-  teaCategory: TeaCategory;
-  level: BrandLevel;
-  status: BrandStatus;
+  mainCategories: string[];
   productCount: number;
   website: string;
   cooperationDate: string;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
 }
