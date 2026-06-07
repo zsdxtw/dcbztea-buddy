@@ -181,6 +181,8 @@ export default function ProductTeaList() {
             ) : (
               <Button variant="ghost" onClick={handleEnterDeleteMode} style={{ color: '#FD742D' }}>删除</Button>
             )}
+          </div>
+          <div style={{ marginTop: 'var(--space-2)' }}>
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>
               共 {filtered.length} 个茶种
             </span>
