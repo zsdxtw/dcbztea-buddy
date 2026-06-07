@@ -12,15 +12,14 @@ export default function ProductTeaCategory() {
       <div className="content-body">
         <Card title="七大茶类">
           <Table
-            headers={['茶类名称', '茶类介绍', '工艺特点', '存储条件', '风味描述', '子分类', '关联商品数']}
+            headers={['茶类名称', '茶类介绍', '工艺特点', '存储条件', '风味描述', '代表茶种']}
             rows={teaCategories.map((item) => [
               <Tag category={item.category} />,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', maxWidth: 280, display: 'inline-block' }}>{item.introduction}</span>,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>{item.process}</span>,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>{item.storage}</span>,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>{item.flavor}</span>,
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{item.subCategories.join('、')}</span>,
-              <span className="mono">{item.productCount}</span>,
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{item.representativeTeas.join('、')}</span>,
             ])}
           />
         </Card>

@@ -13,7 +13,7 @@ export const teaCategories: TeaCategoryDetail[] = [
     process: '不发酵，杀青→揉捻→干燥',
     storage: '冷藏0-5°C，避光防潮',
     flavor: '清汤绿叶，鲜爽甘醇',
-    subCategories: ['炒青绿茶', '烘青绿茶', '晒青绿茶', '蒸青绿茶'],
+    representativeTeas: ['西湖龙井', '碧螺春', '黄山毛峰', '信阳毛尖', '太平猴魁', '六安瓜片'],
     productCount: 42,
   },
   {
@@ -22,7 +22,7 @@ export const teaCategories: TeaCategoryDetail[] = [
     process: '全发酵，萎凋→揉捻→发酵→干燥',
     storage: '常温密封避光，防潮',
     flavor: '红汤红叶，醇厚甜香',
-    subCategories: ['小种红茶', '工夫红茶', '红碎茶'],
+    representativeTeas: ['祁门红茶', '正山小种', '金骏眉', '滇红工夫', '坦洋工夫'],
     productCount: 26,
   },
   {
@@ -31,7 +31,7 @@ export const teaCategories: TeaCategoryDetail[] = [
     process: '半发酵，做青→炒青→揉捻→烘焙',
     storage: '常温密封避光，防潮防异味',
     flavor: '绿叶红镶边，花香果韵',
-    subCategories: ['闽北乌龙', '闽南乌龙', '广东乌龙', '台湾乌龙'],
+    representativeTeas: ['大红袍', '肉桂', '铁观音', '凤凰单丛', '冻顶乌龙', '水仙'],
     productCount: 35,
   },
   {
@@ -40,7 +40,7 @@ export const teaCategories: TeaCategoryDetail[] = [
     process: '微发酵，萎凋→干燥',
     storage: '常温避光干燥，可长期陈化',
     flavor: '汤色杏黄，毫香蜜韵',
-    subCategories: ['白毫银针', '白牡丹', '贡眉', '寿眉'],
+    representativeTeas: ['白毫银针', '白牡丹', '贡眉', '寿眉'],
     productCount: 18,
   },
   {
@@ -49,7 +49,7 @@ export const teaCategories: TeaCategoryDetail[] = [
     process: '轻发酵，杀青→揉捻→闷黄→干燥',
     storage: '冷藏密封，避光防潮',
     flavor: '黄汤黄叶，甜香持久',
-    subCategories: ['黄芽茶', '黄小茶', '黄大茶'],
+    representativeTeas: ['君山银针', '蒙顶黄芽', '霍山黄芽', '平阳黄汤'],
     productCount: 8,
   },
   {
@@ -58,7 +58,7 @@ export const teaCategories: TeaCategoryDetail[] = [
     process: '后发酵，杀青→揉捻→渥堆→干燥',
     storage: '常温通风干燥，可长期陈化',
     flavor: '汤色红浓，陈香醇厚',
-    subCategories: ['湖南黑茶', '四川边茶', '云南普洱', '广西六堡茶'],
+    representativeTeas: ['普洱茶', '安化黑茶', '六堡茶', '茯砖茶', '千两茶'],
     productCount: 22,
   },
   {
@@ -67,7 +67,7 @@ export const teaCategories: TeaCategoryDetail[] = [
     process: '代用茶，窨制或拼配',
     storage: '常温密封避光，防潮防异味',
     flavor: '花香馥郁，清甜甘爽',
-    subCategories: ['茉莉花茶', '玫瑰花茶', '菊花茶', '桂花茶'],
+    representativeTeas: ['茉莉花茶', '玫瑰花茶', '菊花茶', '碧潭飘雪', '桂花茶'],
     productCount: 15,
   },
 ];

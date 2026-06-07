@@ -220,7 +220,7 @@ export interface TeaCategoryDetail {
   process: string;
   storage: string;
   flavor: string;
-  subCategories: string[];
+  representativeTeas: string[];
   productCount: number;
 }
 
