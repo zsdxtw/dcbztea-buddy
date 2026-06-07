@@ -132,8 +132,8 @@ export default function ProductBrandDetail() {
         {/* 品牌头部信息 */}
         <Card style={{ marginBottom: 'var(--space-6)' }}>
           <div className="brand-detail-header">
-            <div className="brand-detail-logo" style={{ position: 'relative' }}>
-              {brand.logo ? <img src={brand.logo} alt={brand.name} /> : <div className="brand-logo-placeholder brand-logo-lg">{brand.name[0]}</div>}
+            <div className="brand-detail-logo" style={{ position: 'relative', width: 75, height: 75, flexShrink: 0 }}>
+              {brand.logo ? <img src={brand.logo} alt={brand.name} style={{ width: 75, height: 75, borderRadius: 'var(--radius-lg)' }} /> : <div className="brand-logo-placeholder brand-logo-lg" style={{ width: 75, height: 75 }}>{brand.name[0]}</div>}
               {editing && (
                 <label style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', borderRadius: 'var(--radius-lg)', cursor: 'pointer', color: 'white', fontSize: 'var(--text-xs)', flexDirection: 'column', gap: '2px' }}>
                   <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
@@ -143,16 +143,34 @@ export default function ProductBrandDetail() {
               )}
             </div>
             <div className="brand-detail-header-info">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
                 <span style={{ fontFamily: 'var(--font-family-serif)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{brand.name}</span>
-                <div style={{ display: 'flex', gap: 'var(--space-3)', fontSize: 'var(--text-sm)' }}>
+                <div style={{ display: 'flex', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', alignItems: 'baseline' }}>
                   {brand.website && <a href={brand.website} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>官网</a>}
                   {brand.jdStoreUrl && <a href={brand.jdStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>京东店</a>}
                   {brand.tmallStoreUrl && <a href={brand.tmallStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>天猫店</a>}
                 </div>
               </div>
-              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-2)' }}>
-                <span className="mono">{brand.code}</span> · {brand.owner} · {brand.mainCategories.join('、')}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-2)' }}>
+                <span><span className="mono">{brand.code}</span> · {brand.owner}</span>
+                <span style={{ color: 'var(--color-neutral-400)' }}>|</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                  <span style={{ color: 'var(--color-neutral-500)', flexShrink: 0 }}>主营品类</span>
+                  {editing ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                      {SECOND_LEVEL_CATEGORIES.map((cat) => (
+                        <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
+                          <input type="checkbox" defaultChecked={brand.mainCategories.includes(cat)} />
+                          {cat}
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                      {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
+                    </div>
+                  )}
+                </div>
               </div>
               {editing ? (
                 <textarea className="detail-textarea" defaultValue={brand.introduction} rows={2} style={{ fontSize: 'var(--text-sm)' }} />
@@ -168,22 +186,9 @@ export default function ProductBrandDetail() {
           <Card title="基本信息">
             {editing ? (
               <div className="detail-grid">
-                <EditRow label="品牌编号"><input className="detail-input" defaultValue={brand.code} /></EditRow>
+                <EditRow label="品牌编号"><input className="detail-input" defaultValue={brand.code} readOnly style={{ background: 'var(--color-neutral-100)', color: 'var(--color-neutral-500)' }} /></EditRow>
                 <EditRow label="品牌名称"><input className="detail-input" defaultValue={brand.name} /></EditRow>
-                <EditRow label="品牌所属" span>
-                  <div className="detail-value">
-                    <input className="detail-input" defaultValue={brand.owner} style={{ marginBottom: 'var(--space-2)' }} />
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-1)' }}>主营品类</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                      {SECOND_LEVEL_CATEGORIES.map((cat) => (
-                        <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
-                          <input type="checkbox" defaultChecked={brand.mainCategories.includes(cat)} />
-                          {cat}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </EditRow>
+                <EditRow label="品牌所属"><input className="detail-input" defaultValue={brand.owner} /></EditRow>
                 <EditRow label="商标证书" span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     {brand.trademarkCert.map((file, i) => (
@@ -201,16 +206,7 @@ export default function ProductBrandDetail() {
               <div className="detail-grid">
                 <DetailRow label="品牌编号"><span className="mono">{brand.code}</span></DetailRow>
                 <DetailRow label="品牌名称"><span style={{ fontWeight: 'var(--font-medium)' }}>{brand.name}</span></DetailRow>
-                <DetailRow label="品牌所属">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                    <span>{brand.owner}</span>
-                    <span style={{ color: 'var(--color-neutral-400)', fontSize: 'var(--text-sm)' }}>|</span>
-                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', flexShrink: 0 }}>主营品类</span>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                      {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
-                    </div>
-                  </div>
-                </DetailRow>
+                <DetailRow label="品牌所属">{brand.owner}</DetailRow>
                 <DetailRow label="商标证书" span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     {brand.trademarkCert.map((file, i) => (
