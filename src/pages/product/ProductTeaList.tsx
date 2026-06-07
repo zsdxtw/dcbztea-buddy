@@ -198,9 +198,6 @@ export default function ProductTeaList() {
                 删除
               </Button>
             )}
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>
-              共 {filtered.length} 个茶种
-            </span>
           </div>
         </Card>
 
@@ -293,6 +290,7 @@ export default function ProductTeaList() {
             ))}
             <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => p + 1)} style={{ padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-neutral-200)', background: 'var(--color-neutral-0)', color: currentPage === totalPages ? 'var(--color-neutral-300)' : 'var(--color-neutral-600)', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', fontSize: 'var(--text-sm)' }}>下一页</button>
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginLeft: 'var(--space-2)' }}>第 {currentPage}/{totalPages} 页</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginLeft: 'var(--space-2)' }}>共 {filtered.length} 个茶种</span>
           </div>
         )}
       </div>
