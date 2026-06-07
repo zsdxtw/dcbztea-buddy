@@ -146,9 +146,28 @@ export default function ProductBrandDetail() {
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
                 <span style={{ fontFamily: 'var(--font-family-serif)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{brand.name}</span>
                 <div style={{ display: 'flex', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', alignItems: 'baseline' }}>
-                  {brand.website && <a href={brand.website} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>官网</a>}
-                  {brand.jdStoreUrl && <a href={brand.jdStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>京东店</a>}
-                  {brand.tmallStoreUrl && <a href={brand.tmallStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>天猫店</a>}
+                  {editing ? (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ color: 'var(--color-neutral-500)', flexShrink: 0 }}>官网</span>
+                        <input className="detail-input" defaultValue={brand.website} placeholder="https://" style={{ fontSize: 'var(--text-xs)', width: 140 }} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ color: 'var(--color-neutral-500)', flexShrink: 0 }}>京东店</span>
+                        <input className="detail-input" defaultValue={brand.jdStoreUrl} placeholder="https://" style={{ fontSize: 'var(--text-xs)', width: 140 }} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ color: 'var(--color-neutral-500)', flexShrink: 0 }}>天猫店</span>
+                        <input className="detail-input" defaultValue={brand.tmallStoreUrl} placeholder="https://" style={{ fontSize: 'var(--text-xs)', width: 140 }} />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {brand.website && <a href={brand.website} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>官网</a>}
+                      {brand.jdStoreUrl && <a href={brand.jdStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>京东店</a>}
+                      {brand.tmallStoreUrl && <a href={brand.tmallStoreUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-module-current-base)' }}>天猫店</a>}
+                    </>
+                  )}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-2)' }}>
