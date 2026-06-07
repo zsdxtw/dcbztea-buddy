@@ -379,6 +379,7 @@ export interface TeaProduct {
   detailImages: string[];
   stockAlert: number;
   stock: number;
+  reservedStock: number;
   totalSales: number;
   remark: string;
 }

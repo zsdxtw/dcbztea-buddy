@@ -261,6 +261,12 @@ export default function ProductManageTea() {
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={product.spec}>{product.spec}</span>
                   </div>
 
+                  {/* SKU + 预占 */}
+                  <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>
+                    <span>SKU：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.code}</span></span>
+                    <span>预占：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.reservedStock}</span></span>
+                  </div>
+
                   {/* 库存 + 销量 */}
                   <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>
                     <span>库存：<span style={{ color: 'var(--color-neutral-700)', fontWeight: 'var(--font-medium)' }}>{product.stock}</span></span>

@@ -160,6 +160,9 @@ export default function ProductTeaDetail() {
               <DetailRow label="自有库存">
                 <span style={{ fontWeight: 'var(--font-medium)' }}>{product.stock}</span>
               </DetailRow>
+              <DetailRow label="预占数量">
+                <span style={{ fontWeight: 'var(--font-medium)' }}>{product.reservedStock}</span>
+              </DetailRow>
               <DetailRow label="总销量">
                 <span style={{ fontWeight: 'var(--font-medium)' }}>{product.totalSales}</span>
               </DetailRow>
