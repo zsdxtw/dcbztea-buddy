@@ -13,7 +13,7 @@ import { TeaCategory } from '../../types';
 /** 通过茶类中文名称获取 TeaCategory 枚举 */
 function nameToTeaCategory(name: string): TeaCategory | undefined {
   const map: Record<string, TeaCategory> = {
-    '绿茶': TeaCategory.GREEN, '红茶': TeaCategory.RED, '乌龙茶': TeaCategory.OOLONG,
+    '绿茶': TeaCategory.GREEN, '红茶': TeaCategory.RED, '青茶': TeaCategory.OOLONG,
     '白茶': TeaCategory.WHITE, '黄茶': TeaCategory.YELLOW, '黑茶': TeaCategory.DARK,
     '花草茶': TeaCategory.FLOWER,
   };
@@ -21,7 +21,7 @@ function nameToTeaCategory(name: string): TeaCategory | undefined {
 }
 
 const SECOND_LEVEL_CATEGORIES = [
-  '绿茶', '红茶', '乌龙茶', '白茶', '黄茶', '黑茶', '花草茶',
+  '绿茶', '红茶', '青茶', '白茶', '黄茶', '黑茶', '花草茶',
   '茶壶', '茶杯', '茶盘茶台', '茶道配件',
   '茶食品', '礼盒套装', '茶叶罐/包装',
   '泡茶水', '茶书茶画', '茶香/香道',
@@ -157,7 +157,7 @@ const brandItems: BrandItem[] = [
     introduction: '中国茶业领军品牌，铁观音十三代传人，全国连锁门店超3000家', requirements: '需具备八马品牌授权书，门店面积不低于80㎡', policy: '首批进货额≥50万，年度返利5%', series: ['赛珍珠铁观音', '浓香铁观音', '陈皮普洱'],
     trademarkCert: ['八马商标注册证.pdf'], jdStoreUrl: 'https://bama.jd.com', tmallStoreUrl: 'https://bama.tmall.com',
     contactPerson: '林文杰', contactPhone: '0595-2345****', address: '福建省泉州市安溪县八马茶业大厦',
-    mainCategories: ['乌龙茶'], productCount: 12, supplierCount: 4,
+    mainCategories: ['青茶'], productCount: 12, supplierCount: 4,
     website: 'https://www.bama.com', cooperationDate: '2022-08-01',
   },
   {
@@ -197,7 +197,7 @@ const brandItems: BrandItem[] = [
     introduction: '综合茶业集团，涵盖六大茶类，全国连锁门店超1300家', requirements: '需具备品牌运营经验，门店面积≥100㎡', policy: '首批进货额≥40万，年度返利4.5%', series: ['天福绿茶', '天福乌龙', '天福普洱'],
     trademarkCert: ['天福茗茶商标注册证.pdf'], jdStoreUrl: 'https://tenfu.jd.com', tmallStoreUrl: 'https://tenfu.tmall.com',
     contactPerson: '李瑞河', contactPhone: '0596-388****', address: '福建省漳州市漳浦县天福茶业园区',
-    mainCategories: ['乌龙茶', '绿茶', '黑茶'], productCount: 8, supplierCount: 5,
+    mainCategories: ['青茶', '绿茶', '黑茶'], productCount: 8, supplierCount: 5,
     website: 'https://www.tenfu.com', cooperationDate: '2022-11-01',
   },
   {

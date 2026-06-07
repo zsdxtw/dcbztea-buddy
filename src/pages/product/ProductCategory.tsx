@@ -9,7 +9,7 @@ import { TeaCategory } from '../../types';
 /** 通过茶类中文名称查找茶类详情 */
 function getTeaCategoryDetailByName(name: string) {
   const nameToEnum: Record<string, TeaCategory> = {
-    '绿茶': TeaCategory.GREEN, '红茶': TeaCategory.RED, '乌龙茶': TeaCategory.OOLONG,
+    '绿茶': TeaCategory.GREEN, '红茶': TeaCategory.RED, '青茶': TeaCategory.OOLONG,
     '白茶': TeaCategory.WHITE, '黄茶': TeaCategory.YELLOW, '黑茶': TeaCategory.DARK,
     '花草茶': TeaCategory.FLOWER,
   };
@@ -90,9 +90,9 @@ const initialCategories: CategoryNode[] = [
         ],
       },
       {
-        id: 'oolong-tea', name: '乌龙茶', sort: 3, productCount: 35,
+        id: 'oolong-tea', name: '青茶', sort: 3, productCount: 35,
         fermentation: '半发酵茶',
-        description: '乌龙茶介于绿茶和红茶之间，兼具绿茶的清香和红茶的醇厚，工艺最为复杂。',
+        description: '青茶介于绿茶和红茶之间，兼具绿茶的清香和红茶的醇厚，工艺最为复杂。',
         children: [
           { id: 'tieguanyin', name: '铁观音', sort: 1, productCount: 12, origin: '福建安溪', description: '颗粒紧结如蜻蜓头，天然兰花香馥郁，汤色金黄浓艳似琥珀，"七泡有余香"。' },
           { id: 'dahongpao', name: '大红袍', sort: 2, productCount: 10, origin: '福建武夷山', description: '武夷岩茶之王，条索紧结、色泽绿褐油润，"岩骨花香"显著，滋味醇厚回甘、喉韵悠长。' },

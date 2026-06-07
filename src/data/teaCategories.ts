@@ -27,7 +27,7 @@ export const teaCategories: TeaCategoryDetail[] = [
   },
   {
     category: TeaCategory.OOLONG,
-    introduction: '乌龙茶介于绿茶和红茶之间，兼具绿茶的清香和红茶的醇厚，工艺最为复杂。',
+    introduction: '青茶介于绿茶和红茶之间，兼具绿茶的清香和红茶的醇厚，工艺最为复杂。',
     process: '半发酵，做青→炒青→揉捻→烘焙',
     storage: '常温密封避光，防潮防异味',
     flavor: '绿叶红镶边，花香果韵',
