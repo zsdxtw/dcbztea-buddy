@@ -598,7 +598,7 @@ tbody tr:last-child td { border-bottom: none; }
 .detail-textarea:focus { outline: none; border-color: var(--color-module-current-base); box-shadow: 0 0 0 3px var(--color-module-current-light); }
 
 /* ═══ 品牌排名横向柱状图 ═══ */
-.rank-section { margin-bottom: var(--space-6); }
+.rank-section { margin-top: var(--space-2); margin-bottom: var(--space-6); }
 .rank-section-header { display: flex; align-items: center; justify-content: flex-end; margin-bottom: var(--space-4); }
 .rank-period-toggle { display: flex; border: 1px solid var(--color-neutral-200); border-radius: var(--radius-md); overflow: hidden; }
 .rank-period-btn { padding: var(--space-1) var(--space-4); font-size: var(--text-sm); font-family: var(--font-family-sans); border: none; background: var(--color-neutral-0); color: var(--color-neutral-500); cursor: pointer; transition: var(--transition-fast); }
