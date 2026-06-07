@@ -112,6 +112,16 @@ const initialCategories: CategoryNode[] = [
           { id: 'jingyang-fuzhuan', name: '泾阳茯砖', sort: 5, productCount: 3, origin: '陕西泾阳', description: '最早发明"发花"工艺的黑茶，金花茂密、菌香浓郁，滋味醇厚带微微松烟香，陈放后药香更浓。' },
         ],
       },
+      {
+        id: 'flower-tea', name: '花草茶', sort: 7, productCount: 15,
+        fermentation: '代用茶',
+        description: '花草茶是以植物的花、叶、果、根等为原料，经加工而成的饮品，兼具美观与健康功效。',
+        children: [
+          { id: 'jasmine-tea', name: '茉莉花茶', sort: 1, productCount: 6, origin: '福建福州', description: '以绿茶为茶坯，经茉莉花窨制而成，香气鲜灵持久，滋味醇厚鲜爽，有"窨得茉莉无上味，列作人间第一香"的美誉。' },
+          { id: 'rose-tea', name: '玫瑰花茶', sort: 2, productCount: 4, origin: '山东平阴', description: '采用重瓣红玫瑰，香气浓郁甜美，汤色浅黄明亮，有疏肝解郁、美容养颜的功效。' },
+          { id: 'chrysanthemum-tea', name: '菊花茶', sort: 3, productCount: 5, origin: '浙江桐乡', description: '以杭白菊为代表，花朵完整，香气清冽，有清热解毒、明目的功效。' },
+        ],
+      },
     ],
   },
   {
@@ -326,17 +336,19 @@ export default function ProductCategory() {
           {node.icon && <span className="category-tree-icon" style={{ width: 18, height: 18, flexShrink: 0, color: 'var(--color-module-current-base)' }}>{node.icon}</span>}
           <span className="category-tree-name">{node.name}</span>
           <span className="category-tree-count">{node.productCount}</span>
-          {!nodeIsLevel1 && nodeDepth < 2 && (
+          {(nodeIsLevel1 && ['teaware', 'tea-peripheral', 'other'].includes(node.id) ? true : (!nodeIsLevel1 && nodeDepth < 2)) && (
             <span className="category-tree-actions" onClick={(e) => e.stopPropagation()}>
               <button className="category-tree-action-btn" title="新增子分类" onClick={() => handleAddChild(node.id, nodeDepth)}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
               </button>
-              <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
-                <svg viewBox="0 0 14 14" fill="none"><path d="M3 4h8M5 4V3h4v1M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 4l.7 7h4.6l.7-7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
-              </button>
+              {!nodeIsLevel1 && (
+                <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
+                  <svg viewBox="0 0 14 14" fill="none"><path d="M3 4h8M5 4V3h4v1M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 4l.7 7h4.6l.7-7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
+                </button>
+              )}
             </span>
           )}
-          {!nodeIsLevel1 && nodeDepth >= 2 && (
+          {(!nodeIsLevel1 && nodeDepth >= 2) && (
             <span className="category-tree-actions" onClick={(e) => e.stopPropagation()}>
               <button className="category-tree-action-btn category-tree-action-delete" title="删除" onClick={() => handleDelete(node.id)}>
                 <svg viewBox="0 0 14 14" fill="none"><path d="M3 4h8M5 4V3h4v1M6 6v4M8 6v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 4l.7 7h4.6l.7-7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
@@ -451,19 +463,19 @@ export default function ProductCategory() {
                               </span>
                             ))}
                           </div>
-                          {selectedPath && selectedPath.length < 3 && (
-                            <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, selectedPath.length - 1)}>
+                          {((selectedPath && selectedPath.length < 3) || (isLevel1 && ['teaware', 'tea-peripheral', 'other'].includes(selectedNode.id))) && (
+                            <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, selectedPath ? selectedPath.length - 1 : 0)}>
                               <PlusIcon /> 添加子分类
                             </Button>
                           )}
                         </div>
                       </div>
                     )}
-                    {!selectedNode.children && selectedPath && selectedPath.length < 3 && (
+                    {!selectedNode.children && ((selectedPath && selectedPath.length < 3) || (isLevel1 && ['teaware', 'tea-peripheral', 'other'].includes(selectedNode.id))) && (
                       <div className="detail-row detail-row-span">
                         <div className="detail-label">子分类</div>
                         <div className="detail-value">
-                          <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, selectedPath.length - 1)}>
+                          <Button variant="ghost" size="sm" onClick={() => handleAddChild(selectedNode.id, selectedPath ? selectedPath.length - 1 : 0)}>
                             <PlusIcon /> 添加子分类
                           </Button>
                         </div>
