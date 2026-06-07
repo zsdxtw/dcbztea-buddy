@@ -126,20 +126,19 @@ function RankBarChart({ title, data }: { title: string; data: { name: string; va
   }
 
   return (
-    <Card title={title} className="rank-chart-card">
-      <div className="rank-chart">
-        {data.map((item, i) => (
-          <div key={item.name} className="rank-chart-row">
-            <span className="rank-chart-rank">{i + 1}</span>
-            <span className="rank-chart-name">{item.name}</span>
-            <div className="rank-chart-bar-wrap">
-              <div className="rank-chart-bar" style={{ width: `${(item.value / max) * 100}%`, background: barColors[i] }} />
-            </div>
-            <span className="rank-chart-value">{formatValue(item.value)}</span>
+    <div className="rank-chart-compact">
+      <div className="rank-chart-compact-title">{title}</div>
+      {data.slice(0, 3).map((item, i) => (
+        <div key={item.name} className="rank-chart-compact-row">
+          <span className="rank-chart-compact-rank" style={{ background: barColors[i] }}>{i + 1}</span>
+          <span className="rank-chart-compact-name">{item.name}</span>
+          <div className="rank-chart-compact-bar-wrap">
+            <div className="rank-chart-compact-bar" style={{ width: `${(item.value / max) * 100}%`, background: barColors[i] }} />
           </div>
-        ))}
-      </div>
-    </Card>
+          <span className="rank-chart-compact-value">{formatValue(item.value)}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -330,11 +329,11 @@ export default function ProductBrand() {
               <button className={`rank-period-btn${rankPeriod === 'year' ? ' active' : ''}`} onClick={() => setRankPeriod('year')}>当年</button>
               <button className={`rank-period-btn${rankPeriod === 'oneYear' ? ' active' : ''}`} onClick={() => setRankPeriod('oneYear')}>一年内</button>
             </div>
-          </div>
-          <div className="rank-charts-grid">
-            <RankBarChart title="销售金额 TOP5" data={rankData[rankPeriod].salesAmount} />
-            <RankBarChart title="利润总额 TOP5" data={rankData[rankPeriod].profitTotal} />
-            <RankBarChart title="销售数量 TOP5" data={rankData[rankPeriod].salesQuantity} />
+            <div className="rank-charts-compact-grid">
+              <RankBarChart title="销售金额 TOP3" data={rankData[rankPeriod].salesAmount} />
+              <RankBarChart title="利润总额 TOP3" data={rankData[rankPeriod].profitTotal} />
+              <RankBarChart title="销售数量 TOP3" data={rankData[rankPeriod].salesQuantity} />
+            </div>
           </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
