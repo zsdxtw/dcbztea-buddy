@@ -21,6 +21,17 @@ const CATEGORY_MAP: Record<string, TeaCategory> = {
   '花草茶': TeaCategory.FLOWER,
 };
 
+/** 茶类主色映射 */
+const CATEGORY_COLORS: Record<string, string> = {
+  '绿茶': '#7BA23F',
+  '红茶': '#A7413B',
+  '青茶': '#5B6A3E',
+  '白茶': '#D6B577',
+  '黄茶': '#C9A84C',
+  '黑茶': '#4A3B2A',
+  '花草茶': '#B03070',
+};
+
 /** 从 category 字符串提取茶类枚举，如 "绿茶-西湖龙井" -> TeaCategory.GREEN */
 function parseCategory(category: string): TeaCategory | null {
   const prefix = category.split('-')[0];
@@ -262,6 +273,19 @@ export default function ProductManageTea() {
                       label={getShelfStatusLabel(product.shelfStatus)}
                     />
                   </div>
+                  {/* 茶类色条 */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                    background: (() => {
+                      const topCat = product.category.split('-')[0];
+                      const color = CATEGORY_COLORS[topCat];
+                      return color || 'var(--color-neutral-200)';
+                    })(),
+                  }} />
                 </div>
 
                 {/* 商品信息 */}
