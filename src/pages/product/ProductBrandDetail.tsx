@@ -154,9 +154,7 @@ export default function ProductBrandDetail() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-2)' }}>
                 <span><span className="mono">{brand.code}</span> · {brand.owner}</span>
                 <span style={{ color: 'var(--color-neutral-400)' }}>|</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                  {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
-                </div>
+                <span>{brand.mainCategories.join(' | ')}</span>
               </div>
               {editing ? (
                 <textarea className="detail-textarea" defaultValue={brand.introduction} rows={2} style={{ fontSize: 'var(--text-sm)' }} />
