@@ -37,6 +37,7 @@ export default function ProductTeaDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const product = teaProducts.find((p) => p.id === id);
 
@@ -72,6 +73,7 @@ export default function ProductTeaDetail() {
           <>
             <Button variant="ghost" onClick={() => navigate(-1)}>返回</Button>
             <Button>编辑</Button>
+            <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
           </>
         }
       />
@@ -237,6 +239,22 @@ export default function ProductTeaDetail() {
           </Card>
         </div>
       </div>
+
+      {/* 删除确认弹窗 */}
+      {showDeleteConfirm && (
+        <div className="category-dialog-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="category-dialog" onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-3)' }}>确认删除</div>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', marginBottom: 'var(--space-5)' }}>
+              确定要删除商品「{product?.name}」吗？此操作不可撤销。
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
+              <Button onClick={() => { setShowDeleteConfirm(false); navigate('/product/product-manage-tea'); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
