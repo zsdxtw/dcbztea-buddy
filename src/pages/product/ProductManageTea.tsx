@@ -951,27 +951,8 @@ export default function ProductManageTea() {
                 </div>
                 <div className="drawer-form-field">
                   <label className="drawer-label">系列</label>
-                  <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
-                    <select
-                      className="detail-input"
-                      value={form.isNewSeries ? '__new__' : form.series}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === '__new__') {
-                          setForm({ ...form, isNewSeries: true, series: '' });
-                        } else {
-                          setForm({ ...form, isNewSeries: false, newSeriesName: '', series: val });
-                        }
-                      }}
-                      style={{ flex: form.isNewSeries ? '0 0 auto' : 1, minWidth: 120 }}
-                    >
-                      <option value="">请选择系列</option>
-                      {currentBrandSeries.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                      <option value="__new__">填写新系列</option>
-                    </select>
-                    {form.isNewSeries && (
+                  {form.isNewSeries ? (
+                    <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                       <input
                         className="detail-input"
                         value={form.newSeriesName}
@@ -980,8 +961,35 @@ export default function ProductManageTea() {
                         style={{ flex: 1 }}
                         autoFocus
                       />
-                    )}
-                  </div>
+                      <button
+                        onClick={() => setForm({ ...form, isNewSeries: false, newSeriesName: '' })}
+                        style={{
+                          padding: '4px 8px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)',
+                          border: '1px solid var(--color-neutral-200)', background: 'var(--color-neutral-0)',
+                          color: 'var(--color-neutral-500)', cursor: 'pointer', whiteSpace: 'nowrap',
+                        }}
+                      >取消</button>
+                    </div>
+                  ) : (
+                    <select
+                      className="detail-input"
+                      value={form.series}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '__new__') {
+                          setForm({ ...form, isNewSeries: true, series: '' });
+                        } else {
+                          setForm({ ...form, series: val });
+                        }
+                      }}
+                    >
+                      <option value="">请选择系列</option>
+                      {currentBrandSeries.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                      <option value="__new__">填写新系列</option>
+                    </select>
+                  )}
                 </div>
               </div>
 

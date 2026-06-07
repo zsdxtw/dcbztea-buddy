@@ -375,30 +375,8 @@ export default function ProductTeaDetail() {
                   </select>
                 </EditRow>
                 <EditRow label="系列">
-                  <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', width: '100%' }}>
-                    <select
-                      className="detail-input"
-                      value={form.isNewSeries ? '__new__' : (f.series || '')}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === '__new__') {
-                          setForm({ ...form, isNewSeries: true, series: '' });
-                        } else {
-                          setForm({ ...form, isNewSeries: false, newSeriesName: '', series: val });
-                        }
-                      }}
-                      style={{ ...selectStyle, flex: form.isNewSeries ? '0 0 auto' : 1, minWidth: 120 }}
-                    >
-                      <option value="">请选择系列</option>
-                      {brandSeriesOptions.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                      {f.series && !brandSeriesOptions.includes(f.series) && !form.isNewSeries && (
-                        <option value={f.series}>{f.series}</option>
-                      )}
-                      <option value="__new__">填写新系列</option>
-                    </select>
-                    {form.isNewSeries && (
+                  {form.isNewSeries ? (
+                    <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', width: '100%' }}>
                       <input
                         className="detail-input"
                         value={form.newSeriesName || ''}
@@ -407,8 +385,39 @@ export default function ProductTeaDetail() {
                         placeholder="输入新系列名称"
                         autoFocus
                       />
-                    )}
-                  </div>
+                      <button
+                        onClick={() => setForm({ ...form, isNewSeries: false, newSeriesName: '' })}
+                        style={{
+                          padding: '4px 8px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)',
+                          border: '1px solid var(--color-neutral-200)', background: 'var(--color-neutral-0)',
+                          color: 'var(--color-neutral-500)', cursor: 'pointer', whiteSpace: 'nowrap',
+                        }}
+                      >取消</button>
+                    </div>
+                  ) : (
+                    <select
+                      className="detail-input"
+                      value={f.series || ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '__new__') {
+                          setForm({ ...form, isNewSeries: true, series: '' });
+                        } else {
+                          setForm({ ...form, isNewSeries: false, series: val });
+                        }
+                      }}
+                      style={selectStyle}
+                    >
+                      <option value="">请选择系列</option>
+                      {brandSeriesOptions.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                      {f.series && !brandSeriesOptions.includes(f.series) && (
+                        <option value={f.series}>{f.series}</option>
+                      )}
+                      <option value="__new__">填写新系列</option>
+                    </select>
+                  )}
                 </EditRow>
                 <EditRow label="品级">
                   <select className="detail-input" value={f.grade || ''} onChange={(e) => setForm({ ...form, grade: e.target.value })} style={selectStyle}>
