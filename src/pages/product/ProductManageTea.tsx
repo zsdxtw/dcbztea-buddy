@@ -415,7 +415,7 @@ export default function ProductManageTea() {
               style={selectStyle(!!productionFilter)}
             >
               <option value="">生产状态</option>
-              <option value="producing">生产</option>
+              <option value="producing">在产</option>
               <option value="stopped">停产</option>
             </select>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', flexShrink: 0 }}>价格：</span>
@@ -505,17 +505,33 @@ export default function ProductManageTea() {
                 }}
               >
                 {/* 商品主图 */}
-                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)' }}>
+                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)', position: 'relative' }}>
                   <img
                     src={mainImage}
                     alt={product.name}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   />
+                  <span style={{
+                    position: 'absolute',
+                    top: 'var(--space-2)',
+                    left: 'var(--space-2)',
+                    display: 'inline-block',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'rgba(1, 121, 93, 0.85)',
+                    color: '#fff',
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 'var(--font-semibold)',
+                    lineHeight: '18px',
+                    backdropFilter: 'blur(4px)',
+                  }}>
+                    {product.brand}
+                  </span>
                 </div>
 
                 {/* 商品信息 */}
                 <div style={{ padding: 'var(--space-3) var(--space-3) var(--space-2)' }}>
-                  {/* 品牌 + 商品名称 */}
+                  {/* 商品名称 */}
                   <div style={{
                     fontSize: 'var(--text-sm)',
                     fontWeight: 'var(--font-semibold)',
@@ -525,24 +541,8 @@ export default function ProductManageTea() {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-1)',
                   }} title={product.name}>
-                    <span style={{
-                      display: 'inline-block',
-                      padding: '1px 6px',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'var(--color-module-current-lightest)',
-                      color: 'var(--color-module-current-base)',
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: 'var(--font-semibold)',
-                      lineHeight: '18px',
-                      flexShrink: 0,
-                    }}>
-                      {product.brand}
-                    </span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</span>
+                    {product.name}
                   </div>
 
                   {/* 产品特点 */}
@@ -972,7 +972,7 @@ export default function ProductManageTea() {
                 <div className="drawer-form-field">
                   <label className="drawer-label">生产状态</label>
                   <select className="detail-input" value={form.productionStatus} onChange={(e) => setForm({ ...form, productionStatus: e.target.value as 'producing' | 'stopped' })}>
-                    <option value="producing">生产</option>
+                    <option value="producing">在产</option>
                     <option value="stopped">停产</option>
                   </select>
                 </div>

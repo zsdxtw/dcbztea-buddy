@@ -1580,5 +1580,5 @@ export function getPurchaseStatusLabel(status: 'available' | 'stopped') {
 }
 
 export function getProductionStatusLabel(status: 'producing' | 'stopped') {
-  return status === 'producing' ? '生产' : '停产';
+  return status === 'producing' ? '在产' : '停产';
 }
