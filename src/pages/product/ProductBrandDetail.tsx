@@ -59,18 +59,18 @@ function DetailRow({ label, children, span }: { label: string; children: React.R
 
 /** 关联商品模拟数据 */
 const associatedProducts = [
-  { id: 'p1', name: '西湖龙井·明前特级', category: '绿茶', series: '明前系列', price: 680, stock: 156 },
-  { id: 'p2', name: '西湖龙井·雨前一级', category: '绿茶', series: '雨前系列', price: 320, stock: 230 },
-  { id: 'p3', name: '龙井茶礼盒装', category: '绿茶', series: '礼盒系列', price: 1280, stock: 45 },
-  { id: 'p4', name: '西湖龙井·罐装', category: '绿茶', series: '日常系列', price: 198, stock: 380 },
-  { id: 'p5', name: '龙井茶·袋泡装', category: '绿茶', series: '便捷系列', price: 88, stock: 520 },
+  { id: 'p1', name: '西湖龙井·明前特级', category: '绿茶', series: '明前系列', price: 680, salesCount: 3256 },
+  { id: 'p2', name: '西湖龙井·雨前一级', category: '绿茶', series: '雨前系列', price: 320, salesCount: 2840 },
+  { id: 'p3', name: '龙井茶礼盒装', category: '绿茶', series: '礼盒系列', price: 1280, salesCount: 1560 },
+  { id: 'p4', name: '西湖龙井·罐装', category: '绿茶', series: '日常系列', price: 198, salesCount: 1230 },
+  { id: 'p5', name: '龙井茶·袋泡装', category: '绿茶', series: '便捷系列', price: 88, salesCount: 980 },
 ];
 
 /** 关联供应商模拟数据 */
 const associatedSuppliers = [
-  { id: 's1', name: '杭州西湖茶源供应链', contactPerson: '王建国', contactPhone: '0571-8765xxxx', cooperationType: '独家' },
-  { id: 's2', name: '浙江茶都茶叶有限公司', contactPerson: '李明辉', contactPhone: '0571-8543xxxx', cooperationType: '普通' },
-  { id: 's3', name: '西湖区龙井茶合作社', contactPerson: '陈志远', contactPhone: '0571-8321xxxx', cooperationType: '普通' },
+  { id: 's1', name: '杭州西湖茶源供应链', contactPerson: '王建国', contactPhone: '0571-8765xxxx', cooperationType: '独家', purchaseCount: 5680 },
+  { id: 's2', name: '浙江茶都茶叶有限公司', contactPerson: '李明辉', contactPhone: '0571-8543xxxx', cooperationType: '普通', purchaseCount: 3420 },
+  { id: 's3', name: '西湖区龙井茶合作社', contactPerson: '陈志远', contactPhone: '0571-8321xxxx', cooperationType: '普通', purchaseCount: 1860 },
 ];
 
 /** 编辑行组件 */
@@ -232,6 +232,9 @@ export default function ProductBrandDetail() {
                     <Button variant="ghost" size="sm">+ 上传文件</Button>
                   </div>
                 </EditRow>
+                <EditRow label="联系人"><input className="detail-input" defaultValue={brand.contactPerson} /></EditRow>
+                <EditRow label="联系电话"><input className="detail-input" defaultValue={brand.contactPhone} /></EditRow>
+                <EditRow label="地址" span><input className="detail-input" defaultValue={brand.address} /></EditRow>
               </div>
             ) : (
               <div className="detail-grid">
@@ -250,6 +253,9 @@ export default function ProductBrandDetail() {
                     ))}
                   </div>
                 </DetailRow>
+                <DetailRow label="联系人"><span style={{ fontWeight: 'var(--font-medium)' }}>{brand.contactPerson}</span></DetailRow>
+                <DetailRow label="联系电话"><span className="mono">{brand.contactPhone}</span></DetailRow>
+                <DetailRow label="地址" span>{brand.address || <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>}</DetailRow>
               </div>
             )}
           </Card>
@@ -311,58 +317,45 @@ export default function ProductBrandDetail() {
             )}
           </Card>
 
-          {/* 联系信息 */}
-          <Card title="联系信息">
-            {editing ? (
-              <div className="detail-grid">
-                <EditRow label="联系人"><input className="detail-input" defaultValue={brand.contactPerson} /></EditRow>
-                <EditRow label="联系电话"><input className="detail-input" defaultValue={brand.contactPhone} /></EditRow>
-                <EditRow label="地址" span><input className="detail-input" defaultValue={brand.address} /></EditRow>
-              </div>
-            ) : (
-              <div className="detail-grid">
-                <DetailRow label="联系人"><span style={{ fontWeight: 'var(--font-medium)' }}>{brand.contactPerson}</span></DetailRow>
-                <DetailRow label="联系电话"><span className="mono">{brand.contactPhone}</span></DetailRow>
-                <DetailRow label="地址" span>{brand.address || <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>}</DetailRow>
-              </div>
-            )}
-          </Card>
-
-          {/* 关联商品 */}
-          <Card title="关联商品" headerRight={<span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>共 {associatedProducts.length} 件</span>}>
+          {/* 热销商品TOP5 */}
+          <Card title="热销商品TOP5" headerRight={<span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>总销售 {associatedProducts.reduce((sum, p) => sum + p.salesCount, 0).toLocaleString()} 件</span>}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              {associatedProducts.map((p) => (
+              {associatedProducts.map((p, i) => (
                 <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--color-neutral-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', flexShrink: 0 }}>
-                    {p.name[0]}
+                  <div style={{ width: 20, height: 20, borderRadius: 'var(--radius-full)', background: i < 3 ? ['#CB405D', '#F18F4D', '#0DAFC6'][i] : 'var(--color-neutral-300)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-xs)', color: '#fff', fontWeight: 'var(--font-semibold)', flexShrink: 0 }}>
+                    {i + 1}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)', marginBottom: '2px' }}>{p.name}</div>
                     <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{p.category} · {p.series}</div>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)', color: 'var(--color-semantic-error)' }}>¥{p.price}</div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>库存 {p.stock}</div>
+                    <div style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }}>{p.salesCount.toLocaleString()} 件</div>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>¥{p.price}</div>
                   </div>
                 </div>
               ))}
             </div>
           </Card>
 
-          {/* 关联供应商 */}
-          <Card title="关联供应商" headerRight={<span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>共 {associatedSuppliers.length} 家</span>}>
+          {/* 常采供应商TOP5 */}
+          <Card title="常采供应商TOP5" headerRight={<span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>共 {associatedSuppliers.length} 家</span>}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              {associatedSuppliers.map((s) => (
+              {associatedSuppliers.map((s, i) => (
                 <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-full)', background: 'var(--color-module-product-base)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-sm)', color: '#fff', fontWeight: 'var(--font-semibold)', flexShrink: 0 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 'var(--radius-full)', background: i < 3 ? ['#CB405D', '#F18F4D', '#0DAFC6'][i] : 'var(--color-neutral-300)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-xs)', color: '#fff', fontWeight: 'var(--font-semibold)', flexShrink: 0 }}>
+                    {i + 1}
+                  </div>
+                  <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-full)', background: 'var(--color-module-product-base)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-xs)', color: '#fff', fontWeight: 'var(--font-semibold)', flexShrink: 0 }}>
                     {s.name[0]}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)', marginBottom: '2px' }}>{s.name}</div>
                     <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{s.contactPerson} · {s.contactPhone}</div>
                   </div>
-                  <div style={{ flexShrink: 0 }}>
-                    <span className="brand-series-tag" style={{ background: s.cooperationType === '独家' ? 'var(--color-semantic-error-light)' : 'var(--color-semantic-info-light)', color: s.cooperationType === '独家' ? 'var(--color-semantic-error)' : 'var(--color-semantic-info)' }}>{s.cooperationType}</span>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }}>采购 {s.purchaseCount.toLocaleString()} 件</div>
+                    <span className="brand-series-tag" style={{ background: s.cooperationType === '独家' ? 'var(--color-semantic-error-light)' : 'var(--color-semantic-info-light)', color: s.cooperationType === '独家' ? 'var(--color-semantic-error)' : 'var(--color-semantic-info)', fontSize: 'var(--text-xs)' }}>{s.cooperationType}</span>
                   </div>
                 </div>
               ))}
