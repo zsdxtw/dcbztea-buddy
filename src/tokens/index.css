@@ -627,6 +627,8 @@ tbody tr:last-child td { border-bottom: none; }
 .rank-period-btn { padding: 0; font-size: var(--text-xs); font-family: var(--font-family-sans); border: none; background: none; color: var(--color-neutral-400); cursor: pointer; transition: var(--transition-fast); line-height: 1; }
 .rank-period-btn.active { color: var(--color-module-current-base); font-weight: var(--font-medium); }
 .rank-period-btn:not(.active):hover { color: var(--color-neutral-600); }
+.rank-period-btn + .rank-period-btn { position: relative; padding-left: calc(var(--space-2) + 1px); }
+.rank-period-btn + .rank-period-btn::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 1px; height: 10px; background: var(--color-neutral-300); }
 .rank-chart-card .card-body { padding: var(--space-4) var(--space-5); }
 .rank-chart { display: flex; flex-direction: column; gap: var(--space-3); }
 .rank-chart-row { display: flex; align-items: center; gap: var(--space-3); }
