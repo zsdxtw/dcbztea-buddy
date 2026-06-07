@@ -139,9 +139,14 @@ export default function ProductBrandDetail() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
                 <span style={{ fontFamily: 'var(--font-family-serif)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{brand.name}</span>
               </div>
-              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>
+              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-2)' }}>
                 <span className="mono">{brand.code}</span> · {brand.owner} · {brand.mainCategories.join('、')}
               </div>
+              {editing ? (
+                <textarea className="detail-textarea" defaultValue={brand.introduction} rows={2} style={{ fontSize: 'var(--text-sm)' }} />
+              ) : (
+                <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-md)' }}>{brand.introduction}</div>
+              )}
             </div>
           </div>
         </Card>
@@ -171,7 +176,6 @@ export default function ProductBrandDetail() {
                     <Button variant="ghost" size="sm">上传文件</Button>
                   </div>
                 </EditRow>
-                <EditRow label="品牌介绍" span><textarea className="detail-textarea" defaultValue={brand.introduction} rows={3} /></EditRow>
               </div>
             ) : (
               <div className="detail-grid">
@@ -193,7 +197,6 @@ export default function ProductBrandDetail() {
                     <Button variant="ghost" size="sm">下载</Button>
                   </div>
                 </DetailRow>
-                <DetailRow label="品牌介绍" span>{brand.introduction}</DetailRow>
               </div>
             )}
           </Card>
