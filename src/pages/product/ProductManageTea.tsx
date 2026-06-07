@@ -8,7 +8,7 @@ import StatusTag from '../../components/common/StatusTag';
 import { teaProducts, getShelfStatusLabel } from '../../data/teaProducts';
 import { TeaCategory } from '../../types';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 20;
 
 /** 茶类中文名 -> TeaCategory 枚举映射 */
 const CATEGORY_MAP: Record<string, TeaCategory> = {
@@ -158,7 +158,7 @@ export default function ProductManageTea() {
         </Card>
 
         {/* 商品卡片网格 */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
           {paged.map((product) => {
             const teaCat = parseCategory(product.category);
             const mainImage = product.mainImages[0] || '';
