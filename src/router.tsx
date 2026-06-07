@@ -37,6 +37,7 @@ import InventoryAlertSettings from './pages/inventory/InventoryAlertSettings';
 import ProductOverview from './pages/product/ProductOverview';
 import ProductList from './pages/product/ProductList';
 import ProductTeaCategory from './pages/product/ProductTeaCategory';
+import ProductTeaList from './pages/product/ProductTeaList';
 import ProductGrade from './pages/product/ProductGrade';
 import ProductSpecs from './pages/product/ProductSpecs';
 import ProductCategory from './pages/product/ProductCategory';
@@ -115,6 +116,8 @@ export const router = createBrowserRouter([
       { path: 'product/product-overview', element: <ProductOverview /> },
       { path: 'product/product-list', element: <ProductList /> },
       { path: 'product/product-tea-category', element: <ProductTeaCategory /> },
+      { path: 'product/product-tea-seven', element: <ProductTeaCategory /> },
+      { path: 'product/product-tea-list', element: <ProductTeaList /> },
       { path: 'product/product-grade', element: <ProductGrade /> },
       { path: 'product/product-specs', element: <ProductSpecs /> },
       { path: 'product/product-category', element: <ProductCategory /> },

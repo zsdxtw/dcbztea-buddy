@@ -35,7 +35,7 @@ export default function ProductTeaCategory() {
 
   return (
     <>
-      <ContentHeader title="茶类档案" breadcrumbs={['商品', '茶类档案']} />
+      <ContentHeader title="七大茶类" breadcrumbs={['商品', '茶类档案', '七大茶类']} />
       <div className="content-body">
         <Card title="七大茶类">
           <Table

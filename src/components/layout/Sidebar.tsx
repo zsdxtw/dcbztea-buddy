@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../stores/appStore';
 import { MODULE_CONFIGS } from '../../data/modules';
 import clsx from 'clsx';
+import type { MenuItem } from '../../types';
 
 /** 侧边栏 */
 export default function Sidebar() {
@@ -15,9 +17,28 @@ export default function Sidebar() {
   const config = MODULE_CONFIGS[currentModule];
   const menus = config?.menus ?? [];
 
+  // 展开的菜单组
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
+
   const handleMenuClick = (menuKey: string) => {
     switchSubMenu(menuKey);
     navigate(`/${currentModule}/${menuKey}`);
+  };
+
+  const handleToggleExpand = (menuKey: string) => {
+    setExpandedKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(menuKey)) {
+        next.delete(menuKey);
+      } else {
+        next.add(menuKey);
+      }
+      return next;
+    });
+  };
+
+  const isChildActive = (menu: MenuItem) => {
+    return menu.children?.some((child) => currentSubMenu === child.key) ?? false;
   };
 
   return (
@@ -31,17 +52,53 @@ export default function Sidebar() {
         </button>
       </div>
       <nav className="sidebar-nav">
-        {menus.map((menu) => (
-          <div
-            key={menu.key}
-            className={clsx('sidebar-nav-item', currentSubMenu === menu.key && 'active')}
-            data-tooltip={menu.label}
-            onClick={() => handleMenuClick(menu.key)}
-          >
-            <span className="sidebar-nav-item-icon">{menu.icon}</span>
-            <span className="sidebar-nav-item-text">{menu.label}</span>
-          </div>
-        ))}
+        {menus.map((menu) => {
+          const hasChildren = menu.children && menu.children.length > 0;
+          const expanded = expandedKeys.has(menu.key);
+          const childActive = isChildActive(menu);
+
+          if (hasChildren) {
+            return (
+              <div key={menu.key} className={clsx('sidebar-nav-group', childActive && 'group-active')}>
+                <div
+                  className={clsx('sidebar-nav-item', childActive && 'active')}
+                  onClick={() => handleToggleExpand(menu.key)}
+                  data-tooltip={menu.label}
+                >
+                  <span className="sidebar-nav-item-icon">{menu.icon}</span>
+                  <span className="sidebar-nav-item-text">{menu.label}</span>
+                  <span className={clsx('sidebar-nav-arrow', expanded && 'expanded')}>
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                </div>
+                <div className={clsx('sidebar-nav-children', expanded && 'expanded')}>
+                  {menu.children!.map((child) => (
+                    <div
+                      key={child.key}
+                      className={clsx('sidebar-nav-child-item', currentSubMenu === child.key && 'active')}
+                      onClick={() => handleMenuClick(child.key)}
+                    >
+                      <span className="sidebar-nav-child-dot" />
+                      <span className="sidebar-nav-child-text">{child.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div
+              key={menu.key}
+              className={clsx('sidebar-nav-item', currentSubMenu === menu.key && 'active')}
+              data-tooltip={menu.label}
+              onClick={() => handleMenuClick(menu.key)}
+            >
+              <span className="sidebar-nav-item-icon">{menu.icon}</span>
+              <span className="sidebar-nav-item-text">{menu.label}</span>
+            </div>
+          );
+        })}
       </nav>
     </aside>
   );
