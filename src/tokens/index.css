@@ -83,6 +83,7 @@
   --color-tea-oolong-bg: #EFF2E8; --color-tea-oolong-text: #3E4A28; --color-tea-oolong-border: #C8D0B0;
   --color-tea-red-bg: #F8ECEC; --color-tea-red-text: #7A2A28; --color-tea-red-border: #E0C0C0;
   --color-tea-dark-bg: #F0EBE6; --color-tea-dark-text: #3A2E20; --color-tea-dark-border: #D0C8B8;
+  --color-tea-flower-bg: #FFF0F5; --color-tea-flower-text: #B03070; --color-tea-flower-border: #F0C0D8;
 
   /* ── 语义色 ── */
   --color-semantic-success: #01795D; --color-semantic-success-bg: #EDFAF5;
@@ -410,6 +411,7 @@ tbody tr:last-child td { border-bottom: none; }
 .tag-oolong { background: var(--color-tea-oolong-bg); color: var(--color-tea-oolong-text); border: 1px solid var(--color-tea-oolong-border); }
 .tag-red { background: var(--color-tea-red-bg); color: var(--color-tea-red-text); border: 1px solid var(--color-tea-red-border); }
 .tag-dark { background: var(--color-tea-dark-bg); color: var(--color-tea-dark-text); border: 1px solid var(--color-tea-dark-border); }
+.tag-flower { background: var(--color-tea-flower-bg); color: var(--color-tea-flower-text); border: 1px solid var(--color-tea-flower-border); }
 
 .status-tag { display: inline-flex; align-items: center; gap: var(--space-1); height: 22px; padding: 0 var(--space-2); border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: var(--font-medium); }
 .status-tag-dot { width: 6px; height: 6px; border-radius: var(--radius-full); }

@@ -5,8 +5,20 @@ import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
+import Tag from '../../components/common/Tag';
 import FilterBar from '../../components/business/FilterBar';
 import type { StatCardData, BrandItem } from '../../types';
+import { TeaCategory } from '../../types';
+
+/** 通过茶类中文名称获取 TeaCategory 枚举 */
+function nameToTeaCategory(name: string): TeaCategory | undefined {
+  const map: Record<string, TeaCategory> = {
+    '绿茶': TeaCategory.GREEN, '红茶': TeaCategory.RED, '乌龙茶': TeaCategory.OOLONG,
+    '白茶': TeaCategory.WHITE, '黄茶': TeaCategory.YELLOW, '黑茶': TeaCategory.DARK,
+    '花草茶': TeaCategory.FLOWER,
+  };
+  return map[name];
+}
 
 const SECOND_LEVEL_CATEGORIES = [
   '绿茶', '红茶', '乌龙茶', '白茶', '黄茶', '黑茶', '花草茶',
@@ -294,9 +306,10 @@ export default function ProductBrand() {
               <span className="mono">{b.code}</span>,
               <span style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }} title={b.owner}>{b.owner}</span>,
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                {b.mainCategories.map((c) => (
-                  <span key={c} className="brand-series-tag">{c}</span>
-                ))}
+                {b.mainCategories.map((c) => {
+                  const cat = nameToTeaCategory(c);
+                  return cat ? <Tag key={c} category={cat} /> : <span key={c} className="brand-series-tag">{c}</span>;
+                })}
               </div>,
               <span className="mono">{b.productCount}</span>,
               <span className="mono">{b.supplierCount}</span>,

@@ -14,13 +14,14 @@ export default function StatisticsTeaCategory() {
     { label: '黑茶', value: '62', unit: '万¥', icon: <svg viewBox="0 0 18 18" fill="none" style={{ color: 'var(--color-tea-dark)' }}><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/></svg> },
     { label: '白茶', value: '45', unit: '万¥', icon: <svg viewBox="0 0 18 18" fill="none" style={{ color: 'var(--color-tea-white)' }}><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/></svg> },
     { label: '黄茶', value: '18', unit: '万¥', icon: <svg viewBox="0 0 18 18" fill="none" style={{ color: 'var(--color-tea-yellow)' }}><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/></svg> },
+    { label: '花草茶', value: '32', unit: '万¥', icon: <svg viewBox="0 0 18 18" fill="none" style={{ color: 'var(--color-tea-flower)' }}><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/></svg> },
   ];
 
   return (
     <>
       <ContentHeader title="茶类分析" breadcrumbs={['统计', '茶类分析']} />
       <div className="content-body">
-        <div className="stat-cards" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        <div className="stat-cards" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
           {teaCategoryStats.map((s, i) => (
             <StatCard key={i} data={{
               label: s.label + '销售额',

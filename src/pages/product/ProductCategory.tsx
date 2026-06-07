@@ -3,6 +3,19 @@ import ContentHeader from '../../components/layout/ContentHeader';
 import Card from '../../components/common/Card';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
+import { getTeaCategoryDetail, getTeaCategoryLabel } from '../../data/teaCategories';
+import { TeaCategory } from '../../types';
+
+/** 通过茶类中文名称查找茶类详情 */
+function getTeaCategoryDetailByName(name: string) {
+  const nameToEnum: Record<string, TeaCategory> = {
+    '绿茶': TeaCategory.GREEN, '红茶': TeaCategory.RED, '乌龙茶': TeaCategory.OOLONG,
+    '白茶': TeaCategory.WHITE, '黄茶': TeaCategory.YELLOW, '黑茶': TeaCategory.DARK,
+    '花草茶': TeaCategory.FLOWER,
+  };
+  const cat = nameToEnum[name];
+  return cat ? getTeaCategoryDetail(cat) : undefined;
+}
 
 /* ── 分类数据结构 ── */
 interface CategoryNode {
@@ -428,7 +441,7 @@ export default function ProductCategory() {
                       </div>
                     </div>
 
-                    {/* 二级分类：显示发酵种类和茶类介绍 */}
+                    {/* 二级分类：显示发酵种类和茶类介绍（从茶类管理数据源获取） */}
                     {depth === 1 && selectedNode.fermentation && (
                       <div className="detail-row">
                         <div className="detail-label">发酵种类</div>
@@ -437,12 +450,16 @@ export default function ProductCategory() {
                         </div>
                       </div>
                     )}
-                    {depth === 1 && selectedNode.description && (
-                      <div className="detail-row detail-row-span">
-                        <div className="detail-label">茶类介绍</div>
-                        <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{selectedNode.description}</div>
-                      </div>
-                    )}
+                    {depth === 1 && (() => {
+                      const teaDetail = getTeaCategoryDetailByName(selectedNode.name);
+                      const intro = teaDetail?.introduction || selectedNode.description;
+                      return intro ? (
+                        <div className="detail-row detail-row-span">
+                          <div className="detail-label">茶类介绍</div>
+                          <div className="detail-value" style={{ lineHeight: 'var(--leading-relaxed)' }}>{intro}</div>
+                        </div>
+                      ) : null;
+                    })()}
 
                     {/* 三级分类：显示产地和茶叶特点 */}
                     {depth === 2 && selectedNode.origin && (

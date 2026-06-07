@@ -3,7 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ContentHeader from '../../components/layout/ContentHeader';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
+import Tag from '../../components/common/Tag';
 import type { BrandItem } from '../../types';
+import { TeaCategory } from '../../types';
+import { getTeaCategoryLabel } from '../../data/teaCategories';
+
+/** 通过茶类中文名称获取 TeaCategory 枚举 */
+function nameToTeaCategory(name: string): TeaCategory | undefined {
+  const map: Record<string, TeaCategory> = {
+    '绿茶': TeaCategory.GREEN, '红茶': TeaCategory.RED, '乌龙茶': TeaCategory.OOLONG,
+    '白茶': TeaCategory.WHITE, '黄茶': TeaCategory.YELLOW, '黑茶': TeaCategory.DARK,
+    '花草茶': TeaCategory.FLOWER,
+  };
+  return map[name];
+}
 
 const SECOND_LEVEL_CATEGORIES = [
   '绿茶', '红茶', '乌龙茶', '白茶', '黄茶', '黑茶', '花草茶',
@@ -190,7 +203,10 @@ export default function ProductBrandDetail() {
                 <span><span className="mono">{brand.code}</span> · {brand.owner}</span>
                 <span style={{ color: 'var(--color-neutral-400)' }}>|</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                  {brand.mainCategories.map((c) => (<span key={c} className="brand-series-tag">{c}</span>))}
+                  {brand.mainCategories.map((c) => {
+                    const cat = nameToTeaCategory(c);
+                    return cat ? <Tag key={c} category={cat} /> : <span key={c} className="brand-series-tag">{c}</span>;
+                  })}
                 </div>
               </div>
               {editing ? (

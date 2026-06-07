@@ -18,6 +18,7 @@ export enum TeaCategory {
   OOLONG = 'oolong',
   RED = 'red',
   DARK = 'dark',
+  FLOWER = 'flower',
 }
 
 /** 订单状态 */
@@ -215,6 +216,7 @@ export interface GradeItem {
 /** 茶类详情 */
 export interface TeaCategoryDetail {
   category: TeaCategory;
+  introduction: string;
   process: string;
   storage: string;
   flavor: string;

@@ -5,7 +5,7 @@ interface TagProps {
   label?: string;
 }
 
-/** 六大茶类标签组件 */
+/** 茶类标签组件 */
 export default function Tag({ category, label }: TagProps) {
   const categoryLabels: Record<TeaCategory, string> = {
     [TeaCategory.GREEN]: '绿茶',
@@ -14,6 +14,7 @@ export default function Tag({ category, label }: TagProps) {
     [TeaCategory.OOLONG]: '青茶',
     [TeaCategory.RED]: '红茶',
     [TeaCategory.DARK]: '黑茶',
+    [TeaCategory.FLOWER]: '花草茶',
   };
 
   const tagClass = `tag tag-${category}`;
