@@ -557,7 +557,7 @@ export default function ProductTeaDetail() {
             {/* 商品图片 */}
             <Card title="商品图片" style={{ marginBottom: 'var(--space-4)' }}>
               <div style={{ marginBottom: 'var(--space-4)' }}>
-                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--color-neutral-700)', marginBottom: 'var(--space-2)' }}>主图（点击设为展示图）</div>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--color-neutral-700)', marginBottom: 'var(--space-2)' }}>轮播图（点击设为主图）</div>
                 <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
                   {(form.mainImages as string[] || []).map((img: string, i: number) => (
                     <div
@@ -580,7 +580,7 @@ export default function ProductTeaDetail() {
                         }
                       }}
                     >
-                      <img src={img} alt={`主图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      <img src={img} alt={`轮播图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       {(form.displayImageIndex ?? 0) === i && (
                         <span style={{
                           position: 'absolute', top: 2, right: 2,
@@ -597,7 +597,7 @@ export default function ProductTeaDetail() {
                           fontSize: '10px', opacity: 0, transition: 'opacity var(--transition-fast)',
                         }}
                           className="img-hover-label"
-                        >设为展示图</div>
+                        >设为主图</div>
                       )}
                       <div
                         onClick={(e) => {

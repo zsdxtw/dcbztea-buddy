@@ -601,7 +601,7 @@ export default function ProductManageTea() {
                     </div>
                   </div>
                 )}
-                {/* 商品主图 */}
+                {/* 商品轮播图 */}
                 <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: 'var(--color-neutral-100)', position: 'relative' }}>
                   <img
                     src={mainImage}
@@ -1199,10 +1199,10 @@ export default function ProductManageTea() {
 
               {/* ── 商品图片 ── */}
               <div style={sectionTitleStyle}>商品图片</div>
-              {/* 主图 */}
+              {/* 轮播图 */}
               <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
                 <div className="drawer-form-field" style={{ width: '100%' }}>
-                  <label className="drawer-label">主图（点击设为展示图）</label>
+                  <label className="drawer-label">轮播图（点击设为主图）</label>
                   <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: '4px' }}>
                     {form.mainImages.map((img, i) => (
                       <div
@@ -1225,15 +1225,15 @@ export default function ProductManageTea() {
                           }
                         }}
                       >
-                        <img src={img} alt={`主图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                        {/* 展示图标注 */}
+                        <img src={img} alt={`轮播图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        {/* 主图标注 */}
                         {form.displayImageIndex === i && (
                           <span style={{
                             position: 'absolute', top: 2, right: 2,
                             padding: '1px 4px', borderRadius: 'var(--radius-sm)',
                             background: 'var(--color-module-current-base)', color: '#fff',
                             fontSize: '10px', fontWeight: 'var(--font-semibold)', lineHeight: '14px',
-                          }}>展示</span>
+                          }}>主图</span>
                         )}
                         {/* hover 提示 */}
                         {form.displayImageIndex !== i && (
@@ -1244,7 +1244,7 @@ export default function ProductManageTea() {
                             fontSize: '10px', opacity: 0, transition: 'opacity var(--transition-fast)',
                           }}
                             className="img-hover-label"
-                          >设为展示图</div>
+                          >设为主图</div>
                         )}
                         {/* 删除按钮 */}
                         <div
@@ -1266,7 +1266,7 @@ export default function ProductManageTea() {
                         >×</div>
                       </div>
                     ))}
-                    {/* 添加主图 */}
+                    {/* 添加轮播图 */}
                     <label style={{
                       width: 80, height: 80, borderRadius: 'var(--radius-md)',
                       border: '1px dashed var(--color-neutral-300)', display: 'flex',
