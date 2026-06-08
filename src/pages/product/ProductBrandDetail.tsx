@@ -7,6 +7,7 @@ import Tag from '../../components/common/Tag';
 import type { BrandItem } from '../../types';
 import { TeaCategory } from '../../types';
 import { getTeaCategoryLabel } from '../../data/teaCategories';
+import { teaCategoryData, teawareCategoryData, teaPeripheralCategoryData, otherCategoryData } from '../../data/productCategories';
 
 /** 通过茶类中文名称获取 TeaCategory 枚举 */
 function nameToTeaCategory(name: string): TeaCategory | undefined {
@@ -18,11 +19,12 @@ function nameToTeaCategory(name: string): TeaCategory | undefined {
   return map[name];
 }
 
-const SECOND_LEVEL_CATEGORIES = [
-  '绿茶', '红茶', '青茶', '白茶', '黄茶', '黑茶', '花草茶',
-  '茶壶', '茶杯', '茶盘茶台', '茶道配件',
-  '茶食品', '礼盒套装', '茶叶罐/包装',
-  '泡茶水', '茶书茶画', '茶香/香道',
+/** 一级分类选项 */
+const LEVEL1_OPTIONS = [
+  { label: '茶叶', data: teaCategoryData },
+  { label: '茶具', data: teawareCategoryData },
+  { label: '茶周边', data: teaPeripheralCategoryData },
+  { label: '其他', data: otherCategoryData },
 ];
 
 const brandItems: BrandItem[] = [
@@ -239,12 +241,22 @@ export default function ProductBrandDetail() {
                 <EditRow label="品牌所属"><input className="detail-input" defaultValue={brand.owner} /></EditRow>
                 <EditRow label="主营品类">
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                    {SECOND_LEVEL_CATEGORIES.map((cat) => (
-                      <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
-                        <input type="checkbox" defaultChecked={brand.mainCategories.includes(cat)} />
-                        {cat}
-                      </label>
-                    ))}
+                    {LEVEL1_OPTIONS.map((opt) => {
+                      const level2Names = opt.data.children?.map((c) => c.name) ?? [];
+                      return (
+                        <div key={opt.label} style={{ width: '100%', marginBottom: 'var(--space-1)' }}>
+                          <div style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)', marginBottom: '4px', color: 'var(--color-neutral-700)' }}>{opt.label}</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                            {level2Names.map((cat) => (
+                              <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
+                                <input type="checkbox" defaultChecked={brand.mainCategories.includes(cat)} />
+                                {cat}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </EditRow>
                 <EditRow label="商标证书" span>

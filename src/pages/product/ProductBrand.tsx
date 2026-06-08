@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ContentHeader from '../../components/layout/ContentHeader';
 import StatCard from '../../components/common/StatCard';
@@ -10,6 +10,7 @@ import FilterBar from '../../components/business/FilterBar';
 import type { StatCardData, BrandItem } from '../../types';
 import { TeaCategory } from '../../types';
 import { brandItems } from '../../data/brands';
+import { teaCategoryData, teawareCategoryData, teaPeripheralCategoryData, otherCategoryData } from '../../data/productCategories';
 
 /** 通过茶类中文名称获取 TeaCategory 枚举 */
 function nameToTeaCategory(name: string): TeaCategory | undefined {
@@ -21,12 +22,19 @@ function nameToTeaCategory(name: string): TeaCategory | undefined {
   return map[name];
 }
 
-const SECOND_LEVEL_CATEGORIES = [
-  '绿茶', '红茶', '青茶', '白茶', '黄茶', '黑茶', '花草茶',
-  '茶壶', '茶杯', '茶盘茶台', '茶道配件',
-  '茶食品', '礼盒套装', '茶叶罐/包装',
-  '泡茶水', '茶书茶画', '茶香/香道',
+/** 一级分类选项 */
+const LEVEL1_OPTIONS = [
+  { label: '茶叶', data: teaCategoryData },
+  { label: '茶具', data: teawareCategoryData },
+  { label: '茶周边', data: teaPeripheralCategoryData },
+  { label: '其他', data: otherCategoryData },
 ];
+
+/** 获取一级分类下的二级分类名称列表 */
+function getLevel2Names(level1: string): string[] {
+  const found = LEVEL1_OPTIONS.find((o) => o.label === level1);
+  return found ? (found.data.children?.map((c) => c.name) ?? []) : [];
+}
 
 const stats: StatCardData[] = [];
 
@@ -167,7 +175,9 @@ const emptyForm = {
 export default function ProductBrand() {
   const navigate = useNavigate();
   const [filterKeyword, setFilterKeyword] = useState('');
-  const [filterCategory, setFilterCategory] = useState('主营品类');
+  const [filterLevel1, setFilterLevel1] = useState('');
+  const [filterLevel2, setFilterLevel2] = useState('');
+  const level2Options = useMemo(() => filterLevel1 ? getLevel2Names(filterLevel1) : [], [filterLevel1]);
   const [salesAmountPeriod, setSalesAmountPeriod] = useState<RankPeriod>('month');
   const [profitTotalPeriod, setProfitTotalPeriod] = useState<RankPeriod>('month');
   const [salesQuantityPeriod, setSalesQuantityPeriod] = useState<RankPeriod>('month');
@@ -178,7 +188,11 @@ export default function ProductBrand() {
 
   const filteredItems = brandItems.filter((b) => {
     if (filterKeyword && !b.name.includes(filterKeyword) && !b.code.toLowerCase().includes(filterKeyword.toLowerCase()) && !b.owner.includes(filterKeyword)) return false;
-    if (filterCategory !== '主营品类' && !b.mainCategories.includes(filterCategory)) return false;
+    if (filterLevel2 && !b.mainCategories.includes(filterLevel2)) return false;
+    if (filterLevel1 && !filterLevel2) {
+      const level2Names = getLevel2Names(filterLevel1);
+      if (!b.mainCategories.some((c) => level2Names.includes(c))) return false;
+    }
     return true;
   });
 
@@ -241,9 +255,13 @@ export default function ProductBrand() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
           <FilterBar>
             <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => setFilterKeyword(e.target.value)} />
-            <select className="filter-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-              <option>主营品类</option>
-              {SECOND_LEVEL_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+            <select className="filter-select" value={filterLevel1} onChange={(e) => { setFilterLevel1(e.target.value); setFilterLevel2(''); }}>
+              <option value="">一级分类</option>
+              {LEVEL1_OPTIONS.map((o) => <option key={o.label} value={o.label}>{o.label}</option>)}
+            </select>
+            <select className="filter-select" value={filterLevel2} onChange={(e) => setFilterLevel2(e.target.value)}>
+              <option value="">二级分类</option>
+              {level2Options.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </FilterBar>
           <Button onClick={handleOpenDrawer}><PlusIcon />新增品牌</Button>
@@ -319,12 +337,22 @@ export default function ProductBrand() {
                 <div className="drawer-form-field">
                   <label className="drawer-label">主营品类</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginTop: '4px' }}>
-                    {SECOND_LEVEL_CATEGORIES.map((cat) => (
-                      <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
-                        <input type="checkbox" checked={form.mainCategories.includes(cat)} onChange={() => handleToggleCategory(cat)} />
-                        {cat}
-                      </label>
-                    ))}
+                    {LEVEL1_OPTIONS.map((opt) => {
+                      const level2Names = opt.data.children?.map((c) => c.name) ?? [];
+                      return (
+                        <div key={opt.label} style={{ width: '100%', marginBottom: 'var(--space-1)' }}>
+                          <div style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)', marginBottom: '4px', color: 'var(--color-neutral-700)' }}>{opt.label}</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                            {level2Names.map((cat) => (
+                              <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
+                                <input type="checkbox" checked={form.mainCategories.includes(cat)} onChange={() => handleToggleCategory(cat)} />
+                                {cat}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
