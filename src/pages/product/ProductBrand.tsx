@@ -256,11 +256,11 @@ export default function ProductBrand() {
           <FilterBar>
             <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => setFilterKeyword(e.target.value)} />
             <select className="filter-select" value={filterLevel1} onChange={(e) => { setFilterLevel1(e.target.value); setFilterLevel2(''); }}>
-              <option value="">一级分类</option>
+              <option value="">全部</option>
               {LEVEL1_OPTIONS.map((o) => <option key={o.label} value={o.label}>{o.label}</option>)}
             </select>
             <select className="filter-select" value={filterLevel2} onChange={(e) => setFilterLevel2(e.target.value)}>
-              <option value="">二级分类</option>
+              <option value="">全部</option>
               {level2Options.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </FilterBar>
