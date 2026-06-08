@@ -587,7 +587,7 @@ export default function ProductTeaDetail() {
                           padding: '1px 4px', borderRadius: 'var(--radius-sm)',
                           background: 'var(--color-module-current-base)', color: '#fff',
                           fontSize: '10px', fontWeight: 'var(--font-semibold)', lineHeight: '14px',
-                        }}>展示</span>
+                        }}>主图</span>
                       )}
                       {(form.displayImageIndex ?? 0) !== i && (
                         <div style={{
