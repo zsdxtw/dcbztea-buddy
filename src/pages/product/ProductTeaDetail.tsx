@@ -106,7 +106,7 @@ export default function ProductTeaDetail() {
 
   const topCategory = getTopCategory(product.category);
   const teaCat = nameToTeaCategory(topCategory);
-  const mainPreview = previewImage ?? product.mainImages[0] ?? '';
+  const mainPreview = previewImage ?? product.mainImages[product.displayImageIndex] ?? product.mainImages[0] ?? '';
 
   const shelfVariant = product.shelfStatus === 'on' ? 'success' : 'error';
   const purchaseVariant = product.purchaseStatus === 'available' ? 'success' : 'warning';
@@ -126,6 +126,7 @@ export default function ProductTeaDetail() {
     formData.selectedL3 = l3Name ? [l3Name] : [];
     formData.isNewSeries = false;
     formData.newSeriesName = '';
+    formData.displayImageIndex = product.displayImageIndex || 0;
     setForm(formData);
     setEditMode(true);
   };
@@ -550,6 +551,133 @@ export default function ProductTeaDetail() {
                     {computedIncludesTeaware ? '是（分类含茶具自动标记）' : '否'}
                   </span>
                 </EditRow>
+              </div>
+            </Card>
+
+            {/* 商品图片 */}
+            <Card title="商品图片" style={{ marginBottom: 'var(--space-4)' }}>
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--color-neutral-700)', marginBottom: 'var(--space-2)' }}>主图（点击设为展示图）</div>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                  {(form.mainImages as string[] || []).map((img: string, i: number) => (
+                    <div
+                      key={i}
+                      style={{
+                        width: 80, height: 80, borderRadius: 'var(--radius-md)', overflow: 'hidden',
+                        border: `2px solid ${(form.displayImageIndex ?? 0) === i ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                        position: 'relative', cursor: 'pointer',
+                        transition: 'border-color var(--transition-fast)',
+                      }}
+                      onClick={() => setForm({ ...form, displayImageIndex: i })}
+                      onMouseEnter={(e) => {
+                        if ((form.displayImageIndex ?? 0) !== i) {
+                          (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--color-module-current-base)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if ((form.displayImageIndex ?? 0) !== i) {
+                          (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--color-neutral-200)';
+                        }
+                      }}
+                    >
+                      <img src={img} alt={`主图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      {(form.displayImageIndex ?? 0) === i && (
+                        <span style={{
+                          position: 'absolute', top: 2, right: 2,
+                          padding: '1px 4px', borderRadius: 'var(--radius-sm)',
+                          background: 'var(--color-module-current-base)', color: '#fff',
+                          fontSize: '10px', fontWeight: 'var(--font-semibold)', lineHeight: '14px',
+                        }}>展示</span>
+                      )}
+                      {(form.displayImageIndex ?? 0) !== i && (
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          background: 'rgba(0,0,0,0.45)', color: '#fff',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '10px', opacity: 0, transition: 'opacity var(--transition-fast)',
+                        }}
+                          className="img-hover-label"
+                        >设为展示图</div>
+                      )}
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newImages = (form.mainImages as string[]).filter((_, idx) => idx !== i);
+                          let newDisplayIndex = form.displayImageIndex ?? 0;
+                          if (i < newDisplayIndex) newDisplayIndex--;
+                          else if (i === newDisplayIndex) newDisplayIndex = 0;
+                          if (newDisplayIndex >= newImages.length) newDisplayIndex = 0;
+                          setForm({ ...form, mainImages: newImages, displayImageIndex: newDisplayIndex });
+                        }}
+                        style={{
+                          position: 'absolute', top: 2, left: 2, width: 16, height: 16,
+                          borderRadius: '50%', background: 'rgba(0,0,0,0.5)', color: '#fff',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', fontSize: '10px', lineHeight: 1,
+                        }}
+                      >×</div>
+                    </div>
+                  ))}
+                  <label style={{
+                    width: 80, height: 80, borderRadius: 'var(--radius-md)',
+                    border: '1px dashed var(--color-neutral-300)', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                    background: 'var(--color-neutral-50)', color: 'var(--color-neutral-400)',
+                    fontSize: 'var(--text-xs)', flexDirection: 'column', gap: 2,
+                  }}>
+                    <svg viewBox="0 0 16 16" fill="none" style={{ width: 20, height: 20 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                    添加主图
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const url = URL.createObjectURL(file);
+                      setForm({ ...form, mainImages: [...(form.mainImages as string[] || []), url] });
+                      e.target.value = '';
+                    }} />
+                  </label>
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--color-neutral-700)', marginBottom: 'var(--space-2)' }}>详情图</div>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                  {(form.detailImages as string[] || []).map((img: string, i: number) => (
+                    <div
+                      key={i}
+                      style={{
+                        width: 80, height: 80, borderRadius: 'var(--radius-md)', overflow: 'hidden',
+                        border: '1px solid var(--color-neutral-200)', position: 'relative',
+                      }}
+                    >
+                      <img src={img} alt={`详情图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      <div
+                        onClick={() => setForm({ ...form, detailImages: (form.detailImages as string[]).filter((_, idx) => idx !== i) })}
+                        style={{
+                          position: 'absolute', top: 2, left: 2, width: 16, height: 16,
+                          borderRadius: '50%', background: 'rgba(0,0,0,0.5)', color: '#fff',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', fontSize: '10px', lineHeight: 1,
+                        }}
+                      >×</div>
+                    </div>
+                  ))}
+                  <label style={{
+                    width: 80, height: 80, borderRadius: 'var(--radius-md)',
+                    border: '1px dashed var(--color-neutral-300)', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                    background: 'var(--color-neutral-50)', color: 'var(--color-neutral-400)',
+                    fontSize: 'var(--text-xs)', flexDirection: 'column', gap: 2,
+                  }}>
+                    <svg viewBox="0 0 16 16" fill="none" style={{ width: 20, height: 20 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                    添加详情图
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const url = URL.createObjectURL(file);
+                      setForm({ ...form, detailImages: [...(form.detailImages as string[] || []), url] });
+                      e.target.value = '';
+                    }} />
+                  </label>
+                </div>
               </div>
             </Card>
 

@@ -81,6 +81,7 @@ const emptyForm = {
   productionStatus: 'producing' as 'producing' | 'stopped',
   mainImages: [] as string[],
   detailImages: [] as string[],
+  displayImageIndex: 0,
   stockAlert: 50,
   stock: 0,
   reservedStock: 0,
@@ -365,6 +366,7 @@ export default function ProductManageTea() {
       productionStatus: form.productionStatus,
       mainImages: form.mainImages.length > 0 ? form.mainImages : [`https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(form.name)}&image_size=square_hd`],
       detailImages: form.detailImages,
+      displayImageIndex: form.displayImageIndex,
       stockAlert: form.stockAlert,
       stock: form.stock,
       reservedStock: form.reservedStock,
@@ -548,7 +550,7 @@ export default function ProductManageTea() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
           {paged.map((product) => {
             const teaCat = parseCategory(product.category);
-            const mainImage = product.mainImages[0] || '';
+            const mainImage = product.mainImages[product.displayImageIndex] || product.mainImages[0] || '';
             const isSelected = selectedForDelete.has(product.id);
             return (
               <div
@@ -1192,6 +1194,143 @@ export default function ProductManageTea() {
                 <div className="drawer-form-field" style={{ width: '100%' }}>
                   <label className="drawer-label">包装清单</label>
                   <input className="detail-input" value={form.packageList} onChange={(e) => setForm({ ...form, packageList: e.target.value })} placeholder="如：茶叶罐×1、手提袋×1、品鉴茶具套装×1" />
+                </div>
+              </div>
+
+              {/* ── 商品图片 ── */}
+              <div style={sectionTitleStyle}>商品图片</div>
+              {/* 主图 */}
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">主图（点击设为展示图）</label>
+                  <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: '4px' }}>
+                    {form.mainImages.map((img, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          width: 80, height: 80, borderRadius: 'var(--radius-md)', overflow: 'hidden',
+                          border: `2px solid ${form.displayImageIndex === i ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                          position: 'relative', cursor: 'pointer',
+                          transition: 'border-color var(--transition-fast)',
+                        }}
+                        onClick={() => setForm({ ...form, displayImageIndex: i })}
+                        onMouseEnter={(e) => {
+                          if (form.displayImageIndex !== i) {
+                            (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--color-module-current-base)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (form.displayImageIndex !== i) {
+                            (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--color-neutral-200)';
+                          }
+                        }}
+                      >
+                        <img src={img} alt={`主图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        {/* 展示图标注 */}
+                        {form.displayImageIndex === i && (
+                          <span style={{
+                            position: 'absolute', top: 2, right: 2,
+                            padding: '1px 4px', borderRadius: 'var(--radius-sm)',
+                            background: 'var(--color-module-current-base)', color: '#fff',
+                            fontSize: '10px', fontWeight: 'var(--font-semibold)', lineHeight: '14px',
+                          }}>展示</span>
+                        )}
+                        {/* hover 提示 */}
+                        {form.displayImageIndex !== i && (
+                          <div style={{
+                            position: 'absolute', inset: 0,
+                            background: 'rgba(0,0,0,0.45)', color: '#fff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: '10px', opacity: 0, transition: 'opacity var(--transition-fast)',
+                          }}
+                            className="img-hover-label"
+                          >设为展示图</div>
+                        )}
+                        {/* 删除按钮 */}
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newImages = form.mainImages.filter((_, idx) => idx !== i);
+                            let newDisplayIndex = form.displayImageIndex;
+                            if (i < form.displayImageIndex) newDisplayIndex--;
+                            else if (i === form.displayImageIndex) newDisplayIndex = 0;
+                            if (newDisplayIndex >= newImages.length) newDisplayIndex = 0;
+                            setForm({ ...form, mainImages: newImages, displayImageIndex: newDisplayIndex });
+                          }}
+                          style={{
+                            position: 'absolute', top: 2, left: 2, width: 16, height: 16,
+                            borderRadius: '50%', background: 'rgba(0,0,0,0.5)', color: '#fff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', fontSize: '10px', lineHeight: 1,
+                          }}
+                        >×</div>
+                      </div>
+                    ))}
+                    {/* 添加主图 */}
+                    <label style={{
+                      width: 80, height: 80, borderRadius: 'var(--radius-md)',
+                      border: '1px dashed var(--color-neutral-300)', display: 'flex',
+                      alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                      background: 'var(--color-neutral-50)', color: 'var(--color-neutral-400)',
+                      fontSize: 'var(--text-xs)', flexDirection: 'column', gap: 2,
+                    }}>
+                      <svg viewBox="0 0 16 16" fill="none" style={{ width: 20, height: 20 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                      添加主图
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const url = URL.createObjectURL(file);
+                        setForm({ ...form, mainImages: [...form.mainImages, url] });
+                        e.target.value = '';
+                      }} />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* 详情图 */}
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">详情图</label>
+                  <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: '4px' }}>
+                    {form.detailImages.map((img, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          width: 80, height: 80, borderRadius: 'var(--radius-md)', overflow: 'hidden',
+                          border: '1px solid var(--color-neutral-200)', position: 'relative',
+                        }}
+                      >
+                        <img src={img} alt={`详情图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        <div
+                          onClick={() => setForm({ ...form, detailImages: form.detailImages.filter((_, idx) => idx !== i) })}
+                          style={{
+                            position: 'absolute', top: 2, left: 2, width: 16, height: 16,
+                            borderRadius: '50%', background: 'rgba(0,0,0,0.5)', color: '#fff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', fontSize: '10px', lineHeight: 1,
+                          }}
+                        >×</div>
+                      </div>
+                    ))}
+                    <label style={{
+                      width: 80, height: 80, borderRadius: 'var(--radius-md)',
+                      border: '1px dashed var(--color-neutral-300)', display: 'flex',
+                      alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                      background: 'var(--color-neutral-50)', color: 'var(--color-neutral-400)',
+                      fontSize: 'var(--text-xs)', flexDirection: 'column', gap: 2,
+                    }}>
+                      <svg viewBox="0 0 16 16" fill="none" style={{ width: 20, height: 20 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                      添加详情图
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const url = URL.createObjectURL(file);
+                        setForm({ ...form, detailImages: [...form.detailImages, url] });
+                        e.target.value = '';
+                      }} />
+                    </label>
+                  </div>
                 </div>
               </div>
 

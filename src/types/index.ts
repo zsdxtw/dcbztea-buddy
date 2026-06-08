@@ -377,6 +377,7 @@ export interface TeaProduct {
   productionStatus: 'producing' | 'stopped';
   mainImages: string[];
   detailImages: string[];
+  displayImageIndex: number;
   stockAlert: number;
   stock: number;
   reservedStock: number;

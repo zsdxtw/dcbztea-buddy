@@ -715,3 +715,6 @@ tbody tr:last-child td { border-bottom: none; }
 /* ── 茶种卡片悬停编辑按钮 ── */
 .tea-card-edit-btn { opacity: 0; transition: opacity 0.2s ease; }
 .tea-card-hover:hover .tea-card-edit-btn { opacity: 1; }
+
+/* ── 图片设为展示图悬停提示 ── */
+div:hover > .img-hover-label { opacity: 1 !important; }
