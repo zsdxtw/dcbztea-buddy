@@ -87,6 +87,10 @@ export default function ProductTeaDetail() {
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState<Record<string, any>>({});
 
+  // 拖拽排序状态
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragType, setDragType] = useState<'main' | 'detail' | null>(null);
+
   const product = teaProducts.find((p) => p.id === id);
 
   if (!product) {
@@ -562,6 +566,26 @@ export default function ProductTeaDetail() {
                   {(form.mainImages as string[] || []).map((img: string, i: number) => (
                     <div
                       key={i}
+                      draggable
+                      onDragStart={() => { setDragIndex(i); setDragType('main'); }}
+                      onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.opacity = '0.5'; }}
+                      onDragLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.style.opacity = '1';
+                        if (dragType === 'main' && dragIndex !== null && dragIndex !== i) {
+                          const newImages = [...(form.mainImages as string[])];
+                          const [moved] = newImages.splice(dragIndex, 1);
+                          newImages.splice(i, 0, moved);
+                          let newDisplayIndex = form.displayImageIndex ?? 0;
+                          if (newDisplayIndex === dragIndex) newDisplayIndex = i;
+                          else if (dragIndex < newDisplayIndex && i >= newDisplayIndex) newDisplayIndex--;
+                          else if (dragIndex > newDisplayIndex && i <= newDisplayIndex) newDisplayIndex++;
+                          setForm({ ...form, mainImages: newImages, displayImageIndex: newDisplayIndex });
+                        }
+                        setDragIndex(null); setDragType(null);
+                      }}
+                      onDragEnd={() => { setDragIndex(null); setDragType(null); }}
                       style={{
                         width: 80, height: 80, borderRadius: 'var(--radius-md)', overflow: 'hidden',
                         border: `2px solid ${(form.displayImageIndex ?? 0) === i ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
@@ -581,6 +605,15 @@ export default function ProductTeaDetail() {
                       }}
                     >
                       <img src={img} alt={`轮播图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      {/* 序号 */}
+                      <span style={{
+                        position: 'absolute', top: 2, left: 2,
+                        width: 16, height: 16, borderRadius: '50%',
+                        background: 'rgba(0,0,0,0.5)', color: '#fff',
+                        fontSize: '10px', fontWeight: 'var(--font-semibold)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        lineHeight: 1,
+                      }}>{i + 1}</span>
                       {(form.displayImageIndex ?? 0) === i && (
                         <span style={{
                           position: 'absolute', top: 2, right: 2,
@@ -610,7 +643,7 @@ export default function ProductTeaDetail() {
                           setForm({ ...form, mainImages: newImages, displayImageIndex: newDisplayIndex });
                         }}
                         style={{
-                          position: 'absolute', top: 2, left: 2, width: 16, height: 16,
+                          position: 'absolute', bottom: 2, right: 2, width: 16, height: 16,
                           borderRadius: '50%', background: 'rgba(0,0,0,0.5)', color: '#fff',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           cursor: 'pointer', fontSize: '10px', lineHeight: 1,
@@ -618,23 +651,43 @@ export default function ProductTeaDetail() {
                       >×</div>
                     </div>
                   ))}
-                  <label style={{
-                    width: 80, height: 80, borderRadius: 'var(--radius-md)',
-                    border: '1px dashed var(--color-neutral-300)', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                    background: 'var(--color-neutral-50)', color: 'var(--color-neutral-400)',
-                    fontSize: 'var(--text-xs)', flexDirection: 'column', gap: 2,
-                  }}>
-                    <svg viewBox="0 0 16 16" fill="none" style={{ width: 20, height: 20 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-                    添加主图
-                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const url = URL.createObjectURL(file);
-                      setForm({ ...form, mainImages: [...(form.mainImages as string[] || []), url] });
-                      e.target.value = '';
-                    }} />
-                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <label style={{
+                      width: 80, height: 80, borderRadius: 'var(--radius-md)',
+                      border: '1px dashed var(--color-neutral-300)', display: 'flex',
+                      alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                      background: 'var(--color-neutral-50)', color: 'var(--color-neutral-400)',
+                      fontSize: 'var(--text-xs)', flexDirection: 'column', gap: 2,
+                    }}>
+                      <svg viewBox="0 0 16 16" fill="none" style={{ width: 20, height: 20 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                      添加轮播图
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const imgEl = new Image();
+                        const url = URL.createObjectURL(file);
+                        imgEl.onload = () => {
+                          if (imgEl.width > 500 || imgEl.height > 500) {
+                            alert('图片尺寸不能超过500×500像素，请重新选择');
+                            URL.revokeObjectURL(url);
+                            return;
+                          }
+                          setForm({ ...form, mainImages: [...(form.mainImages as string[] || []), url] });
+                        };
+                        imgEl.src = url;
+                        e.target.value = '';
+                      }} />
+                    </label>
+                    <div style={{
+                      position: 'absolute', inset: 0, borderRadius: 'var(--radius-md)',
+                      background: 'rgba(0,0,0,0.45)', color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '10px', opacity: 0, transition: 'opacity var(--transition-fast)',
+                      pointerEvents: 'none',
+                    }}
+                      className="img-hover-label"
+                    >正方形≤500×500</div>
+                  </div>
                 </div>
               </div>
               <div>
@@ -643,16 +696,41 @@ export default function ProductTeaDetail() {
                   {(form.detailImages as string[] || []).map((img: string, i: number) => (
                     <div
                       key={i}
+                      draggable
+                      onDragStart={() => { setDragIndex(i); setDragType('detail'); }}
+                      onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.opacity = '0.5'; }}
+                      onDragLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.style.opacity = '1';
+                        if (dragType === 'detail' && dragIndex !== null && dragIndex !== i) {
+                          const newImages = [...(form.detailImages as string[])];
+                          const [moved] = newImages.splice(dragIndex, 1);
+                          newImages.splice(i, 0, moved);
+                          setForm({ ...form, detailImages: newImages });
+                        }
+                        setDragIndex(null); setDragType(null);
+                      }}
+                      onDragEnd={() => { setDragIndex(null); setDragType(null); }}
                       style={{
                         width: 80, height: 80, borderRadius: 'var(--radius-md)', overflow: 'hidden',
-                        border: '1px solid var(--color-neutral-200)', position: 'relative',
+                        border: '1px solid var(--color-neutral-200)', position: 'relative', cursor: 'grab',
                       }}
                     >
                       <img src={img} alt={`详情图-${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      {/* 序号 */}
+                      <span style={{
+                        position: 'absolute', top: 2, left: 2,
+                        width: 16, height: 16, borderRadius: '50%',
+                        background: 'rgba(0,0,0,0.5)', color: '#fff',
+                        fontSize: '10px', fontWeight: 'var(--font-semibold)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        lineHeight: 1,
+                      }}>{i + 1}</span>
                       <div
                         onClick={() => setForm({ ...form, detailImages: (form.detailImages as string[]).filter((_, idx) => idx !== i) })}
                         style={{
-                          position: 'absolute', top: 2, left: 2, width: 16, height: 16,
+                          position: 'absolute', bottom: 2, right: 2, width: 16, height: 16,
                           borderRadius: '50%', background: 'rgba(0,0,0,0.5)', color: '#fff',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           cursor: 'pointer', fontSize: '10px', lineHeight: 1,
@@ -660,23 +738,43 @@ export default function ProductTeaDetail() {
                       >×</div>
                     </div>
                   ))}
-                  <label style={{
-                    width: 80, height: 80, borderRadius: 'var(--radius-md)',
-                    border: '1px dashed var(--color-neutral-300)', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                    background: 'var(--color-neutral-50)', color: 'var(--color-neutral-400)',
-                    fontSize: 'var(--text-xs)', flexDirection: 'column', gap: 2,
-                  }}>
-                    <svg viewBox="0 0 16 16" fill="none" style={{ width: 20, height: 20 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-                    添加详情图
-                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const url = URL.createObjectURL(file);
-                      setForm({ ...form, detailImages: [...(form.detailImages as string[] || []), url] });
-                      e.target.value = '';
-                    }} />
-                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <label style={{
+                      width: 80, height: 80, borderRadius: 'var(--radius-md)',
+                      border: '1px dashed var(--color-neutral-300)', display: 'flex',
+                      alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                      background: 'var(--color-neutral-50)', color: 'var(--color-neutral-400)',
+                      fontSize: 'var(--text-xs)', flexDirection: 'column', gap: 2,
+                    }}>
+                      <svg viewBox="0 0 16 16" fill="none" style={{ width: 20, height: 20 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                      添加详情图
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const imgEl = new Image();
+                        const url = URL.createObjectURL(file);
+                        imgEl.onload = () => {
+                          if (imgEl.width > 500 || imgEl.height > 500) {
+                            alert('图片尺寸不能超过500×500像素，请重新选择');
+                            URL.revokeObjectURL(url);
+                            return;
+                          }
+                          setForm({ ...form, detailImages: [...(form.detailImages as string[] || []), url] });
+                        };
+                        imgEl.src = url;
+                        e.target.value = '';
+                      }} />
+                    </label>
+                    <div style={{
+                      position: 'absolute', inset: 0, borderRadius: 'var(--radius-md)',
+                      background: 'rgba(0,0,0,0.45)', color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '10px', opacity: 0, transition: 'opacity var(--transition-fast)',
+                      pointerEvents: 'none',
+                    }}
+                      className="img-hover-label"
+                    >正方形≤500×500</div>
+                  </div>
                 </div>
               </div>
             </Card>
