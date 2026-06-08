@@ -664,11 +664,12 @@ export default function ProductTeaDetail() {
                       <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
+                        if ((form.mainImages as string[] || []).length >= 8) { alert('轮播图最多8张'); return; }
                         const imgEl = new Image();
                         const url = URL.createObjectURL(file);
                         imgEl.onload = () => {
-                          if (imgEl.width > 500 || imgEl.height > 500) {
-                            alert('图片尺寸不能超过500×500像素，请重新选择');
+                          if (imgEl.width !== imgEl.height || imgEl.width < 500 || imgEl.width > 1920) {
+                            alert('轮播图要求正方形，边长500-1920像素，请重新选择');
                             URL.revokeObjectURL(url);
                             return;
                           }
@@ -686,7 +687,7 @@ export default function ProductTeaDetail() {
                       pointerEvents: 'none',
                     }}
                       className="img-hover-label"
-                    >正方形≤500×500</div>
+                    >正方形500-1920px</div>
                   </div>
                 </div>
               </div>
@@ -751,11 +752,12 @@ export default function ProductTeaDetail() {
                       <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
+                        if ((form.detailImages as string[] || []).length >= 20) { alert('详情图最多20张'); return; }
                         const imgEl = new Image();
                         const url = URL.createObjectURL(file);
                         imgEl.onload = () => {
-                          if (imgEl.width > 500 || imgEl.height > 500) {
-                            alert('图片尺寸不能超过500×500像素，请重新选择');
+                          if (imgEl.width < 500 || imgEl.width > 1920 || imgEl.height > 3000) {
+                            alert('详情图要求宽500-1920像素，高不超过3000像素，请重新选择');
                             URL.revokeObjectURL(url);
                             return;
                           }
@@ -773,7 +775,7 @@ export default function ProductTeaDetail() {
                       pointerEvents: 'none',
                     }}
                       className="img-hover-label"
-                    >正方形≤500×500</div>
+                    >宽500-1920px 高≤3000px</div>
                   </div>
                 </div>
               </div>
