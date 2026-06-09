@@ -186,7 +186,7 @@ export default function ProductBrand() {
   const [newSeries, setNewSeries] = useState('');
   const [showSeriesInput, setShowSeriesInput] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 20;
+  const PAGE_SIZE = 10;
 
   const filteredItems = brandItems.filter((b) => {
     if (filterKeyword && !b.name.includes(filterKeyword) && !b.code.toLowerCase().includes(filterKeyword.toLowerCase()) && !b.owner.includes(filterKeyword)) return false;
