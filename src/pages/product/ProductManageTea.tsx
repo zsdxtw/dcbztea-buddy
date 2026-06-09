@@ -493,26 +493,23 @@ export default function ProductManageTea() {
                 const l2Node = teaCategoryData.children?.find(c => c.name === catName);
                 if (!l2Node?.children || l2Node.children.length === 0) return null;
                 return (
-                  <div key={catName} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>{catName}：</span>
-                    {l2Node.children.map(c => (
-                      <button
-                        key={c.id}
-                        onClick={() => handleL3Toggle(c.name)}
-                        style={{
-                          padding: '1px 8px',
-                          borderRadius: 'var(--radius-sm)',
-                          border: `1px solid ${l3Filter.has(c.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
-                          background: l3Filter.has(c.name) ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
-                          color: l3Filter.has(c.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
-                          cursor: 'pointer',
-                          fontSize: 'var(--text-xs)',
-                          transition: 'var(--transition-fast)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {c.name}
-                      </button>
+                  <div key={catName} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginBottom: '4px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0, marginRight: '2px' }}>{catName}：</span>
+                    {l2Node.children.map((c, i) => (
+                      <span key={c.id} style={{ display: 'inline-flex', alignItems: 'center', fontSize: 'var(--text-xs)' }}>
+                        {i > 0 && <span style={{ color: 'var(--color-neutral-300)', margin: '0 2px' }}>|</span>}
+                        <span
+                          onClick={() => handleL3Toggle(c.name)}
+                          style={{
+                            cursor: 'pointer',
+                            color: l3Filter.has(c.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+                            fontWeight: l3Filter.has(c.name) ? 'var(--font-semibold)' : 'normal',
+                            transition: 'color var(--transition-fast)',
+                          }}
+                        >
+                          {c.name}
+                        </span>
+                      </span>
                     ))}
                   </div>
                 );
