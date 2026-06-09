@@ -8,6 +8,7 @@ import Tag from '../../components/common/Tag';
 import { teaProducts, getShelfStatusLabel, getPurchaseStatusLabel, getProductionStatusLabel } from '../../data/teaProducts';
 import { TeaCategory, TeaProduct } from '../../types';
 import { brandItems } from '../../data/brands';
+import { weightUnits, dimensionUnits, packageUnits } from '../../data/units';
 import { teaCategoryData, teawareCategoryData, teaPeripheralCategoryData, otherCategoryData, productCategoryLabels, type ProductCategoryType, type CategoryNode } from '../../data/productCategories';
 
 /** 通过茶类中文名称获取 TeaCategory 枚举 */
@@ -452,30 +453,90 @@ export default function ProductTeaDetail() {
                 </EditRow>
                 <EditRow label="包装单位">
                   <select className="detail-input" value={f.packageUnit || ''} onChange={(e) => setForm({ ...form, packageUnit: e.target.value })} style={selectStyle}>
-                    <option value="罐">罐</option>
-                    <option value="袋">袋</option>
-                    <option value="盒">盒</option>
-                    <option value="饼">饼</option>
-                    <option value="砖">砖</option>
-                    <option value="条">条</option>
-                    <option value="箱">箱</option>
+                    {packageUnits.map(u => <option key={u.name} value={u.name}>{u.name}</option>)}
                   </select>
                 </EditRow>
-                <EditRow label="重量(kg)">
-                  <input className="detail-input" type="number" value={f.weight || ''} onChange={(e) => setForm({ ...form, weight: Number(e.target.value) })} style={inputStyle} placeholder="0" />
-                </EditRow>
-                <EditRow label="每箱数量">
-                  <input className="detail-input" type="number" value={f.quantityPerUnit || ''} onChange={(e) => setForm({ ...form, quantityPerUnit: Number(e.target.value) })} style={inputStyle} placeholder="0" />
-                </EditRow>
-                <EditRow label="体积(cm)" span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', width: '100%' }}>
-                    <input className="detail-input" type="number" value={f.volume?.length || ''} onChange={(e) => setForm({ ...form, volume: { ...((f.volume) || { length: 0, width: 0, height: 0 }), length: Number(e.target.value) } })} style={{ ...inputStyle, width: '30%' }} placeholder="长" />
-                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
-                    <input className="detail-input" type="number" value={f.volume?.width || ''} onChange={(e) => setForm({ ...form, volume: { ...((f.volume) || { length: 0, width: 0, height: 0 }), width: Number(e.target.value) } })} style={{ ...inputStyle, width: '30%' }} placeholder="宽" />
-                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
-                    <input className="detail-input" type="number" value={f.volume?.height || ''} onChange={(e) => setForm({ ...form, volume: { ...((f.volume) || { length: 0, width: 0, height: 0 }), height: Number(e.target.value) } })} style={{ ...inputStyle, width: '30%' }} placeholder="高" />
+              </div>
+
+              {/* 每份规格 */}
+              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)', margin: 'var(--space-3) 0 var(--space-2)', borderLeft: '3px solid var(--color-module-current-base)', paddingLeft: '8px' }}>每份规格</div>
+              <div className="detail-grid">
+                <EditRow label="净重">
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <input className="detail-input" type="number" value={f.perUnitSpec?.netWeight || ''} onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setForm({ ...form, perUnitSpec: { ...f.perUnitSpec!, netWeight: val }, perBoxSpec: { ...f.perBoxSpec!, netWeight: val * (f.perBoxSpec?.quantity || 0) } });
+                    }} style={inputStyle} placeholder="0" />
+                    <select className="detail-input" value={f.perUnitSpec?.netWeightUnit || 'g'} onChange={(e) => setForm({ ...form, perUnitSpec: { ...f.perUnitSpec!, netWeightUnit: e.target.value } })} style={{ ...selectStyle, width: 80 }}>
+                      {weightUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
                   </div>
                 </EditRow>
+                <EditRow label="毛重">
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <input className="detail-input" type="number" value={f.perUnitSpec?.grossWeight || ''} onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setForm({ ...form, perUnitSpec: { ...f.perUnitSpec!, grossWeight: val }, perBoxSpec: { ...f.perBoxSpec!, grossWeight: val * (f.perBoxSpec?.quantity || 0) } });
+                    }} style={inputStyle} placeholder="0" />
+                    <select className="detail-input" value={f.perUnitSpec?.grossWeightUnit || 'g'} onChange={(e) => setForm({ ...form, perUnitSpec: { ...f.perUnitSpec!, grossWeightUnit: e.target.value } })} style={{ ...selectStyle, width: 80 }}>
+                      {weightUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
+                </EditRow>
+                <EditRow label="体积" span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', width: '100%' }}>
+                    <input className="detail-input" type="number" value={f.perUnitSpec?.length || ''} onChange={(e) => setForm({ ...form, perUnitSpec: { ...f.perUnitSpec!, length: Number(e.target.value) } })} style={{ ...inputStyle, width: '22%' }} placeholder="长" />
+                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
+                    <input className="detail-input" type="number" value={f.perUnitSpec?.width || ''} onChange={(e) => setForm({ ...form, perUnitSpec: { ...f.perUnitSpec!, width: Number(e.target.value) } })} style={{ ...inputStyle, width: '22%' }} placeholder="宽" />
+                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
+                    <input className="detail-input" type="number" value={f.perUnitSpec?.height || ''} onChange={(e) => setForm({ ...form, perUnitSpec: { ...f.perUnitSpec!, height: Number(e.target.value) } })} style={{ ...inputStyle, width: '22%' }} placeholder="高" />
+                    <select className="detail-input" value={f.perUnitSpec?.dimensionUnit || 'cm'} onChange={(e) => setForm({ ...form, perUnitSpec: { ...f.perUnitSpec!, dimensionUnit: e.target.value } })} style={{ ...selectStyle, width: 80 }}>
+                      {dimensionUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
+                </EditRow>
+              </div>
+
+              {/* 每箱规格（箱规） */}
+              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)', margin: 'var(--space-3) 0 var(--space-2)', borderLeft: '3px solid var(--color-module-current-base)', paddingLeft: '8px' }}>每箱规格（箱规）</div>
+              <div className="detail-grid">
+                <EditRow label="每箱数量">
+                  <input className="detail-input" type="number" value={f.perBoxSpec?.quantity || ''} onChange={(e) => {
+                    const qty = Number(e.target.value);
+                    setForm({ ...form, perBoxSpec: { ...f.perBoxSpec!, quantity: qty, netWeight: (f.perUnitSpec?.netWeight || 0) * qty, grossWeight: (f.perUnitSpec?.grossWeight || 0) * qty } });
+                  }} style={inputStyle} placeholder="0" />
+                </EditRow>
+                <EditRow label="净重">
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <input className="detail-input" type="number" value={f.perBoxSpec?.netWeight || ''} readOnly style={{ ...inputStyle, background: 'var(--color-neutral-50)', color: 'var(--color-neutral-500)' }} />
+                    <select className="detail-input" value={f.perBoxSpec?.netWeightUnit || 'kg'} onChange={(e) => setForm({ ...form, perBoxSpec: { ...f.perBoxSpec!, netWeightUnit: e.target.value } })} style={{ ...selectStyle, width: 80 }}>
+                      {weightUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
+                </EditRow>
+                <EditRow label="毛重">
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <input className="detail-input" type="number" value={f.perBoxSpec?.grossWeight || ''} readOnly style={{ ...inputStyle, background: 'var(--color-neutral-50)', color: 'var(--color-neutral-500)' }} />
+                    <select className="detail-input" value={f.perBoxSpec?.grossWeightUnit || 'kg'} onChange={(e) => setForm({ ...form, perBoxSpec: { ...f.perBoxSpec!, grossWeightUnit: e.target.value } })} style={{ ...selectStyle, width: 80 }}>
+                      {weightUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
+                </EditRow>
+                <EditRow label="体积" span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', width: '100%' }}>
+                    <input className="detail-input" type="number" value={f.perBoxSpec?.length || ''} onChange={(e) => setForm({ ...form, perBoxSpec: { ...f.perBoxSpec!, length: Number(e.target.value) } })} style={{ ...inputStyle, width: '22%' }} placeholder="长" />
+                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
+                    <input className="detail-input" type="number" value={f.perBoxSpec?.width || ''} onChange={(e) => setForm({ ...form, perBoxSpec: { ...f.perBoxSpec!, width: Number(e.target.value) } })} style={{ ...inputStyle, width: '22%' }} placeholder="宽" />
+                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
+                    <input className="detail-input" type="number" value={f.perBoxSpec?.height || ''} onChange={(e) => setForm({ ...form, perBoxSpec: { ...f.perBoxSpec!, height: Number(e.target.value) } })} style={{ ...inputStyle, width: '22%' }} placeholder="高" />
+                    <select className="detail-input" value={f.perBoxSpec?.dimensionUnit || 'cm'} onChange={(e) => setForm({ ...form, perBoxSpec: { ...f.perBoxSpec!, dimensionUnit: e.target.value } })} style={{ ...selectStyle, width: 80 }}>
+                      {dimensionUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
+                </EditRow>
+              </div>
+
+              <div className="detail-grid" style={{ marginTop: 'var(--space-3)' }}>
                 <EditRow label="69码">
                   <input className="detail-input" value={f.barcode69 || ''} onChange={(e) => setForm({ ...form, barcode69: e.target.value })} style={inputStyle} placeholder="13位条码" maxLength={13} />
                 </EditRow>
@@ -846,14 +907,28 @@ export default function ProductTeaDetail() {
                     <DetailRow label="等级"><span style={{ fontWeight: 'var(--font-medium)' }}>{product.grade}</span></DetailRow>
                     <DetailRow label="产地">{product.origin}</DetailRow>
                     <DetailRow label="规格">{product.spec}</DetailRow>
-                    <DetailRow label="重量">{product.weight} kg</DetailRow>
-                    <DetailRow label="体积">{product.volume.length}×{product.volume.width}×{product.volume.height} cm</DetailRow>
                     <DetailRow label="包装单位">{product.packageUnit}</DetailRow>
-                    <DetailRow label="单位数量">{product.quantityPerUnit}</DetailRow>
                     <DetailRow label="保质期">{product.shelfLife} 个月</DetailRow>
                     <DetailRow label="税率">{product.taxRate}%</DetailRow>
                     <DetailRow label="69码"><span className="mono">{product.barcode69}</span></DetailRow>
                     <DetailRow label="型号"><span className="mono">{product.model}</span></DetailRow>
+                  </div>
+                  {/* 每份规格 */}
+                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)', margin: 'var(--space-3) 0 var(--space-2)', borderLeft: '3px solid var(--color-module-current-base)', paddingLeft: '8px' }}>每份规格</div>
+                  <div className="detail-grid">
+                    <DetailRow label="净重">{product.perUnitSpec?.netWeight || '-'} {product.perUnitSpec?.netWeightUnit || ''}</DetailRow>
+                    <DetailRow label="毛重">{product.perUnitSpec?.grossWeight || '-'} {product.perUnitSpec?.grossWeightUnit || ''}</DetailRow>
+                    <DetailRow label="体积">{product.perUnitSpec?.length || '-'}×{product.perUnitSpec?.width || '-'}×{product.perUnitSpec?.height || '-'} {product.perUnitSpec?.dimensionUnit || ''}</DetailRow>
+                  </div>
+                  {/* 每箱规格（箱规） */}
+                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)', margin: 'var(--space-3) 0 var(--space-2)', borderLeft: '3px solid var(--color-module-current-base)', paddingLeft: '8px' }}>每箱规格（箱规）</div>
+                  <div className="detail-grid">
+                    <DetailRow label="每箱数量">{product.perBoxSpec?.quantity || '-'}</DetailRow>
+                    <DetailRow label="净重">{product.perBoxSpec?.netWeight || '-'} {product.perBoxSpec?.netWeightUnit || ''}</DetailRow>
+                    <DetailRow label="毛重">{product.perBoxSpec?.grossWeight || '-'} {product.perBoxSpec?.grossWeightUnit || ''}</DetailRow>
+                    <DetailRow label="体积">{product.perBoxSpec?.length || '-'}×{product.perBoxSpec?.width || '-'}×{product.perBoxSpec?.height || '-'} {product.perBoxSpec?.dimensionUnit || ''}</DetailRow>
+                  </div>
+                  <div className="detail-grid" style={{ marginTop: 'var(--space-2)' }}>
                     <DetailRow label="产品特点" span>{product.features}</DetailRow>
                   </div>
                 </div>

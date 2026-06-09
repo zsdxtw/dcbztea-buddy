@@ -359,6 +359,29 @@ export interface TeaProduct {
   barcode69: string;
   model: string;
   spec: string;
+  /** 每份规格 */
+  perUnitSpec: {
+    netWeight: number;       // 净重
+    netWeightUnit: string;   // 净重单位
+    grossWeight: number;     // 毛重
+    grossWeightUnit: string; // 毛重单位
+    length: number;          // 长
+    width: number;           // 宽
+    height: number;          // 高
+    dimensionUnit: string;   // 尺寸单位
+  };
+  /** 每箱规格（箱规） */
+  perBoxSpec: {
+    quantity: number;        // 每箱数量
+    netWeight: number;       // 净重 = 每份净重 × 数量
+    netWeightUnit: string;   // 净重单位
+    grossWeight: number;     // 毛重 = 每份毛重 × 数量
+    grossWeightUnit: string; // 毛重单位
+    length: number;          // 长
+    width: number;           // 宽
+    height: number;          // 高
+    dimensionUnit: string;   // 尺寸单位
+  };
   weight: number;
   volume: { length: number; width: number; height: number };
   quantityPerUnit: number;

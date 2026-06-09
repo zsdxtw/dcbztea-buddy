@@ -10,6 +10,7 @@ import { TeaProduct, TeaCategory } from '../../types';
 import { teaCategoryData, teawareCategoryData, teaPeripheralCategoryData, otherCategoryData, productCategoryLabels, type ProductCategoryType, type CategoryNode } from '../../data/productCategories';
 import { brandItems } from '../../data/brands';
 import { generateProductCode } from '../../utils/productCode';
+import { weightUnits, dimensionUnits, packageUnits } from '../../data/units';
 
 const PAGE_SIZE = 20;
 
@@ -63,6 +64,27 @@ const emptyForm = {
   barcode69: '',
   model: '',
   spec: '',
+  perUnitSpec: {
+    netWeight: 0,
+    netWeightUnit: 'g',
+    grossWeight: 0,
+    grossWeightUnit: 'g',
+    length: 0,
+    width: 0,
+    height: 0,
+    dimensionUnit: 'cm',
+  },
+  perBoxSpec: {
+    quantity: 0,
+    netWeight: 0,
+    netWeightUnit: 'kg',
+    grossWeight: 0,
+    grossWeightUnit: 'kg',
+    length: 0,
+    width: 0,
+    height: 0,
+    dimensionUnit: 'cm',
+  },
   weight: 0,
   volume: { length: 0, width: 0, height: 0 },
   quantityPerUnit: 0,
@@ -403,6 +425,8 @@ export default function ProductManageTea() {
       barcode69: form.barcode69,
       model: form.model,
       spec: form.spec,
+      perUnitSpec: form.perUnitSpec,
+      perBoxSpec: form.perBoxSpec,
       weight: form.weight,
       volume: form.volume,
       quantityPerUnit: form.quantityPerUnit,
@@ -1120,38 +1144,100 @@ export default function ProductManageTea() {
                 <div className="drawer-form-field">
                   <label className="drawer-label">包装单位</label>
                   <select className="detail-input" value={form.packageUnit} onChange={(e) => setForm({ ...form, packageUnit: e.target.value })}>
-                    <option value="罐">罐</option>
-                    <option value="袋">袋</option>
-                    <option value="盒">盒</option>
-                    <option value="饼">饼</option>
-                    <option value="砖">砖</option>
-                    <option value="条">条</option>
-                    <option value="箱">箱</option>
+                    {packageUnits.map(u => <option key={u.name} value={u.name}>{u.name}</option>)}
                   </select>
                 </div>
               </div>
+
+              {/* 每份规格 */}
+              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)', margin: 'var(--space-3) 0 var(--space-2)', borderLeft: '3px solid var(--color-module-current-base)', paddingLeft: '8px' }}>每份规格</div>
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
-                  <label className="drawer-label">重量(kg)</label>
-                  <input className="detail-input" type="number" value={form.weight || ''} onChange={(e) => setForm({ ...form, weight: Number(e.target.value) })} placeholder="0" />
+                  <label className="drawer-label">净重</label>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <input className="detail-input" type="number" value={form.perUnitSpec.netWeight || ''} onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setForm({ ...form, perUnitSpec: { ...form.perUnitSpec, netWeight: val }, perBoxSpec: { ...form.perBoxSpec, netWeight: val * form.perBoxSpec.quantity } });
+                    }} placeholder="0" style={{ flex: 1 }} />
+                    <select className="detail-input" value={form.perUnitSpec.netWeightUnit} onChange={(e) => setForm({ ...form, perUnitSpec: { ...form.perUnitSpec, netWeightUnit: e.target.value } })} style={{ width: 80 }}>
+                      {weightUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
                 </div>
                 <div className="drawer-form-field">
-                  <label className="drawer-label">每箱数量</label>
-                  <input className="detail-input" type="number" value={form.quantityPerUnit || ''} onChange={(e) => setForm({ ...form, quantityPerUnit: Number(e.target.value) })} placeholder="0" />
+                  <label className="drawer-label">毛重</label>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <input className="detail-input" type="number" value={form.perUnitSpec.grossWeight || ''} onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setForm({ ...form, perUnitSpec: { ...form.perUnitSpec, grossWeight: val }, perBoxSpec: { ...form.perBoxSpec, grossWeight: val * form.perBoxSpec.quantity } });
+                    }} placeholder="0" style={{ flex: 1 }} />
+                    <select className="detail-input" value={form.perUnitSpec.grossWeightUnit} onChange={(e) => setForm({ ...form, perUnitSpec: { ...form.perUnitSpec, grossWeightUnit: e.target.value } })} style={{ width: 80 }}>
+                      {weightUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
                 </div>
               </div>
               <div className="drawer-form-row">
                 <div className="drawer-form-field" style={{ width: '100%' }}>
-                  <label className="drawer-label">体积(cm) 长×宽×高</label>
+                  <label className="drawer-label">体积 <span style={{ color: 'var(--color-neutral-400)', fontWeight: 'normal' }}>长×宽×高</span></label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <input className="detail-input" type="number" value={form.volume.length || ''} onChange={(e) => setForm({ ...form, volume: { ...form.volume, length: Number(e.target.value) } })} placeholder="长" style={{ width: '33%' }} />
+                    <input className="detail-input" type="number" value={form.perUnitSpec.length || ''} onChange={(e) => setForm({ ...form, perUnitSpec: { ...form.perUnitSpec, length: Number(e.target.value) } })} placeholder="长" style={{ width: '25%' }} />
                     <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
-                    <input className="detail-input" type="number" value={form.volume.width || ''} onChange={(e) => setForm({ ...form, volume: { ...form.volume, width: Number(e.target.value) } })} placeholder="宽" style={{ width: '33%' }} />
+                    <input className="detail-input" type="number" value={form.perUnitSpec.width || ''} onChange={(e) => setForm({ ...form, perUnitSpec: { ...form.perUnitSpec, width: Number(e.target.value) } })} placeholder="宽" style={{ width: '25%' }} />
                     <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
-                    <input className="detail-input" type="number" value={form.volume.height || ''} onChange={(e) => setForm({ ...form, volume: { ...form.volume, height: Number(e.target.value) } })} placeholder="高" style={{ width: '33%' }} />
+                    <input className="detail-input" type="number" value={form.perUnitSpec.height || ''} onChange={(e) => setForm({ ...form, perUnitSpec: { ...form.perUnitSpec, height: Number(e.target.value) } })} placeholder="高" style={{ width: '25%' }} />
+                    <select className="detail-input" value={form.perUnitSpec.dimensionUnit} onChange={(e) => setForm({ ...form, perUnitSpec: { ...form.perUnitSpec, dimensionUnit: e.target.value } })} style={{ width: 80 }}>
+                      {dimensionUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
                   </div>
                 </div>
               </div>
+
+              {/* 每箱规格（箱规） */}
+              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)', margin: 'var(--space-3) 0 var(--space-2)', borderLeft: '3px solid var(--color-module-current-base)', paddingLeft: '8px' }}>每箱规格（箱规）</div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">每箱数量</label>
+                  <input className="detail-input" type="number" value={form.perBoxSpec.quantity || ''} onChange={(e) => {
+                    const qty = Number(e.target.value);
+                    setForm({ ...form, perBoxSpec: { ...form.perBoxSpec, quantity: qty, netWeight: form.perUnitSpec.netWeight * qty, grossWeight: form.perUnitSpec.grossWeight * qty } });
+                  }} placeholder="0" />
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">净重 <span style={{ color: 'var(--color-neutral-400)', fontWeight: 'normal', fontSize: 'var(--text-xs)' }}>= 每份净重 × 数量</span></label>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <input className="detail-input" type="number" value={form.perBoxSpec.netWeight || ''} readOnly style={{ flex: 1, background: 'var(--color-neutral-50)', color: 'var(--color-neutral-500)' }} />
+                    <select className="detail-input" value={form.perBoxSpec.netWeightUnit} onChange={(e) => setForm({ ...form, perBoxSpec: { ...form.perBoxSpec, netWeightUnit: e.target.value } })} style={{ width: 80 }}>
+                      {weightUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">毛重 <span style={{ color: 'var(--color-neutral-400)', fontWeight: 'normal', fontSize: 'var(--text-xs)' }}>= 每份毛重 × 数量</span></label>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <input className="detail-input" type="number" value={form.perBoxSpec.grossWeight || ''} readOnly style={{ flex: 1, background: 'var(--color-neutral-50)', color: 'var(--color-neutral-500)' }} />
+                    <select className="detail-input" value={form.perBoxSpec.grossWeightUnit} onChange={(e) => setForm({ ...form, perBoxSpec: { ...form.perBoxSpec, grossWeightUnit: e.target.value } })} style={{ width: 80 }}>
+                      {weightUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">体积 <span style={{ color: 'var(--color-neutral-400)', fontWeight: 'normal' }}>长×宽×高</span></label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    <input className="detail-input" type="number" value={form.perBoxSpec.length || ''} onChange={(e) => setForm({ ...form, perBoxSpec: { ...form.perBoxSpec, length: Number(e.target.value) } })} placeholder="长" style={{ width: '25%' }} />
+                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
+                    <input className="detail-input" type="number" value={form.perBoxSpec.width || ''} onChange={(e) => setForm({ ...form, perBoxSpec: { ...form.perBoxSpec, width: Number(e.target.value) } })} placeholder="宽" style={{ width: '25%' }} />
+                    <span style={{ color: 'var(--color-neutral-400)' }}>×</span>
+                    <input className="detail-input" type="number" value={form.perBoxSpec.height || ''} onChange={(e) => setForm({ ...form, perBoxSpec: { ...form.perBoxSpec, height: Number(e.target.value) } })} placeholder="高" style={{ width: '25%' }} />
+                    <select className="detail-input" value={form.perBoxSpec.dimensionUnit} onChange={(e) => setForm({ ...form, perBoxSpec: { ...form.perBoxSpec, dimensionUnit: e.target.value } })} style={{ width: 80 }}>
+                      {dimensionUnits.map(u => <option key={u.symbol} value={u.symbol}>{u.symbol}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
                   <label className="drawer-label">69码</label>
