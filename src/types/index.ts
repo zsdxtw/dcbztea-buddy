@@ -353,6 +353,7 @@ export interface TeaProduct {
   code: string;
   name: string;
   category: string;
+  categories: string[];
   brand: string;
   series: string;
   packageUnit: string;

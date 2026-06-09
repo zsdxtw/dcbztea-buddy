@@ -53,7 +53,7 @@ const CATEGORY_DATA_MAP: Record<ProductCategoryType, CategoryNode> = {
 /** 新增商品表单初始值 */
 const emptyForm = {
   name: '',
-  selectedL1: 'tea' as ProductCategoryType,
+  selectedL1List: ['tea'] as ProductCategoryType[],
   selectedL2: [] as string[],
   selectedL3: [] as string[],
   brand: '',
@@ -124,7 +124,7 @@ export default function ProductManageTea() {
   const [purchaseFilter, setPurchaseFilter] = useState('');
   const [productionFilter, setProductionFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState<Set<string>>(new Set());
-  const [quickFilter, setQuickFilter] = useState<Set<'teaware' | 'lowStock'>>(new Set());
+  const [quickFilter, setQuickFilter] = useState<Set<'teaware' | 'lowStock' | 'comboTea'>>(new Set());
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'sales-asc' | 'sales-desc'>('default');
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
@@ -168,6 +168,13 @@ export default function ProductManageTea() {
       if (brandFilter.size > 0 && !brandFilter.has(p.brand)) return false;
       if (quickFilter.has('teaware') && !p.includesTeaware) return false;
       if (quickFilter.has('lowStock') && p.stock >= p.stockAlert) return false;
+      if (quickFilter.has('comboTea')) {
+        // 组合茶：茶叶下选了多个不同二级分类
+        const teaL2Names = (teaCategoryData.children || []).map(ch => ch.name);
+        const teaCats = (p.categories || []).filter(c => teaL2Names.some(l2 => c.startsWith(l2)));
+        const uniqueTeaL2 = new Set(teaCats.map(c => teaL2Names.find(l2 => c.startsWith(l2)) || c));
+        if (uniqueTeaL2.size <= 1) return false;
+      }
       if (keyword) {
         const kw = keyword.toLowerCase();
         if (
@@ -245,7 +252,7 @@ export default function ProductManageTea() {
     setCurrentPage(1);
   };
   const handleBrandClear = () => { setBrandFilter(new Set()); setCurrentPage(1); };
-  const handleQuickToggle = (value: 'teaware' | 'lowStock') => {
+  const handleQuickToggle = (value: 'teaware' | 'lowStock' | 'comboTea') => {
     setQuickFilter(prev => {
       const next = new Set(prev);
       if (next.has(value)) next.delete(value); else next.add(value);
@@ -261,13 +268,19 @@ export default function ProductManageTea() {
 
   // ── 分类联动 ──
   const l2Options = useMemo(() => {
-    const data = CATEGORY_DATA_MAP[form.selectedL1];
-    return data?.children || [];
-  }, [form.selectedL1]);
+    const result: { l1: ProductCategoryType; l1Label: string; nodes: CategoryNode[] }[] = [];
+    for (const l1 of form.selectedL1List) {
+      const data = CATEGORY_DATA_MAP[l1];
+      if (data?.children) {
+        result.push({ l1, l1Label: productCategoryLabels[l1], nodes: data.children });
+      }
+    }
+    return result;
+  }, [form.selectedL1List]);
 
   const l3Options = useMemo(() => {
-    if (form.selectedL1 !== 'tea') return {};
     const result: Record<string, CategoryNode[]> = {};
+    if (!form.selectedL1List.includes('tea')) return result;
     const teaData = teaCategoryData.children || [];
     for (const l2 of teaData) {
       if (form.selectedL2.includes(l2.name) && l2.children && l2.children.length > 0) {
@@ -275,13 +288,17 @@ export default function ProductManageTea() {
       }
     }
     return result;
-  }, [form.selectedL1, form.selectedL2]);
+  }, [form.selectedL1List, form.selectedL2]);
 
   // 计算选中的分类路径
   const computedCategories = useMemo(() => {
     const cats: string[] = [];
-    if (form.selectedL1 === 'tea') {
+    // 茶叶分类
+    if (form.selectedL1List.includes('tea')) {
       for (const l2Name of form.selectedL2) {
+        // 仅属于茶叶下的L2
+        const teaL2Names = (teaCategoryData.children || []).map(c => c.name);
+        if (!teaL2Names.includes(l2Name)) continue;
         const l2Node = teaCategoryData.children?.find(c => c.name === l2Name);
         if (l2Node?.children && l2Node.children.length > 0) {
           const selectedL3ForL2 = form.selectedL3.filter(l3Name =>
@@ -298,23 +315,67 @@ export default function ProductManageTea() {
           cats.push(l2Name);
         }
       }
-    } else {
-      for (const l2Name of form.selectedL2) {
-        cats.push(l2Name);
+    }
+    // 非茶叶分类（茶具、茶周边、其他）只到二级
+    for (const l1 of form.selectedL1List) {
+      if (l1 === 'tea') continue;
+      const data = CATEGORY_DATA_MAP[l1];
+      const l1Label = productCategoryLabels[l1];
+      if (data?.children) {
+        for (const l2 of data.children) {
+          if (form.selectedL2.includes(l2.name)) {
+            cats.push(`${l1Label}-${l2.name}`);
+          }
+        }
       }
     }
     return cats;
-  }, [form.selectedL1, form.selectedL2, form.selectedL3]);
+  }, [form.selectedL1List, form.selectedL2, form.selectedL3]);
 
   // 自动判断是否含茶具
   const computedIncludesTeaware = useMemo(() => {
-    if (form.selectedL1 === 'teaware') return true;
-    return false;
-  }, [form.selectedL1]);
+    return form.selectedL1List.includes('teaware');
+  }, [form.selectedL1List]);
 
-  // L1 变更时重置 L2/L3
-  const handleL1Change = (l1: ProductCategoryType) => {
-    setForm(prev => ({ ...prev, selectedL1: l1, selectedL2: [], selectedL3: [] }));
+  // 是否为组合茶（茶叶下选了多个分类）
+  const computedIsComboTea = useMemo(() => {
+    if (!form.selectedL1List.includes('tea')) return false;
+    // 统计茶叶下选了多少个不同的二级分类
+    const teaL2Names = (teaCategoryData.children || []).map(c => c.name);
+    const selectedTeaL2 = form.selectedL2.filter(n => teaL2Names.includes(n));
+    return selectedTeaL2.length > 1;
+  }, [form.selectedL1List, form.selectedL2]);
+
+  // L1 多选切换
+  const handleToggleL1 = (l1: ProductCategoryType) => {
+    setForm(prev => {
+      const newList = prev.selectedL1List.includes(l1)
+        ? prev.selectedL1List.filter(x => x !== l1)
+        : [...prev.selectedL1List, l1];
+      // 茶叶必选
+      if (!newList.includes('tea')) newList.unshift('tea');
+      // 清除不属于已选L1的L2
+      const validL2Names: string[] = [];
+      for (const selL1 of newList) {
+        const data = CATEGORY_DATA_MAP[selL1];
+        if (data?.children) {
+          for (const c of data.children) {
+            if (prev.selectedL2.includes(c.name)) validL2Names.push(c.name);
+          }
+        }
+      }
+      // 清除不再属于已选L2的L3
+      const validL3 = prev.selectedL3.filter(l3Name => {
+        const teaData = teaCategoryData.children || [];
+        for (const l2 of teaData) {
+          if (validL2Names.includes(l2.name) && l2.children?.some(c => c.name === l3Name)) {
+            return true;
+          }
+        }
+        return false;
+      });
+      return { ...prev, selectedL1List: newList, selectedL2: validL2Names, selectedL3: validL3 };
+    });
   };
 
   // L2 多选切换
@@ -402,7 +463,7 @@ export default function ProductManageTea() {
     if (!form.brand) return;
 
     const category = computedCategories[0];
-    const l1Name = productCategoryLabels[form.selectedL1];
+    const l1Name = productCategoryLabels[form.selectedL1List[0]];
     const l2Name = form.selectedL2[0] || '';
 
     const existingCount = products.filter(p => p.brand === form.brand).length;
@@ -419,6 +480,7 @@ export default function ProductManageTea() {
       code,
       name: form.name.trim(),
       category,
+      categories: computedCategories,
       brand: form.brand,
       series: finalSeries,
       packageUnit: form.packageUnit,
@@ -553,6 +615,7 @@ export default function ProductManageTea() {
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>快捷：</span>
             <button style={filterBtnStyle(quickFilter.size === 0)} onClick={handleQuickClear}>全部</button>
             <button style={filterBtnStyle(quickFilter.has('teaware'))} onClick={() => handleQuickToggle('teaware')}>带茶具</button>
+            <button style={filterBtnStyle(quickFilter.has('comboTea'))} onClick={() => handleQuickToggle('comboTea')}>组合茶</button>
             <button style={filterBtnStyle(quickFilter.has('lowStock'))} onClick={() => handleQuickToggle('lowStock')}>库存紧张</button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
@@ -968,51 +1031,70 @@ export default function ProductManageTea() {
                 </div>
               </div>
 
-              {/* 一级分类 */}
-              <div className="drawer-form-row">
-                <div className="drawer-form-field">
-                  <label className="drawer-label">一级分类 <span style={{ color: '#FD742D' }}>*</span></label>
-                  <select
-                    className="detail-input"
-                    value={form.selectedL1}
-                    onChange={(e) => handleL1Change(e.target.value as ProductCategoryType)}
-                  >
-                    {(Object.keys(productCategoryLabels) as ProductCategoryType[]).map((key) => (
-                      <option key={key} value={key}>{productCategoryLabels[key]}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* 二级分类（多选） */}
+              {/* 一级分类（多选，茶叶必选） */}
               <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
                 <div className="drawer-form-field" style={{ width: '100%' }}>
-                  <label className="drawer-label">二级分类 <span style={{ color: '#FD742D' }}>*</span>（多选）</label>
+                  <label className="drawer-label">一级分类 <span style={{ color: '#FD742D' }}>*</span>（茶叶必选）</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
-                    {l2Options.map((l2) => (
-                      <label key={l2.id} style={{
-                        display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer',
+                    {(Object.keys(productCategoryLabels) as ProductCategoryType[]).map((key) => (
+                      <label key={key} style={{
+                        display: 'flex', alignItems: 'center', gap: '4px', cursor: key === 'tea' ? 'default' : 'pointer',
                         fontSize: 'var(--text-sm)', padding: '2px 8px', borderRadius: 'var(--radius-md)',
-                        border: `1px solid ${form.selectedL2.includes(l2.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
-                        background: form.selectedL2.includes(l2.name) ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
-                        color: form.selectedL2.includes(l2.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+                        border: `1px solid ${form.selectedL1List.includes(key) ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                        background: form.selectedL1List.includes(key) ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+                        color: form.selectedL1List.includes(key) ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
                         transition: 'var(--transition-fast)',
+                        opacity: key === 'tea' ? 1 : undefined,
                       }}>
                         <input
                           type="checkbox"
-                          checked={form.selectedL2.includes(l2.name)}
-                          onChange={() => handleToggleL2(l2.name)}
+                          checked={form.selectedL1List.includes(key)}
+                          onChange={() => handleToggleL1(key)}
+                          disabled={key === 'tea'}
                           style={{ display: 'none' }}
                         />
-                        {l2.name}
+                        {productCategoryLabels[key]}
+                        {key === 'tea' && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>（必选）</span>}
                       </label>
                     ))}
                   </div>
                 </div>
               </div>
 
+              {/* 二级分类（多选，按一级分类分组） */}
+              <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+                <div className="drawer-form-field" style={{ width: '100%' }}>
+                  <label className="drawer-label">二级分类 <span style={{ color: '#FD742D' }}>*</span>（多选）</label>
+                  {l2Options.map(({ l1, l1Label, nodes }) => (
+                    <div key={l1} style={{ marginBottom: 'var(--space-2)' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginBottom: '4px', fontWeight: 'var(--font-medium)' }}>{l1Label}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {nodes.map((l2) => (
+                          <label key={l2.id} style={{
+                            display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer',
+                            fontSize: 'var(--text-sm)', padding: '2px 8px', borderRadius: 'var(--radius-md)',
+                            border: `1px solid ${form.selectedL2.includes(l2.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                            background: form.selectedL2.includes(l2.name) ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+                            color: form.selectedL2.includes(l2.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+                            transition: 'var(--transition-fast)',
+                          }}>
+                            <input
+                              type="checkbox"
+                              checked={form.selectedL2.includes(l2.name)}
+                              onChange={() => handleToggleL2(l2.name)}
+                              style={{ display: 'none' }}
+                            />
+                            {l2.name}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* 三级茶种（仅茶叶，多选） */}
-              {form.selectedL1 === 'tea' && Object.keys(l3Options).length > 0 && (
+              {form.selectedL1List.includes('tea') && Object.keys(l3Options).length > 0 && (
                 <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
                   <div className="drawer-form-field" style={{ width: '100%' }}>
                     <label className="drawer-label">三级茶种（多选）</label>

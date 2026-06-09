@@ -120,15 +120,41 @@ export default function ProductTeaDetail() {
   // ── 编辑模式逻辑 ──
   const handleEnterEdit = () => {
     const formData: any = { ...product };
-    // 初始化分类选择
-    const l1Name = getTopCategory(product.category);
-    const l1Type = L1_NAME_TO_TYPE[l1Name] || 'tea';
-    const parts = product.category.split('-');
-    const l2Name = parts[1] || '';
-    const l3Name = parts[2] || '';
-    formData.selectedL1 = l1Type;
-    formData.selectedL2 = [l2Name];
-    formData.selectedL3 = l3Name ? [l3Name] : [];
+    // 初始化分类选择 - 从 categories 数组反推
+    const cats = product.categories || [product.category];
+    const selectedL1List: ProductCategoryType[] = ['tea']; // 茶叶必选
+    const selectedL2: string[] = [];
+    const selectedL3: string[] = [];
+
+    for (const cat of cats) {
+      const parts = cat.split('-');
+      const l2Name = parts[0] || '';
+      const l3Name = parts[1] || '';
+      // 判断属于哪个一级分类
+      const teaL2Names = (teaCategoryData.children || []).map(c => c.name);
+      const teawareL2Names = (teawareCategoryData.children || []).map(c => c.name);
+      const peripheralL2Names = (teaPeripheralCategoryData.children || []).map(c => c.name);
+      const otherL2Names = (otherCategoryData.children || []).map(c => c.name);
+
+      if (teaL2Names.includes(l2Name)) {
+        if (!selectedL1List.includes('tea')) selectedL1List.push('tea');
+        if (!selectedL2.includes(l2Name)) selectedL2.push(l2Name);
+        if (l3Name && !selectedL3.includes(l3Name)) selectedL3.push(l3Name);
+      } else if (teawareL2Names.includes(l2Name)) {
+        if (!selectedL1List.includes('teaware')) selectedL1List.push('teaware');
+        if (!selectedL2.includes(l2Name)) selectedL2.push(l2Name);
+      } else if (peripheralL2Names.includes(l2Name)) {
+        if (!selectedL1List.includes('tea-peripheral')) selectedL1List.push('tea-peripheral');
+        if (!selectedL2.includes(l2Name)) selectedL2.push(l2Name);
+      } else if (otherL2Names.includes(l2Name)) {
+        if (!selectedL1List.includes('other')) selectedL1List.push('other');
+        if (!selectedL2.includes(l2Name)) selectedL2.push(l2Name);
+      }
+    }
+
+    formData.selectedL1List = selectedL1List;
+    formData.selectedL2 = selectedL2;
+    formData.selectedL3 = selectedL3;
     formData.isNewSeries = false;
     formData.newSeriesName = '';
     formData.displayImageIndex = product.displayImageIndex || 0;
@@ -145,6 +171,7 @@ export default function ProductTeaDetail() {
     // 更新分类
     if (editComputedCategories.length > 0) {
       form.category = editComputedCategories[0];
+      form.categories = editComputedCategories;
     }
     // 更新含茶具标记
     form.includesTeaware = computedIncludesTeaware;
@@ -179,19 +206,21 @@ export default function ProductTeaDetail() {
   };
 
   // 编辑模式下：分类联动
-  const editL1Type = useMemo(() => {
-    const l1Name = productCategoryLabels[form.selectedL1 as ProductCategoryType] || '';
-    return form.selectedL1 as ProductCategoryType | undefined;
-  }, [form.selectedL1]);
-
   const editL2Options = useMemo(() => {
-    if (!editL1Type) return [];
-    const data = CATEGORY_DATA_MAP[editL1Type];
-    return data?.children || [];
-  }, [editL1Type]);
+    const l1List: ProductCategoryType[] = (form as any).selectedL1List || ['tea'];
+    const result: { l1: ProductCategoryType; l1Label: string; nodes: CategoryNode[] }[] = [];
+    for (const l1 of l1List) {
+      const data = CATEGORY_DATA_MAP[l1];
+      if (data?.children) {
+        result.push({ l1, l1Label: productCategoryLabels[l1], nodes: data.children });
+      }
+    }
+    return result;
+  }, [(form as any).selectedL1List]);
 
   const editL3Options = useMemo(() => {
-    if (!editL1Type || editL1Type !== 'tea') return {};
+    const l1List: ProductCategoryType[] = (form as any).selectedL1List || ['tea'];
+    if (!l1List.includes('tea')) return {};
     const result: Record<string, CategoryNode[]> = {};
     const teaData = teaCategoryData.children || [];
     for (const l2 of teaData) {
@@ -200,13 +229,16 @@ export default function ProductTeaDetail() {
       }
     }
     return result;
-  }, [editL1Type, form.selectedL2]);
+  }, [(form as any).selectedL1List, form.selectedL2]);
 
   const editComputedCategories = useMemo(() => {
-    if (!form.selectedL1) return [];
+    const l1List: ProductCategoryType[] = (form as any).selectedL1List || ['tea'];
     const cats: string[] = [];
-    if (form.selectedL1 === 'tea') {
+    // 茶叶分类
+    if (l1List.includes('tea')) {
       for (const l2Name of (form.selectedL2 || [])) {
+        const teaL2Names = (teaCategoryData.children || []).map(c => c.name);
+        if (!teaL2Names.includes(l2Name)) continue;
         const l2Node = teaCategoryData.children?.find(c => c.name === l2Name);
         if (l2Node?.children && l2Node.children.length > 0) {
           const selectedL3ForL2 = (form.selectedL3 || []).filter((l3Name: string) =>
@@ -223,21 +255,56 @@ export default function ProductTeaDetail() {
           cats.push(l2Name);
         }
       }
-    } else {
-      for (const l2Name of (form.selectedL2 || [])) {
-        cats.push(l2Name);
+    }
+    // 非茶叶分类
+    for (const l1 of l1List) {
+      if (l1 === 'tea') continue;
+      const data = CATEGORY_DATA_MAP[l1];
+      const l1Label = productCategoryLabels[l1];
+      if (data?.children) {
+        for (const l2 of data.children) {
+          if ((form.selectedL2 || []).includes(l2.name)) {
+            cats.push(`${l1Label}-${l2.name}`);
+          }
+        }
       }
     }
     return cats;
-  }, [form.selectedL1, form.selectedL2, form.selectedL3]);
+  }, [(form as any).selectedL1List, form.selectedL2, form.selectedL3]);
 
   const computedIncludesTeaware = useMemo(() => {
-    if (form.selectedL1 === 'teaware') return true;
-    return form.includesTeaware || false;
-  }, [form.selectedL1, form.includesTeaware]);
+    const l1List: ProductCategoryType[] = (form as any).selectedL1List || ['tea'];
+    return l1List.includes('teaware') || form.includesTeaware || false;
+  }, [(form as any).selectedL1List, form.includesTeaware]);
 
-  const handleEditL1Change = (l1: ProductCategoryType) => {
-    setForm(prev => ({ ...prev, selectedL1: l1, selectedL2: [], selectedL3: [] }));
+  const handleEditToggleL1 = (l1: ProductCategoryType) => {
+    setForm((prev: any) => {
+      const prevList: ProductCategoryType[] = prev.selectedL1List || ['tea'];
+      const newList = prevList.includes(l1)
+        ? prevList.filter((x: ProductCategoryType) => x !== l1)
+        : [...prevList, l1];
+      if (!newList.includes('tea')) newList.unshift('tea');
+      // 清除不属于已选L1的L2
+      const validL2Names: string[] = [];
+      for (const selL1 of newList) {
+        const data = CATEGORY_DATA_MAP[selL1];
+        if (data?.children) {
+          for (const c of data.children) {
+            if ((prev.selectedL2 || []).includes(c.name)) validL2Names.push(c.name);
+          }
+        }
+      }
+      const validL3 = (prev.selectedL3 || []).filter((l3Name: string) => {
+        const teaData = teaCategoryData.children || [];
+        for (const l2 of teaData) {
+          if (validL2Names.includes(l2.name) && l2.children?.some(c => c.name === l3Name)) {
+            return true;
+          }
+        }
+        return false;
+      });
+      return { ...prev, selectedL1List: newList, selectedL2: validL2Names, selectedL3: validL3 };
+    });
   };
 
   const handleEditToggleL2 = (name: string) => {
@@ -305,39 +372,56 @@ export default function ProductTeaDetail() {
                 <EditRow label="商品名称">
                   <input className="detail-input" value={f.name || ''} onChange={(e) => setForm({ ...form, name: e.target.value })} style={inputStyle} placeholder="请输入商品名称" />
                 </EditRow>
-                <EditRow label="一级分类">
-                  <select
-                    className="detail-input"
-                    value={(form as any).selectedL1 || ''}
-                    onChange={(e) => handleEditL1Change(e.target.value as ProductCategoryType)}
-                    style={selectStyle}
-                  >
-                    {(Object.keys(productCategoryLabels) as ProductCategoryType[]).map((key) => (
-                      <option key={key} value={key}>{productCategoryLabels[key]}</option>
-                    ))}
-                  </select>
-                </EditRow>
-                <EditRow label="二级分类（多选）">
+                <EditRow label="一级分类（多选）">
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {editL2Options.map((l2) => {
-                      const selected = ((form as any).selectedL2 || []).includes(l2.name);
+                    {(Object.keys(productCategoryLabels) as ProductCategoryType[]).map((key) => {
+                      const l1List: ProductCategoryType[] = (form as any).selectedL1List || ['tea'];
+                      const selected = l1List.includes(key);
                       return (
-                        <label key={l2.id} style={{
-                          display: 'flex', alignItems: 'center', gap: '3px', cursor: 'pointer',
+                        <label key={key} style={{
+                          display: 'flex', alignItems: 'center', gap: '3px', cursor: key === 'tea' ? 'default' : 'pointer',
                           fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 'var(--radius-sm)',
                           border: `1px solid ${selected ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
                           background: selected ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
                           color: selected ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
                           transition: 'var(--transition-fast)',
                         }}>
-                          <input type="checkbox" checked={selected} onChange={() => handleEditToggleL2(l2.name)} style={{ display: 'none' }} />
-                          {l2.name}
+                          <input type="checkbox" checked={selected} onChange={() => handleEditToggleL1(key)} disabled={key === 'tea'} style={{ display: 'none' }} />
+                          {productCategoryLabels[key]}
+                          {key === 'tea' && <span style={{ fontSize: '9px', color: 'var(--color-neutral-400)' }}>（必选）</span>}
                         </label>
                       );
                     })}
                   </div>
                 </EditRow>
-                {(form as any).selectedL1 === 'tea' && Object.keys(editL3Options).length > 0 && (
+                <EditRow label="二级分类（多选）" span>
+                  <div>
+                    {editL2Options.map(({ l1, l1Label, nodes }) => (
+                      <div key={l1} style={{ marginBottom: '4px' }}>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginBottom: '2px', fontWeight: 'var(--font-medium)' }}>{l1Label}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                          {nodes.map((l2) => {
+                            const selected = ((form as any).selectedL2 || []).includes(l2.name);
+                            return (
+                              <label key={l2.id} style={{
+                                display: 'flex', alignItems: 'center', gap: '3px', cursor: 'pointer',
+                                fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 'var(--radius-sm)',
+                                border: `1px solid ${selected ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                                background: selected ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+                                color: selected ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+                                transition: 'var(--transition-fast)',
+                              }}>
+                                <input type="checkbox" checked={selected} onChange={() => handleEditToggleL2(l2.name)} style={{ display: 'none' }} />
+                                {l2.name}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </EditRow>
+                {((form as any).selectedL1List || ['tea']).includes('tea') && Object.keys(editL3Options).length > 0 && (
                   <EditRow label="三级茶种（多选）">
                     <div>
                       {Object.entries(editL3Options).map(([l2Name, l3Nodes]) => (
