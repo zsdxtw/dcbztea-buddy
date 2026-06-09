@@ -185,6 +185,8 @@ export default function ProductBrand() {
   const [form, setForm] = useState({ ...emptyForm });
   const [newSeries, setNewSeries] = useState('');
   const [showSeriesInput, setShowSeriesInput] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   const filteredItems = brandItems.filter((b) => {
     if (filterKeyword && !b.name.includes(filterKeyword) && !b.code.toLowerCase().includes(filterKeyword.toLowerCase()) && !b.owner.includes(filterKeyword)) return false;
@@ -195,6 +197,12 @@ export default function ProductBrand() {
     }
     return true;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
+  const pagedItems = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredItems.slice(start, start + PAGE_SIZE);
+  }, [filteredItems, currentPage]);
 
   const handleRowClick = (id: string) => {
     navigate(`/product/product-brand/${id}`);
@@ -254,12 +262,12 @@ export default function ProductBrand() {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
           <FilterBar>
-            <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => setFilterKeyword(e.target.value)} />
-            <select className="filter-select" value={filterLevel1} onChange={(e) => { setFilterLevel1(e.target.value); setFilterLevel2(''); }}>
+            <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => { setFilterKeyword(e.target.value); setCurrentPage(1); }} />
+            <select className="filter-select" value={filterLevel1} onChange={(e) => { setFilterLevel1(e.target.value); setFilterLevel2(''); setCurrentPage(1); }}>
               <option value="">全部</option>
               {LEVEL1_OPTIONS.map((o) => <option key={o.label} value={o.label}>{o.label}</option>)}
             </select>
-            <select className="filter-select" value={filterLevel2} onChange={(e) => setFilterLevel2(e.target.value)}>
+            <select className="filter-select" value={filterLevel2} onChange={(e) => { setFilterLevel2(e.target.value); setCurrentPage(1); }}>
               <option value="">全部</option>
               {level2Options.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -269,8 +277,8 @@ export default function ProductBrand() {
         <Card>
           <Table
             headers={['序号', '品牌LOGO', '品牌名称', '品牌编号', '品牌所属', '主营品类', '商品数量', '联系人', '联系电话', '操作']}
-            rows={filteredItems.map((b, idx) => [
-              <span className="mono">{idx + 1}</span>,
+            rows={pagedItems.map((b, idx) => [
+              <span className="mono">{(currentPage - 1) * PAGE_SIZE + idx + 1}</span>,
               <div className="brand-logo-cell" onClick={() => handleRowClick(b.id)} style={{ cursor: 'pointer' }}>
                 {b.logo ? <img src={b.logo} alt={b.name} className="brand-logo-img" /> : <div className="brand-logo-placeholder">{b.name[0]}</div>}
               </div>,
@@ -293,6 +301,73 @@ export default function ProductBrand() {
             ])}
           />
         </Card>
+        {/* 分页 */}
+        {totalPages > 1 && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            marginTop: 'var(--space-5)',
+            paddingBottom: 'var(--space-4)',
+          }}>
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-neutral-200)',
+                background: 'var(--color-neutral-0)',
+                color: currentPage === 1 ? 'var(--color-neutral-300)' : 'var(--color-neutral-600)',
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                fontSize: 'var(--text-sm)',
+              }}
+            >
+              上一页
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 'var(--radius-md)',
+                  border: `1px solid ${currentPage === page ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                  background: currentPage === page ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+                  color: currentPage === page ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+                  cursor: 'pointer',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: currentPage === page ? 'var(--font-semibold)' : 'normal',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-neutral-200)',
+                background: 'var(--color-neutral-0)',
+                color: currentPage === totalPages ? 'var(--color-neutral-300)' : 'var(--color-neutral-600)',
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                fontSize: 'var(--text-sm)',
+              }}
+            >
+              下一页
+            </button>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginLeft: 'var(--space-2)' }}>
+              第 {currentPage}/{totalPages} 页
+            </span>
+          </div>
+        )}
       </div>
 
       {/* 右侧滑出抽屉 - 新增品牌 */}
