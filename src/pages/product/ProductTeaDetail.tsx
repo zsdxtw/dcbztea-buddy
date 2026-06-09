@@ -109,8 +109,17 @@ export default function ProductTeaDetail() {
     );
   }
 
-  const topCategory = getTopCategory(product.category);
-  const teaCat = nameToTeaCategory(topCategory);
+  // 从 categories 数组提取所有一级分类标签
+  const allCategories = product.categories || [product.category];
+  const categoryTags = allCategories.map(cat => {
+    const l2Name = cat.split('-')[0];
+    const teaCat = nameToTeaCategory(l2Name);
+    if (teaCat) return { type: 'tea' as const, label: l2Name, teaCat };
+    const l1Type = L1_NAME_TO_TYPE[l2Name];
+    if (l1Type) return { type: 'other' as const, label: productCategoryLabels[l1Type], l1Type };
+    return null;
+  }).filter(Boolean);
+
   const mainPreview = previewImage ?? product.mainImages[product.displayImageIndex] ?? product.mainImages[0] ?? '';
 
   const shelfVariant = product.shelfStatus === 'on' ? 'success' : 'error';
@@ -972,11 +981,14 @@ export default function ProductTeaDetail() {
                     <span style={{ fontFamily: 'var(--font-family-serif)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>
                       {product.name}
                     </span>
-                    {teaCat && <Tag category={teaCat} />}
+                    {categoryTags.map((tag, i) => tag?.type === 'tea'
+                      ? <Tag key={i} category={tag.teaCat} />
+                      : <span key={i} style={{ padding: '2px 8px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: 'var(--color-module-current-lightest)', color: 'var(--color-module-current-base)', border: '1px solid var(--color-module-current-base)' }}>{tag?.label}</span>
+                    )}
                   </div>
                   <div className="detail-grid">
                     <DetailRow label="商品编码"><span className="mono">{product.code}</span></DetailRow>
-                    <DetailRow label="分类">{product.category}</DetailRow>
+                    <DetailRow label="分类">{allCategories.join('、')}</DetailRow>
                     <DetailRow label="品牌"><span style={{ fontWeight: 'var(--font-medium)' }}>{product.brand}</span></DetailRow>
                     <DetailRow label="系列">{product.series}</DetailRow>
                     <DetailRow label="等级"><span style={{ fontWeight: 'var(--font-medium)' }}>{product.grade}</span></DetailRow>
