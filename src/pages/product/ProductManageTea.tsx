@@ -166,7 +166,12 @@ export default function ProductManageTea() {
       if (purchaseFilter && p.purchaseStatus !== purchaseFilter) return false;
       if (productionFilter && p.productionStatus !== productionFilter) return false;
       if (brandFilter.size > 0 && !brandFilter.has(p.brand)) return false;
-      if (quickFilter.has('teaware') && !p.includesTeaware) return false;
+      if (quickFilter.has('teaware')) {
+        // 带茶具：分类中包含茶具一级分类下的分类
+        const teawareL2Names = (teawareCategoryData.children || []).map(c => c.name);
+        const hasTeaware = (p.categories || []).some(c => teawareL2Names.some(l2 => c.startsWith(l2) || c.startsWith('茶具-' + l2)));
+        if (!hasTeaware && !p.includesTeaware) return false;
+      }
       if (quickFilter.has('lowStock') && p.stock >= p.stockAlert) return false;
       if (quickFilter.has('comboTea')) {
         // 组合茶：茶叶下选了多个不同二级分类
@@ -1427,20 +1432,8 @@ export default function ProductManageTea() {
                   <input className="detail-input" type="number" value={form.shelfLife || ''} onChange={(e) => setForm({ ...form, shelfLife: Number(e.target.value) })} placeholder="12" />
                 </div>
                 <div className="drawer-form-field">
-                  <label className="drawer-label">含茶具</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', height: 32 }}>
-                    <span style={{
-                      padding: '2px 10px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: 'var(--font-medium)',
-                      background: computedIncludesTeaware ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-100)',
-                      color: computedIncludesTeaware ? 'var(--color-module-current-base)' : 'var(--color-neutral-500)',
-                      border: `1px solid ${computedIncludesTeaware ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
-                    }}>
-                      {computedIncludesTeaware ? '是（分类含茶具自动标记）' : '否'}
-                    </span>
-                  </div>
+                  <label className="drawer-label">税率(%)</label>
+                  <input className="detail-input" type="number" value={form.taxRate || ''} onChange={(e) => setForm({ ...form, taxRate: Number(e.target.value) })} placeholder="9" />
                 </div>
               </div>
               <div className="drawer-form-row" style={{ flexDirection: 'column' }}>

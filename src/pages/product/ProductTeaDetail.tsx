@@ -173,7 +173,7 @@ export default function ProductTeaDetail() {
       form.category = editComputedCategories[0];
       form.categories = editComputedCategories;
     }
-    // 更新含茶具标记
+    // 含茶具标记由分类自动计算
     form.includesTeaware = computedIncludesTeaware;
     // 同步新系列到品牌管理
     const finalSeries = form.isNewSeries ? form.newSeriesName : form.series;
@@ -274,8 +274,8 @@ export default function ProductTeaDetail() {
 
   const computedIncludesTeaware = useMemo(() => {
     const l1List: ProductCategoryType[] = (form as any).selectedL1List || ['tea'];
-    return l1List.includes('teaware') || form.includesTeaware || false;
-  }, [(form as any).selectedL1List, form.includesTeaware]);
+    return l1List.includes('teaware');
+  }, [(form as any).selectedL1List]);
 
   const handleEditToggleL1 = (l1: ProductCategoryType) => {
     setForm((prev: any) => {
@@ -690,16 +690,7 @@ export default function ProductTeaDetail() {
                 <EditRow label="总销量">
                   <input className="detail-input" type="number" value={f.totalSales || ''} onChange={(e) => setForm({ ...form, totalSales: Number(e.target.value) })} style={inputStyle} placeholder="0" />
                 </EditRow>
-                <EditRow label="含茶具">
-                  <span style={{
-                    padding: '2px 10px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
-                    background: computedIncludesTeaware ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-100)',
-                    color: computedIncludesTeaware ? 'var(--color-module-current-base)' : 'var(--color-neutral-500)',
-                    border: `1px solid ${computedIncludesTeaware ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
-                  }}>
-                    {computedIncludesTeaware ? '是（分类含茶具自动标记）' : '否'}
-                  </span>
-                </EditRow>
+
               </div>
             </Card>
 
