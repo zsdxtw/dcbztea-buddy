@@ -60,6 +60,7 @@ import FinanceInvoice from './pages/finance/FinanceInvoice';
 import FinanceAccount from './pages/finance/FinanceAccount';
 
 import StatisticsSales from './pages/statistics/StatisticsSales';
+import StatisticsBrandAnalysis from './pages/statistics/StatisticsBrandAnalysis';
 import StatisticsPurchase from './pages/statistics/StatisticsPurchase';
 import StatisticsInventory from './pages/statistics/StatisticsInventory';
 import StatisticsFinance from './pages/statistics/StatisticsFinance';
@@ -149,6 +150,7 @@ export const router = createBrowserRouter([
       /* ── 统计 ── */
       { path: 'statistics', element: <StatisticsSales /> },
       { path: 'statistics/statistics-sales', element: <StatisticsSales /> },
+      { path: 'statistics/statistics-brand', element: <StatisticsBrandAnalysis /> },
       { path: 'statistics/statistics-purchase', element: <StatisticsPurchase /> },
       { path: 'statistics/statistics-inventory', element: <StatisticsInventory /> },
       { path: 'statistics/statistics-finance', element: <StatisticsFinance /> },

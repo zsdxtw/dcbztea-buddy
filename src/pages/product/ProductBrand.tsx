@@ -1,13 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ContentHeader from '../../components/layout/ContentHeader';
-import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import FilterBar from '../../components/business/FilterBar';
-import type { StatCardData, BrandItem } from '../../types';
+import type { BrandItem } from '../../types';
 import { TeaCategory } from '../../types';
 import { brandItems } from '../../data/brands';
 import { teaCategoryData, teawareCategoryData, teaPeripheralCategoryData, otherCategoryData } from '../../data/productCategories';
@@ -36,134 +35,6 @@ function getLevel2Names(level1: string): string[] {
   return found ? (found.data.children?.map((c) => c.name) ?? []) : [];
 }
 
-const stats: StatCardData[] = [];
-
-/* ── 品牌排名数据 ── */
-type RankPeriod = 'month' | 'year' | 'oneYear';
-
-const rankData: Record<RankPeriod, {
-  salesAmount: { name: string; value: number }[];
-  profitTotal: { name: string; value: number }[];
-  salesQuantity: { name: string; value: number }[];
-}> = {
-  month: {
-    salesAmount: [
-      { name: '大益', value: 286000 },
-      { name: '八马', value: 235000 },
-      { name: '中茶', value: 198000 },
-      { name: '天福茗茶', value: 172000 },
-      { name: '正山堂', value: 156000 },
-    ],
-    profitTotal: [
-      { name: '大益', value: 85600 },
-      { name: '八马', value: 72800 },
-      { name: '正山堂', value: 62400 },
-      { name: '中茶', value: 55200 },
-      { name: '品品香', value: 48600 },
-    ],
-    salesQuantity: [
-      { name: '八马', value: 1280 },
-      { name: '大益', value: 1150 },
-      { name: '天福茗茶', value: 980 },
-      { name: '中茶', value: 860 },
-      { name: '张一元', value: 720 },
-    ],
-  },
-  year: {
-    salesAmount: [
-      { name: '大益', value: 3280000 },
-      { name: '八马', value: 2760000 },
-      { name: '中茶', value: 2350000 },
-      { name: '天福茗茶', value: 1980000 },
-      { name: '西湖牌', value: 1860000 },
-    ],
-    profitTotal: [
-      { name: '大益', value: 985000 },
-      { name: '八马', value: 862000 },
-      { name: '中茶', value: 728000 },
-      { name: '正山堂', value: 656000 },
-      { name: '品品香', value: 580000 },
-    ],
-    salesQuantity: [
-      { name: '八马', value: 15200 },
-      { name: '大益', value: 13800 },
-      { name: '天福茗茶', value: 11600 },
-      { name: '中茶', value: 10200 },
-      { name: '张一元', value: 8600 },
-    ],
-  },
-  oneYear: {
-    salesAmount: [
-      { name: '大益', value: 3050000 },
-      { name: '八马', value: 2560000 },
-      { name: '中茶', value: 2150000 },
-      { name: '天福茗茶', value: 1820000 },
-      { name: '西湖牌', value: 1720000 },
-    ],
-    profitTotal: [
-      { name: '大益', value: 920000 },
-      { name: '八马', value: 798000 },
-      { name: '中茶', value: 695000 },
-      { name: '正山堂', value: 605000 },
-      { name: '品品香', value: 530000 },
-    ],
-    salesQuantity: [
-      { name: '八马', value: 14200 },
-      { name: '大益', value: 12900 },
-      { name: '天福茗茶', value: 10900 },
-      { name: '中茶', value: 9600 },
-      { name: '张一元', value: 8100 },
-    ],
-  },
-};
-
-const barColors = ['#CB405D', '#F18F4D', '#0DAFC6', '#27254B', '#5F4027'];
-
-function formatAmount(v: number) {
-  if (v >= 10000) return `¥${(v / 10000).toFixed(1)}万`;
-  return `¥${v.toLocaleString()}`;
-}
-
-function RankBarChart({ title, data, period, onPeriodChange }: { title: string; data: { name: string; value: number }[]; period: RankPeriod; onPeriodChange: (p: RankPeriod) => void }) {
-  const max = Math.max(...data.map((d) => d.value));
-  const isQuantity = title.includes('数量');
-
-  function formatValue(v: number) {
-    if (isQuantity) return v.toLocaleString();
-    if (v >= 10000) return `¥${(v / 10000).toFixed(1)}万`;
-    return `¥${v.toLocaleString()}`;
-  }
-
-  const periods: { key: RankPeriod; label: string }[] = [
-    { key: 'month', label: '当月' },
-    { key: 'year', label: '当年' },
-    { key: 'oneYear', label: '一年内' },
-  ];
-
-  return (
-    <Card title={title} className="rank-chart-card" headerRight={
-      <div className="rank-period-toggle">
-        {periods.map((p) => (
-          <button key={p.key} className={`rank-period-btn${period === p.key ? ' active' : ''}`} onClick={() => onPeriodChange(p.key)}>{p.label}</button>
-        ))}
-      </div>
-    }>
-      <div className="rank-chart">
-        {data.map((item, i) => (
-          <div key={item.name} className="rank-chart-row">
-            <span className="rank-chart-rank">{i + 1}</span>
-            <span className="rank-chart-name">{item.name}</span>
-            <div className="rank-chart-bar-wrap">
-              <div className="rank-chart-bar" style={{ width: `${(item.value / max) * 100}%`, background: barColors[i] }} />
-            </div>
-            <span className="rank-chart-value">{formatValue(item.value)}</span>
-          </div>
-        ))}
-      </div>
-    </Card>
-  );
-}
-
 /** 新增品牌表单初始值 */
 const emptyForm = {
   name: '', owner: '', introduction: '', requirements: '', policy: '',
@@ -178,9 +49,6 @@ export default function ProductBrand() {
   const [filterLevel1, setFilterLevel1] = useState('');
   const [filterLevel2, setFilterLevel2] = useState('');
   const level2Options = useMemo(() => filterLevel1 ? getLevel2Names(filterLevel1) : [], [filterLevel1]);
-  const [salesAmountPeriod, setSalesAmountPeriod] = useState<RankPeriod>('month');
-  const [profitTotalPeriod, setProfitTotalPeriod] = useState<RankPeriod>('month');
-  const [salesQuantityPeriod, setSalesQuantityPeriod] = useState<RankPeriod>('month');
   const [showDrawer, setShowDrawer] = useState(false);
   const [form, setForm] = useState({ ...emptyForm });
   const [newSeries, setNewSeries] = useState('');
@@ -252,14 +120,6 @@ export default function ProductBrand() {
     <>
       <ContentHeader title="品牌管理" breadcrumbs={['商品', '品牌管理']} />
       <div className="content-body">
-        {/* 品牌排名 */}
-        <div className="rank-section">
-          <div className="rank-charts-grid">
-            <RankBarChart title="销售金额 TOP5" data={rankData[salesAmountPeriod].salesAmount} period={salesAmountPeriod} onPeriodChange={setSalesAmountPeriod} />
-            <RankBarChart title="利润总额 TOP5" data={rankData[profitTotalPeriod].profitTotal} period={profitTotalPeriod} onPeriodChange={setProfitTotalPeriod} />
-            <RankBarChart title="销售数量 TOP5" data={rankData[salesQuantityPeriod].salesQuantity} period={salesQuantityPeriod} onPeriodChange={setSalesQuantityPeriod} />
-          </div>
-        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
           <FilterBar>
             <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => { setFilterKeyword(e.target.value); setCurrentPage(1); }} />

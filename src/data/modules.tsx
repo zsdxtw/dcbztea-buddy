@@ -101,6 +101,9 @@ const ReconciliationIcon = () => (
 const SalesAnalysisIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-5 3 2 4-6 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
 );
+const BrandAnalysisIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M10 3l6 3.5v7L10 17l-6-3.5v-7L10 3z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.0"/></svg>
+);
 const PurchaseAnalysisIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="10" width="4" height="7" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="8" y="6" width="4" height="11" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="13" y="3" width="4" height="14" rx="0.5" stroke="currentColor" strokeWidth="1.3"/></svg>
 );
@@ -285,6 +288,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '统计',
     menus: [
       { key: 'statistics-sales', label: '销售分析', icon: <SalesAnalysisIcon /> },
+      { key: 'statistics-brand', label: '品牌分析', icon: <BrandAnalysisIcon /> },
       { key: 'statistics-purchase', label: '采购分析', icon: <PurchaseAnalysisIcon /> },
       { key: 'statistics-inventory', label: '库存分析', icon: <InventoryAnalysisIcon /> },
       { key: 'statistics-finance', label: '财务报表', icon: <FinanceReportIcon /> },
