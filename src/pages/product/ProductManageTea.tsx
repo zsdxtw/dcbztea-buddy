@@ -97,6 +97,7 @@ export default function ProductManageTea() {
   const [products, setProducts] = useState<TeaProduct[]>(initialProducts);
   const [keyword, setKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set());
+  const [l3Filter, setL3Filter] = useState<Set<string>>(new Set());
   const [shelfFilter, setShelfFilter] = useState('');
   const [purchaseFilter, setPurchaseFilter] = useState('');
   const [productionFilter, setProductionFilter] = useState('');
@@ -134,6 +135,11 @@ export default function ProductManageTea() {
         const prefix = p.category.split('-')[0];
         if (!categoryFilter.has(prefix)) return false;
       }
+      if (l3Filter.size > 0) {
+        // 三级分类匹配：category 格式为 "二级-三级"，检查是否包含任一选中的三级名
+        const l3Part = p.category.split('-').slice(1).join('-');
+        if (!l3Filter.has(l3Part)) return false;
+      }
       if (shelfFilter && p.shelfStatus !== shelfFilter) return false;
       if (purchaseFilter && p.purchaseStatus !== purchaseFilter) return false;
       if (productionFilter && p.productionStatus !== productionFilter) return false;
@@ -166,7 +172,7 @@ export default function ProductManageTea() {
       result = [...result].sort((a, b) => a.totalSales - b.totalSales);
     }
     return result;
-  }, [products, keyword, categoryFilter, shelfFilter, purchaseFilter, productionFilter, brandFilter, quickFilter, sortBy, priceMin, priceMax]);
+  }, [products, keyword, categoryFilter, l3Filter, shelfFilter, purchaseFilter, productionFilter, brandFilter, quickFilter, sortBy, priceMin, priceMax]);
 
   // 分页
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -178,12 +184,33 @@ export default function ProductManageTea() {
   const handleCategoryToggle = (name: string) => {
     setCategoryFilter(prev => {
       const next = new Set(prev);
+      if (next.has(name)) {
+        next.delete(name);
+        // 取消选中茶类时，清除该茶类下的三级筛选
+        const l2Node = teaCategoryData.children?.find(c => c.name === name);
+        if (l2Node?.children) {
+          setL3Filter(prev3 => {
+            const next3 = new Set(prev3);
+            l2Node.children!.forEach(c => next3.delete(c.name));
+            return next3;
+          });
+        }
+      } else {
+        next.add(name);
+      }
+      return next;
+    });
+    setCurrentPage(1);
+  };
+  const handleCategoryClear = () => { setCategoryFilter(new Set()); setL3Filter(new Set()); setCurrentPage(1); };
+  const handleL3Toggle = (name: string) => {
+    setL3Filter(prev => {
+      const next = new Set(prev);
       if (next.has(name)) next.delete(name); else next.add(name);
       return next;
     });
     setCurrentPage(1);
   };
-  const handleCategoryClear = () => { setCategoryFilter(new Set()); setCurrentPage(1); };
   const handleShelfChange = (value: string) => { setShelfFilter(value); setCurrentPage(1); };
   const handlePurchaseChange = (value: string) => { setPurchaseFilter(value); setCurrentPage(1); };
   const handleProductionChange = (value: string) => { setProductionFilter(value); setCurrentPage(1); };
@@ -459,18 +486,34 @@ export default function ProductManageTea() {
               </button>
             ))}
           </div>
-          {/* 选中茶类后展示三级分类纯文本 */}
+          {/* 选中茶类后展示三级分类，支持复选筛选 */}
           {categoryFilter.size > 0 && (
             <div style={{ marginBottom: 'var(--space-3)', paddingLeft: 'var(--space-2)' }}>
               {Array.from(categoryFilter).map((catName) => {
                 const l2Node = teaCategoryData.children?.find(c => c.name === catName);
                 if (!l2Node?.children || l2Node.children.length === 0) return null;
                 return (
-                  <div key={catName} style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
+                  <div key={catName} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>{catName}：</span>
-                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-600)', lineHeight: 1.6 }}>
-                      {l2Node.children.map(c => c.name).join('、')}
-                    </span>
+                    {l2Node.children.map(c => (
+                      <button
+                        key={c.id}
+                        onClick={() => handleL3Toggle(c.name)}
+                        style={{
+                          padding: '1px 8px',
+                          borderRadius: 'var(--radius-sm)',
+                          border: `1px solid ${l3Filter.has(c.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)'}`,
+                          background: l3Filter.has(c.name) ? 'var(--color-module-current-lightest)' : 'var(--color-neutral-0)',
+                          color: l3Filter.has(c.name) ? 'var(--color-module-current-base)' : 'var(--color-neutral-600)',
+                          cursor: 'pointer',
+                          fontSize: 'var(--text-xs)',
+                          transition: 'var(--transition-fast)',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {c.name}
+                      </button>
+                    ))}
                   </div>
                 );
               })}
