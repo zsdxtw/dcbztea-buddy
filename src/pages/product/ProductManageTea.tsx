@@ -96,12 +96,12 @@ export default function ProductManageTea() {
   const navigate = useNavigate();
   const [products, setProducts] = useState<TeaProduct[]>(initialProducts);
   const [keyword, setKeyword] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set());
   const [shelfFilter, setShelfFilter] = useState('');
   const [purchaseFilter, setPurchaseFilter] = useState('');
   const [productionFilter, setProductionFilter] = useState('');
-  const [brandFilter, setBrandFilter] = useState('');
-  const [quickFilter, setQuickFilter] = useState<'' | 'teaware' | 'lowStock'>('');
+  const [brandFilter, setBrandFilter] = useState<Set<string>>(new Set());
+  const [quickFilter, setQuickFilter] = useState<Set<'teaware' | 'lowStock'>>(new Set());
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'sales-asc' | 'sales-desc'>('default');
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
@@ -130,16 +130,16 @@ export default function ProductManageTea() {
   // 筛选 + 排序
   const filtered = useMemo(() => {
     let result = products.filter((p) => {
-      if (categoryFilter) {
+      if (categoryFilter.size > 0) {
         const prefix = p.category.split('-')[0];
-        if (prefix !== categoryFilter) return false;
+        if (!categoryFilter.has(prefix)) return false;
       }
       if (shelfFilter && p.shelfStatus !== shelfFilter) return false;
       if (purchaseFilter && p.purchaseStatus !== purchaseFilter) return false;
       if (productionFilter && p.productionStatus !== productionFilter) return false;
-      if (brandFilter && p.brand !== brandFilter) return false;
-      if (quickFilter === 'teaware' && !p.includesTeaware) return false;
-      if (quickFilter === 'lowStock' && p.stock >= p.stockAlert) return false;
+      if (brandFilter.size > 0 && !brandFilter.has(p.brand)) return false;
+      if (quickFilter.has('teaware') && !p.includesTeaware) return false;
+      if (quickFilter.has('lowStock') && p.stock >= p.stockAlert) return false;
       if (keyword) {
         const kw = keyword.toLowerCase();
         if (
@@ -175,12 +175,36 @@ export default function ProductManageTea() {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, currentPage]);
 
-  const handleCategoryChange = (value: string) => { setCategoryFilter(value); setCurrentPage(1); };
+  const handleCategoryToggle = (name: string) => {
+    setCategoryFilter(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name); else next.add(name);
+      return next;
+    });
+    setCurrentPage(1);
+  };
+  const handleCategoryClear = () => { setCategoryFilter(new Set()); setCurrentPage(1); };
   const handleShelfChange = (value: string) => { setShelfFilter(value); setCurrentPage(1); };
   const handlePurchaseChange = (value: string) => { setPurchaseFilter(value); setCurrentPage(1); };
   const handleProductionChange = (value: string) => { setProductionFilter(value); setCurrentPage(1); };
-  const handleBrandChange = (value: string) => { setBrandFilter(value); setCurrentPage(1); };
-  const handleQuickFilter = (value: '' | 'teaware' | 'lowStock') => { setQuickFilter(quickFilter === value ? '' : value); setCurrentPage(1); };
+  const handleBrandToggle = (name: string) => {
+    setBrandFilter(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name); else next.add(name);
+      return next;
+    });
+    setCurrentPage(1);
+  };
+  const handleBrandClear = () => { setBrandFilter(new Set()); setCurrentPage(1); };
+  const handleQuickToggle = (value: 'teaware' | 'lowStock') => {
+    setQuickFilter(prev => {
+      const next = new Set(prev);
+      if (next.has(value)) next.delete(value); else next.add(value);
+      return next;
+    });
+    setCurrentPage(1);
+  };
+  const handleQuickClear = () => { setQuickFilter(new Set()); setCurrentPage(1); };
   const handleSearch = (kw: string) => { setKeyword(kw); setCurrentPage(1); };
   const handleSortChange = (sort: 'default' | 'price-asc' | 'price-desc' | 'sales-asc' | 'sales-desc') => { setSortBy(sort); setCurrentPage(1); };
   const handlePriceMinChange = (v: string) => { setPriceMin(v); setCurrentPage(1); };
@@ -428,27 +452,44 @@ export default function ProductManageTea() {
         <Card>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>茶类：</span>
-            <button style={filterBtnStyle(!categoryFilter)} onClick={() => handleCategoryChange('')}>全部</button>
+            <button style={filterBtnStyle(categoryFilter.size === 0)} onClick={handleCategoryClear}>全部</button>
             {Object.keys(CATEGORY_MAP).map((name) => (
-              <button key={name} style={filterBtnStyle(categoryFilter === name)} onClick={() => handleCategoryChange(categoryFilter === name ? '' : name)}>
+              <button key={name} style={filterBtnStyle(categoryFilter.has(name))} onClick={() => handleCategoryToggle(name)}>
                 {name}
               </button>
             ))}
           </div>
+          {/* 选中茶类后展示三级分类纯文本 */}
+          {categoryFilter.size > 0 && (
+            <div style={{ marginBottom: 'var(--space-3)', paddingLeft: 'var(--space-2)' }}>
+              {Array.from(categoryFilter).map((catName) => {
+                const l2Node = teaCategoryData.children?.find(c => c.name === catName);
+                if (!l2Node?.children || l2Node.children.length === 0) return null;
+                return (
+                  <div key={catName} style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>{catName}：</span>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-600)', lineHeight: 1.6 }}>
+                      {l2Node.children.map(c => c.name).join('、')}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>品牌：</span>
-            <button style={filterBtnStyle(!brandFilter)} onClick={() => handleBrandChange('')}>全部</button>
+            <button style={filterBtnStyle(brandFilter.size === 0)} onClick={handleBrandClear}>全部</button>
             {allBrands.map((b) => (
-              <button key={b} style={filterBtnStyle(brandFilter === b)} onClick={() => handleBrandChange(brandFilter === b ? '' : b)}>
+              <button key={b} style={filterBtnStyle(brandFilter.has(b))} onClick={() => handleBrandToggle(b)}>
                 {b}
               </button>
             ))}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-3)' }}>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>快捷：</span>
-            <button style={filterBtnStyle(!quickFilter)} onClick={() => setQuickFilter('')}>全部</button>
-            <button style={filterBtnStyle(quickFilter === 'teaware')} onClick={() => handleQuickFilter('teaware')}>带茶具</button>
-            <button style={filterBtnStyle(quickFilter === 'lowStock')} onClick={() => handleQuickFilter('lowStock')}>库存紧张</button>
+            <button style={filterBtnStyle(quickFilter.size === 0)} onClick={handleQuickClear}>全部</button>
+            <button style={filterBtnStyle(quickFilter.has('teaware'))} onClick={() => handleQuickToggle('teaware')}>带茶具</button>
+            <button style={filterBtnStyle(quickFilter.has('lowStock'))} onClick={() => handleQuickToggle('lowStock')}>库存紧张</button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', fontWeight: 'var(--font-medium)', flexShrink: 0 }}>条件：</span>
