@@ -5,7 +5,6 @@ import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
-import FilterBar from '../../components/business/FilterBar';
 import type { BrandItem } from '../../types';
 import { TeaCategory } from '../../types';
 import { brandItems } from '../../data/brands';
@@ -149,7 +148,7 @@ export default function ProductBrand() {
     <>
       <ContentHeader title="品牌管理" breadcrumbs={['商品', '品牌管理']} />
       <div className="content-body">
-        <FilterBar>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
           <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => { setFilterKeyword(e.target.value); setCurrentPage(1); }} />
           <select className="filter-select" value={filterLevel1} onChange={(e) => { setFilterLevel1(e.target.value); setFilterLevel2(''); setCurrentPage(1); }}>
             <option value="">全部</option>
@@ -159,8 +158,6 @@ export default function ProductBrand() {
             <option value="">全部</option>
             {level2Options.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
-        </FilterBar>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
           <Button onClick={handleOpenDrawer}>
             <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
               <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
