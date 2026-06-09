@@ -56,6 +56,35 @@ export default function ProductBrand() {
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
 
+  // 批量删除
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [selectedForDelete, setSelectedForDelete] = useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleEnterDeleteMode = () => {
+    setDeleteMode(true);
+    setSelectedForDelete(new Set());
+  };
+
+  const handleCancelDeleteMode = () => {
+    setDeleteMode(false);
+    setSelectedForDelete(new Set());
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedForDelete((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    // 模拟删除（实际项目中应调用API）
+    handleCancelDeleteMode();
+  };
+
   const filteredItems = brandItems.filter((b) => {
     if (filterKeyword && !b.name.includes(filterKeyword) && !b.code.toLowerCase().includes(filterKeyword.toLowerCase()) && !b.owner.includes(filterKeyword)) return false;
     if (filterLevel2 && !b.mainCategories.includes(filterLevel2)) return false;
@@ -120,25 +149,51 @@ export default function ProductBrand() {
     <>
       <ContentHeader title="品牌管理" breadcrumbs={['商品', '品牌管理']} />
       <div className="content-body">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-          <FilterBar>
-            <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => { setFilterKeyword(e.target.value); setCurrentPage(1); }} />
-            <select className="filter-select" value={filterLevel1} onChange={(e) => { setFilterLevel1(e.target.value); setFilterLevel2(''); setCurrentPage(1); }}>
-              <option value="">全部</option>
-              {LEVEL1_OPTIONS.map((o) => <option key={o.label} value={o.label}>{o.label}</option>)}
-            </select>
-            <select className="filter-select" value={filterLevel2} onChange={(e) => { setFilterLevel2(e.target.value); setCurrentPage(1); }}>
-              <option value="">全部</option>
-              {level2Options.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </FilterBar>
-          <Button onClick={handleOpenDrawer}><PlusIcon />新增品牌</Button>
+        <FilterBar>
+          <input className="filter-input" placeholder="搜索品牌名称、编码、所属公司..." value={filterKeyword} onChange={(e) => { setFilterKeyword(e.target.value); setCurrentPage(1); }} />
+          <select className="filter-select" value={filterLevel1} onChange={(e) => { setFilterLevel1(e.target.value); setFilterLevel2(''); setCurrentPage(1); }}>
+            <option value="">全部</option>
+            {LEVEL1_OPTIONS.map((o) => <option key={o.label} value={o.label}>{o.label}</option>)}
+          </select>
+          <select className="filter-select" value={filterLevel2} onChange={(e) => { setFilterLevel2(e.target.value); setCurrentPage(1); }}>
+            <option value="">全部</option>
+            {level2Options.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </FilterBar>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
+          <Button onClick={handleOpenDrawer}>
+            <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
+              <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            新增
+          </Button>
+          {deleteMode ? (
+            <>
+              <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+                <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
+                  <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                删除所选({selectedForDelete.size})
+              </Button>
+              <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
+            </>
+          ) : (
+            <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleEnterDeleteMode}>
+              <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
+                <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              删除
+            </Button>
+          )}
+          <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', flexShrink: 0 }}>共 {filteredItems.length} 个品牌</span>
         </div>
         <Card>
           <Table
-            headers={['序号', '品牌LOGO', '品牌名称', '品牌编号', '品牌所属', '主营品类', '商品数量', '联系人', '联系电话', '操作']}
+            headers={[deleteMode ? '选择' : '序号', '品牌LOGO', '品牌名称', '品牌编号', '品牌所属', '主营品类', '商品数量', '联系人', '联系电话', '操作']}
             rows={pagedItems.map((b, idx) => [
-              <span className="mono">{(currentPage - 1) * PAGE_SIZE + idx + 1}</span>,
+              deleteMode
+                ? <input type="checkbox" checked={selectedForDelete.has(b.id)} onChange={() => handleToggleSelect(b.id)} />
+                : <span className="mono">{(currentPage - 1) * PAGE_SIZE + idx + 1}</span>,
               <div className="brand-logo-cell" onClick={() => handleRowClick(b.id)} style={{ cursor: 'pointer' }}>
                 {b.logo ? <img src={b.logo} alt={b.name} className="brand-logo-img" /> : <div className="brand-logo-placeholder">{b.name[0]}</div>}
               </div>,
@@ -156,7 +211,6 @@ export default function ProductBrand() {
               <span className="mono">{b.contactPhone}</span>,
               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                 <Button variant="ghost" size="sm" onClick={() => handleRowClick(b.id)} style={{ color: '#01795D' }}>详情</Button>
-                <Button variant="ghost" size="sm" style={{ color: '#FD742D' }}>删除</Button>
               </div>,
             ])}
           />
@@ -386,6 +440,22 @@ export default function ProductBrand() {
             <div className="drawer-footer">
               <Button variant="ghost" onClick={handleCloseDrawer}>取消</Button>
               <Button onClick={handleSubmit}>确认新增</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 删除确认弹窗 */}
+      {showDeleteConfirm && (
+        <div className="category-dialog-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="category-dialog" onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-3)' }}>确认删除</div>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', marginBottom: 'var(--space-5)' }}>
+              确定要删除选中的 {selectedForDelete.size} 个品牌吗？此操作不可撤销。
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
+              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
             </div>
           </div>
         </div>
