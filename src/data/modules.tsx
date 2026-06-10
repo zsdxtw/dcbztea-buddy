@@ -89,6 +89,9 @@ const TeaCategoryAnalysisIcon = () => (
 const SpecsIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg>
 );
+const PriceIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v14M6 7h8M6 13h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="14" cy="13" r="3" stroke="currentColor" strokeWidth="1.3"/></svg>
+);
 const ReceivableIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><path d="M4 7l6-4 6 4v6l-6 4-6-4V7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>
 );
@@ -262,6 +265,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
         { key: 'product-category-other', label: '其他', icon: <ProductCategoryIcon /> },
       ] },
       { key: 'product-brand', label: '品牌管理', icon: <BrandIcon /> },
+      { key: 'product-price', label: '价格管理', icon: <PriceIcon /> },
       { key: 'product-tea-category', label: '茶叶档案', icon: <CategoryIcon />, children: [
         { key: 'product-tea-seven', label: '六大茶类', icon: <CategoryIcon /> },
         { key: 'product-tea-list', label: '茶种大全', icon: <CategoryIcon /> },

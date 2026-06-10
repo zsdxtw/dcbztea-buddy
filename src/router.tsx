@@ -48,6 +48,7 @@ import ProductCategoryPeripheral from './pages/product/ProductCategoryPeripheral
 import ProductCategoryOther from './pages/product/ProductCategoryOther';
 import ProductBrand from './pages/product/ProductBrand';
 import ProductBrandDetail from './pages/product/ProductBrandDetail';
+import ProductPrice from './pages/product/ProductPrice';
 
 import FinanceOverview from './pages/finance/FinanceOverview';
 import FinanceReceivable from './pages/finance/FinanceReceivable';
@@ -136,6 +137,7 @@ export const router = createBrowserRouter([
       { path: 'product/product-category-other', element: <ProductCategoryOther /> },
       { path: 'product/product-brand', element: <ProductBrand /> },
       { path: 'product/product-brand/:id', element: <ProductBrandDetail /> },
+      { path: 'product/product-price', element: <ProductPrice /> },
       /* ── 财务 ── */
       { path: 'finance', element: <FinanceOverview /> },
       { path: 'finance/finance-overview', element: <FinanceOverview /> },
