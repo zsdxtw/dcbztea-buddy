@@ -9,11 +9,6 @@ export default defineConfig({
     open: false,
     allowedHosts: 'all',
     strictPort: false,
-    hmr: {
-      protocol: 'ws',
-      host: '0.0.0.0',
-      port: 5173,
-    },
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
