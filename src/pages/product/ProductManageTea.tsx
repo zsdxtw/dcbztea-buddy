@@ -549,6 +549,53 @@ export default function ProductManageTea() {
     cursor: 'pointer',
   });
 
+  const [fetchUrl, setFetchUrl] = useState('');
+  const [fetching, setFetching] = useState(false);
+  const [fetchResult, setFetchResult] = useState<'success' | 'error' | null>(null);
+
+  /** 从京东/天猫链接抓取商品信息（模拟） */
+  const handleFetchProduct = () => {
+    if (!fetchUrl.trim()) return;
+    setFetching(true);
+    setFetchResult(null);
+    // 模拟网络请求延迟
+    setTimeout(() => {
+      const isJd = fetchUrl.includes('jd.com') || fetchUrl.includes('jd.hk');
+      const isTmall = fetchUrl.includes('tmall.com') || fetchUrl.includes('taobao.com');
+      if (!isJd && !isTmall) {
+        setFetchResult('error');
+        setFetching(false);
+        return;
+      }
+      // 模拟抓取结果填充表单
+      const mockData: Record<string, any> = {
+        name: isJd ? '京东商品-自动抓取' : '天猫商品-自动抓取',
+        marketPrice: Math.round(300 + Math.random() * 500),
+        brand: isJd ? '大益' : '八马',
+        spec: '100g/罐',
+        grade: '特级',
+        origin: '云南西双版纳',
+        barcode69: '690' + String(Math.floor(Math.random() * 10000000000)).padStart(10, '0'),
+        model: isJd ? 'JD-AUTO-001' : 'TM-AUTO-001',
+        packageUnit: '罐',
+        shelfLife: 18,
+        taxRate: 9,
+        features: '自动抓取·品质优良',
+        packageList: '茶叶罐×1、手提袋×1、产品说明书×1',
+      };
+      if (isJd) {
+        mockData.jdPrice = mockData.marketPrice;
+        mockData.jdUrl = fetchUrl;
+      } else {
+        mockData.tmallPrice = mockData.marketPrice;
+        mockData.tmallUrl = fetchUrl;
+      }
+      setForm(prev => ({ ...prev, ...mockData }));
+      setFetchResult('success');
+      setFetching(false);
+    }, 1500);
+  };
+
   const sectionTitleStyle: React.CSSProperties = {
     fontSize: 'var(--text-sm)',
     fontWeight: 'var(--font-semibold)',
@@ -1027,6 +1074,60 @@ export default function ProductManageTea() {
               </button>
             </div>
             <div className="drawer-body">
+              {/* ── 网络抓取 ── */}
+              <div style={{
+                background: 'var(--color-neutral-50)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-4)',
+                marginBottom: 'var(--space-3)',
+                border: '1px solid var(--color-neutral-150)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                  <svg viewBox="0 0 18 18" fill="none" style={{ width: 16, height: 16, color: 'var(--color-module-current-base)', flexShrink: 0 }}>
+                    <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3" />
+                    <path d="M2 9h14M9 2c-2 2.5-3 5-3 7s1 4.5 3 7M9 2c2 2.5 3 5 3 7s-1 4.5-3 7" stroke="currentColor" strokeWidth="1.0" />
+                  </svg>
+                  <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>网络抓取</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>输入京东/天猫商品链接，自动获取商品信息</span>
+                </div>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                  <input
+                    className="detail-input"
+                    style={{ flex: 1 }}
+                    placeholder="请输入京东或天猫商品链接，如 https://item.jd.com/12345.html"
+                    value={fetchUrl}
+                    onChange={(e) => { setFetchUrl(e.target.value); setFetchResult(null); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleFetchProduct(); }}
+                  />
+                  <Button
+                    onClick={handleFetchProduct}
+                    disabled={fetching || !fetchUrl.trim()}
+                    style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+                  >
+                    {fetching ? (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14, animation: 'spin 1s linear infinite' }}>
+                          <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" strokeDasharray="12 6" />
+                        </svg>
+                        抓取中...
+                      </span>
+                    ) : '获取信息'}
+                  </Button>
+                </div>
+                {fetchResult === 'success' && (
+                  <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-success-500)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" /><path d="M5.5 8l2 2 3-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    商品信息抓取成功，已自动填充表单
+                  </div>
+                )}
+                {fetchResult === 'error' && (
+                  <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-error-500)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" /><path d="M6 6l4 4M10 6l-4 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
+                    链接无效，请输入京东或天猫的商品链接
+                  </div>
+                )}
+              </div>
+
               {/* ── 基本信息 ── */}
               <div style={sectionTitleStyle}>基本信息</div>
               <div className="drawer-form-row">
