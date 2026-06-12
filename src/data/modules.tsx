@@ -191,6 +191,12 @@ const UserManagementIcon = () => (
 const DataBackupIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/><path d="M10 1v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
 );
+const PersonnelTabIcon = () => (
+  <svg viewBox="0 0 18 18" fill="none"><circle cx="6" cy="6" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M1 15a5 5 0 0110 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="14" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.2"/><path d="M12 14a4 4 0 015 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
+const TeaProfessionalIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" strokeWidth="1.3"/><path d="M3 18a7 7 0 0114 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><path d="M14 4l2-2M16 4l-2-2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
 
 /* ── 模块配置 ── */
 
@@ -313,6 +319,13 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'settings-unit', label: '单位设置', icon: <UnitIcon /> },
     ],
   },
+  [ModuleKey.PERSONNEL]: {
+    key: ModuleKey.PERSONNEL,
+    label: '人员',
+    menus: [
+      { key: 'personnel-tea-professional', label: '茶人管理', icon: <TeaProfessionalIcon /> },
+    ],
+  },
 };
 
 /** 获取指定模块的菜单列表 */
@@ -329,5 +342,6 @@ export const TOPNAV_TABS: Array<{ key: ModuleKey; label: string; icon: React.Rea
   { key: ModuleKey.PRODUCT, label: '商品', icon: <ProductTabIcon /> },
   { key: ModuleKey.FINANCE, label: '财务', icon: <FinanceTabIcon /> },
   { key: ModuleKey.STATISTICS, label: '统计', icon: <StatisticsTabIcon /> },
+  { key: ModuleKey.PERSONNEL, label: '人员', icon: <PersonnelTabIcon /> },
   { key: ModuleKey.SETTINGS, label: '系统', icon: <SettingsTabIcon /> },
 ];

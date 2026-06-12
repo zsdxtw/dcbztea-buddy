@@ -76,6 +76,8 @@ import SettingsUserManagement from './pages/settings/SettingsUserManagement';
 import SettingsDataBackup from './pages/settings/SettingsDataBackup';
 import SettingsUnit from './pages/settings/SettingsUnit';
 
+import PersonnelTeaProfessional from './pages/personnel/PersonnelTeaProfessional';
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -167,6 +169,9 @@ export const router = createBrowserRouter([
       { path: 'settings/settings-user-management', element: <SettingsUserManagement /> },
       { path: 'settings/settings-data-backup', element: <SettingsDataBackup /> },
       { path: 'settings/settings-unit', element: <SettingsUnit /> },
+      /* ── 人员 ── */
+      { path: 'personnel', element: <PersonnelTeaProfessional /> },
+      { path: 'personnel/personnel-tea-professional', element: <PersonnelTeaProfessional /> },
     ],
   },
 ]);

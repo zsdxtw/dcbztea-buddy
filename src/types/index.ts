@@ -8,6 +8,7 @@ export enum ModuleKey {
   FINANCE = 'finance',
   STATISTICS = 'statistics',
   SETTINGS = 'settings',
+  PERSONNEL = 'personnel',
 }
 
 /** 六大茶类 */
@@ -409,4 +410,56 @@ export interface TeaProduct {
   features: string;
   includesTeaware: boolean;
   remark: string;
+}
+
+/** 茶人类型 */
+export type TeaProfessionalType = 'tea_artist' | 'tea_evaluator' | 'tea_maker' | 'tea_sommelier';
+
+/** 茶人证书 */
+export interface TeaCertificate {
+  name: string;
+  level: string;
+  issuer: string;
+  issueDate: string;
+  certNo: string;
+}
+
+/** 茶人获奖记录 */
+export interface TeaAward {
+  name: string;
+  level: string;
+  awardDate: string;
+  organization: string;
+}
+
+/** 茶人服务报价 */
+export interface TeaServiceQuote {
+  serviceType: string;
+  duration: string;
+  price: number;
+  unit: string;
+  remark: string;
+}
+
+/** 茶人 */
+export interface TeaProfessional {
+  id: string;
+  name: string;
+  type: TeaProfessionalType[];
+  gender: 'male' | 'female';
+  photo: string;
+  region: string;
+  height: number;
+  weight: number;
+  birthDate: string;
+  phone: string;
+  email: string;
+  idCard: string;
+  address: string;
+  certificates: TeaCertificate[];
+  specialties: string[];
+  awards: TeaAward[];
+  serviceQuotes: TeaServiceQuote[];
+  introduction: string;
+  status: 'active' | 'inactive';
 }
