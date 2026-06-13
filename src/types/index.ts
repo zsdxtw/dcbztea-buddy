@@ -463,3 +463,91 @@ export interface TeaProfessional {
   introduction: string;
   status: 'active' | 'inactive';
 }
+
+/** 供应商类型 */
+export type SupplierType = 'brand' | 'partner';
+
+/** 供应商评价等级 */
+export type SupplierGrade = 'S' | 'A' | 'B' | 'C' | 'D';
+
+/** 税务类型 */
+export type TaxType = 'small' | 'general';
+
+/** 结算方式 */
+export type SettlementMethod = 'period' | 'prepaid' | 'invoice' | 'monthly' | 'quarterly';
+
+/** 快递费结算方式 */
+export type ShippingSettlement = 'free' | 'not_free_fixed' | 'not_free_ratio' | 'not_free_bear';
+
+/** 仓库信息 */
+export interface SupplierWarehouse {
+  id: string;
+  name: string;
+  address: string;
+  contactPerson: string;
+  contactPhone: string;
+  isDefault: boolean;
+}
+
+/** 开票信息 */
+export interface InvoiceInfo {
+  title: string;
+  taxNo: string;
+  taxRate: number;
+  address?: string;
+  phone?: string;
+  bankName?: string;
+  bankAccount?: string;
+}
+
+/** 结算银行账号 */
+export interface BankAccount {
+  accountName: string;
+  accountNo: string;
+  bankName: string;
+  bankNo: string;
+  remark?: string;
+}
+
+/** 供应商 */
+export interface SupplierItem {
+  id: string;
+  type: SupplierType;
+  name: string;
+  unifiedCreditCode: string;
+  cooperationAgreements: string[];
+  brandAuthAgreements: string[];
+  businessLicense: string;
+  registeredAddress: string;
+  legalRepresentative: string;
+  establishmentDate: string;
+  registeredCapital: string;
+  companyType: string;
+  businessScope: string;
+  contactPerson: string;
+  contactPosition: string;
+  contactAddress: string;
+  contactPhone: string;
+  contactEmail: string;
+  warehouses: SupplierWarehouse[];
+  taxType: TaxType;
+  invoiceInfo: InvoiceInfo;
+  cooperationDate: string;
+  grade: SupplierGrade;
+  mainCategories: string[];
+  introduction: string;
+  settlementMethod: SettlementMethod;
+  bankAccount: BankAccount;
+  shippingSettlement: ShippingSettlement;
+  shippingFee?: number;
+  shippingRemark?: string;
+  supportDropship: boolean;
+  qualificationStatus: 'qualified' | 'pending' | 'expired';
+  paymentTerms: string;
+  deliveryCycle: string;
+  minOrderAmount: number;
+  returnPolicy: string;
+  qualityGuarantee: string;
+  remark: string;
+  status: 'active' | 'inactive';
+}
