@@ -338,10 +338,10 @@ export const TOPNAV_TABS: Array<{ key: ModuleKey; label: string; icon: React.Rea
   { key: ModuleKey.DASHBOARD, label: '工作台', icon: <DashboardTabIcon /> },
   { key: ModuleKey.PURCHASE, label: '采购', icon: <PurchaseTabIcon /> },
   { key: ModuleKey.SALES, label: '销售', icon: <SalesTabIcon /> },
-  { key: ModuleKey.INVENTORY, label: '仓储', icon: <InventoryTabIcon /> },
   { key: ModuleKey.PRODUCT, label: '商品', icon: <ProductTabIcon /> },
+  { key: ModuleKey.PERSONNEL, label: '人员', icon: <PersonnelTabIcon /> },
+  { key: ModuleKey.INVENTORY, label: '仓储', icon: <InventoryTabIcon /> },
   { key: ModuleKey.FINANCE, label: '财务', icon: <FinanceTabIcon /> },
   { key: ModuleKey.STATISTICS, label: '统计', icon: <StatisticsTabIcon /> },
-  { key: ModuleKey.PERSONNEL, label: '人员', icon: <PersonnelTabIcon /> },
   { key: ModuleKey.SETTINGS, label: '系统', icon: <SettingsTabIcon /> },
 ];
