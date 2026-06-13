@@ -129,11 +129,11 @@ export default function PurchaseSuppliers() {
         <Button onClick={() => setShowAddDrawer(true)}>新增</Button>
         {deleteMode ? (
           <>
-            <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0}>删除所选({selectedForDelete.size})</Button>
+            <Button style={{ background: '#0F64B5', borderColor: '#0F64B5' }} onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0}>删除所选({selectedForDelete.size})</Button>
             <Button variant="ghost" onClick={handleCancelDeleteMode}>取消</Button>
           </>
         ) : (
-          <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleEnterDeleteMode}>删除</Button>
+          <Button style={{ background: '#0F64B5', borderColor: '#0F64B5' }} onClick={handleEnterDeleteMode}>删除</Button>
         )}
         <span style={{ marginLeft: 'auto', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>共 {filtered.length} 家供应商</span>
       </div>
@@ -169,7 +169,7 @@ export default function PurchaseSuppliers() {
             <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>确定要删除选中的 {selectedForDelete.size} 家供应商吗？此操作不可撤销。</p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleCancelDeleteMode}>确认删除</Button>
+              <Button style={{ background: '#0F64B5', borderColor: '#0F64B5' }} onClick={handleCancelDeleteMode}>确认删除</Button>
             </div>
           </div>
         </div>

@@ -151,13 +151,13 @@ export default function PersonnelTeaProfessional() {
         <Button onClick={handleAdd}>新增</Button>
         {deleteMode ? (
           <>
-            <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0}>
+            <Button style={{ background: '#C4A830', borderColor: '#C4A830' }} onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0}>
               删除所选({selectedForDelete.size})
             </Button>
             <Button variant="ghost" onClick={handleCancelDeleteMode}>取消</Button>
           </>
         ) : (
-          <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleEnterDeleteMode}>删除</Button>
+          <Button style={{ background: '#C4A830', borderColor: '#C4A830' }} onClick={handleEnterDeleteMode}>删除</Button>
         )}
         <span style={{ marginLeft: 'auto', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>
           共 {filtered.length} 位茶人
@@ -234,7 +234,7 @@ export default function PersonnelTeaProfessional() {
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleConfirmDelete}>确认删除</Button>
+              <Button style={{ background: '#C4A830', borderColor: '#C4A830' }} onClick={handleConfirmDelete}>确认删除</Button>
             </div>
           </div>
         </div>
