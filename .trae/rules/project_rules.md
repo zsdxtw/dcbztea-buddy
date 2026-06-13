@@ -29,7 +29,7 @@
 1. **品牌编号联动**：商品编号中的品牌编号部分直接使用品牌管理中的3位原始编号，不做截取
 2. **编号不可变**：已建立的商品编号不因分类管理中的新增/删除而改变
 3. **分类删除保护**：分类管理中，若某分类下存在商品则不允许删除该分类
-4. **二级分类编号**：茶叶二级分类为 绿茶01、红茶02、青茶03、白茶04、黄茶05、黑茶06、花草茶07
+4. **二级分类编号**：茶叶二级分类为 绿茶01、红茶02、青茶03，白茶04、黄茶05、黑茶06、花草茶07
 
 ### 相关文件
 
@@ -48,15 +48,15 @@
 
 | 模块 | ModuleKey | 主色调 | 色值 | 辅色调 | 色值 |
 |------|-----------|--------|------|--------|------|
-| 工作台 | dashboard | 深蓝 | `#023270` | 粉红 | `#FD7A99` |
-| 采购 | purchase | 玫红 | `#CB405D` | 蓝 | `#0F64B5` |
-| 销售 | sales | 青色 | `#0DAFC6` | 杏橙 | `#F4A487` |
-| 商品 | product | 翡翠绿 | `#01795D` | 橙色 | `#FD742D` |
-| 人员 | personnel | 紫罗兰 | `#9D73BD` | 蓝灰 | `#7BA6D1` |
-| 仓储 | inventory | 棕色 | `#5F4027` | 浅橙 | `#FED6B8` |
-| 财务 | finance | 深靛 | `#27254B` | 蓝灰 | `#7BA6D1` |
-| 统计 | statistics | 橙色 | `#F18F4D` | — | — |
-| 系统 | settings | 灰色 | `#6B7280` | — | — |
+| 工作台 | dashboard | 深蓝 | <span style="display:inline-block;width:14px;height:14px;background:#023270;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#023270` | 粉红 | <span style="display:inline-block;width:14px;height:14px;background:#FD7A99;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#FD7A99` |
+| 采购 | purchase | 玫红 | <span style="display:inline-block;width:14px;height:14px;background:#CB405D;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#CB405D` | 蓝 | <span style="display:inline-block;width:14px;height:14px;background:#0F64B5;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#0F64B5` |
+| 销售 | sales | 青色 | <span style="display:inline-block;width:14px;height:14px;background:#0DAFC6;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#0DAFC6` | 杏橙 | <span style="display:inline-block;width:14px;height:14px;background:#F4A487;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#F4A487` |
+| 商品 | product | 翡翠绿 | <span style="display:inline-block;width:14px;height:14px;background:#01795D;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#01795D` | 橙色 | <span style="display:inline-block;width:14px;height:14px;background:#FD742D;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#FD742D` |
+| 人员 | personnel | 紫罗兰 | <span style="display:inline-block;width:14px;height:14px;background:#9D73BD;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#9D73BD` | 蓝灰 | <span style="display:inline-block;width:14px;height:14px;background:#7BA6D1;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#7BA6D1` |
+| 仓储 | inventory | 棕色 | <span style="display:inline-block;width:14px;height:14px;background:#5F4027;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#5F4027` | 浅橙 | <span style="display:inline-block;width:14px;height:14px;background:#FED6B8;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#FED6B8` |
+| 财务 | finance | 深靛 | <span style="display:inline-block;width:14px;height:14px;background:#27254B;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#27254B` | 蓝灰 | <span style="display:inline-block;width:14px;height:14px;background:#7BA6D1;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#7BA6D1` |
+| 统计 | statistics | 橙色 | <span style="display:inline-block;width:14px;height:14px;background:#F18F4D;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#F18F4D` | — | — |
+| 系统 | settings | 灰色 | <span style="display:inline-block;width:14px;height:14px;background:#6B7280;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#6B7280` | — | — |
 
 ### 模块色阶体系
 
@@ -72,13 +72,13 @@
 
 ### 辅色调使用说明
 
-- **工作台辅色 `#FD7A99`**：用于工作台模块下的强调操作
-- **采购辅色 `#0F64B5`**：用于采购模块下的次要操作、链接等
-- **销售辅色 `#F4A487`**：用于销售模块下的价格、金额等数据展示
-- **商品辅色 `#FD742D`**：用于商品模块下的删除按钮、警告操作
-- **人员辅色 `#7BA6D1`**：用于人员模块下的次要信息展示
-- **仓储辅色 `#FED6B8`**：用于仓储模块下的库存预警等
-- **财务辅色 `#7BA6D1`**：用于财务模块下的银行、账号等信息
+- **工作台辅色** <span style="display:inline-block;width:12px;height:12px;background:#FD7A99;border-radius:2px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:2px"></span> `#FD7A99`：用于工作台模块下的强调操作
+- **采购辅色** <span style="display:inline-block;width:12px;height:12px;background:#0F64B5;border-radius:2px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:2px"></span> `#0F64B5`：用于采购模块下的次要操作、链接等
+- **销售辅色** <span style="display:inline-block;width:12px;height:12px;background:#F4A487;border-radius:2px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:2px"></span> `#F4A487`：用于销售模块下的价格、金额等数据展示
+- **商品辅色** <span style="display:inline-block;width:12px;height:12px;background:#FD742D;border-radius:2px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:2px"></span> `#FD742D`：用于商品模块下的删除按钮、警告操作
+- **人员辅色** <span style="display:inline-block;width:12px;height:12px;background:#7BA6D1;border-radius:2px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:2px"></span> `#7BA6D1`：用于人员模块下的次要信息展示
+- **仓储辅色** <span style="display:inline-block;width:12px;height:12px;background:#FED6B8;border-radius:2px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:2px"></span> `#FED6B8`：用于仓储模块下的库存预警等
+- **财务辅色** <span style="display:inline-block;width:12px;height:12px;background:#7BA6D1;border-radius:2px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:2px"></span> `#7BA6D1`：用于财务模块下的银行、账号等信息
 
 ### 模块色切换机制
 
@@ -113,13 +113,13 @@
 
 | 茶类 | TeaCategory | 背景色 | 文字色 | 边框色 |
 |------|-------------|--------|--------|--------|
-| 绿茶 | green | `#F0F6E4` | `#5C7A2A` | `#D8E8C0` |
-| 白茶 | white | `#F9F3E8` | `#9A8450` | `#E8D8B8` |
-| 黄茶 | yellow | `#FAF3E0` | `#8A7530` | `#E8D8A0` |
-| 青茶 | oolong | `#EFF2E8` | `#3E4A28` | `#C8D0B0` |
-| 红茶 | red | `#F8ECEC` | `#7A2A28` | `#E0C0C0` |
-| 黑茶 | dark | `#F0EBE6` | `#3A2E20` | `#D0C8B8` |
-| 花草茶 | flower | `#FFF0F5` | `#B03070` | `#F0C0D8` |
+| 绿茶 | green | <span style="display:inline-block;width:14px;height:14px;background:#F0F6E4;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#F0F6E4` | <span style="display:inline-block;width:14px;height:14px;background:#5C7A2A;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#5C7A2A` | <span style="display:inline-block;width:14px;height:14px;background:#D8E8C0;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#D8E8C0` |
+| 白茶 | white | <span style="display:inline-block;width:14px;height:14px;background:#F9F3E8;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#F9F3E8` | <span style="display:inline-block;width:14px;height:14px;background:#9A8450;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#9A8450` | <span style="display:inline-block;width:14px;height:14px;background:#E8D8B8;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#E8D8B8` |
+| 黄茶 | yellow | <span style="display:inline-block;width:14px;height:14px;background:#FAF3E0;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#FAF3E0` | <span style="display:inline-block;width:14px;height:14px;background:#8A7530;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#8A7530` | <span style="display:inline-block;width:14px;height:14px;background:#E8D8A0;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#E8D8A0` |
+| 青茶 | oolong | <span style="display:inline-block;width:14px;height:14px;background:#EFF2E8;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#EFF2E8` | <span style="display:inline-block;width:14px;height:14px;background:#3E4A28;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#3E4A28` | <span style="display:inline-block;width:14px;height:14px;background:#C8D0B0;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#C8D0B0` |
+| 红茶 | red | <span style="display:inline-block;width:14px;height:14px;background:#F8ECEC;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#F8ECEC` | <span style="display:inline-block;width:14px;height:14px;background:#7A2A28;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#7A2A28` | <span style="display:inline-block;width:14px;height:14px;background:#E0C0C0;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#E0C0C0` |
+| 黑茶 | dark | <span style="display:inline-block;width:14px;height:14px;background:#F0EBE6;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#F0EBE6` | <span style="display:inline-block;width:14px;height:14px;background:#3A2E20;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#3A2E20` | <span style="display:inline-block;width:14px;height:14px;background:#D0C8B8;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#D0C8B8` |
+| 花草茶 | flower | <span style="display:inline-block;width:14px;height:14px;background:#FFF0F5;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#FFF0F5` | <span style="display:inline-block;width:14px;height:14px;background:#B03070;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-left:4px"></span> `#B03070` | <span style="display:inline-block;width:14px;height:14px;background:#F0C0D8;border-radius:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-left:4px"></span> `#F0C0D8` |
 
 ### CSS 类名映射
 
