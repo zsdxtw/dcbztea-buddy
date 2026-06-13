@@ -155,11 +155,11 @@ export default function SalesCustomers() {
         <Button onClick={() => setShowAddDrawer(true)}>新增</Button>
         {deleteMode ? (
           <>
-            <Button style={{ background: SECONDARY, borderColor: SECONDARY }} onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0}>删除所选({selectedForDelete.size})</Button>
+            <Button style={{ background: '#4D000A', borderColor: '#4D000A' }} onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0}>删除所选({selectedForDelete.size})</Button>
             <Button variant="ghost" onClick={exitDeleteMode}>取消</Button>
           </>
         ) : (
-          <Button style={{ background: SECONDARY, borderColor: SECONDARY }} onClick={enterDeleteMode}>删除</Button>
+          <Button style={{ background: '#4D000A', borderColor: '#4D000A' }} onClick={enterDeleteMode}>删除</Button>
         )}
         <span style={{ marginLeft: 'auto', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-400)' }}>共 {filtered.length} 个客户</span>
       </div>
@@ -209,7 +209,7 @@ export default function SalesCustomers() {
             <p style={{ color: 'var(--color-neutral-600)', marginBottom: 'var(--space-4)' }}>确定要删除选中的 {selectedForDelete.size} 个客户吗？此操作不可撤销。</p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button style={{ background: SECONDARY, borderColor: SECONDARY }} onClick={confirmDelete}>确认删除</Button>
+              <Button style={{ background: '#4D000A', borderColor: '#4D000A' }} onClick={confirmDelete}>确认删除</Button>
             </div>
           </div>
         </div>
