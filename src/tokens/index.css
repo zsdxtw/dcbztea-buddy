@@ -72,6 +72,11 @@
   --color-module-settings-base: #6B7280; --color-module-settings-dark: #5A6170;
   --color-module-settings-darkest: #3E4550;
 
+  /* ── 模块色（人员） ── */
+  --color-module-personnel-lightest: #F3F1FE; --color-module-personnel-light: #E4DFFC;
+  --color-module-personnel-base: #7C6BDB; --color-module-personnel-dark: #6A58C8;
+  --color-module-personnel-darkest: #5040A0;
+
   /* ── 六大茶类专属色 ── */
   --color-tea-green: #7BA23F; --color-tea-white: #D6B577; --color-tea-yellow: #C9A84C;
   --color-tea-oolong: #5B6A3E; --color-tea-red: #A7413B; --color-tea-dark: #4A3B2A;
@@ -188,6 +193,13 @@
   --color-module-current-light: var(--color-module-settings-light);
   --color-module-current-dark: var(--color-module-settings-dark);
   --color-module-current-darkest: var(--color-module-settings-darkest);
+}
+[data-module="personnel"] {
+  --color-module-current-base: var(--color-module-personnel-base);
+  --color-module-current-lightest: var(--color-module-personnel-lightest);
+  --color-module-current-light: var(--color-module-personnel-light);
+  --color-module-current-dark: var(--color-module-personnel-dark);
+  --color-module-current-darkest: var(--color-module-personnel-darkest);
 }
 
 /* ═══ 基础重置 ═══ */
