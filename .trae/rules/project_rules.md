@@ -37,3 +37,105 @@
 - 品牌数据源（含编号）：`src/data/brands.tsx`
 - 分类数据源：`src/data/productCategories.tsx`
 - 商品数据：`src/data/teaProducts.tsx`
+
+---
+
+## 配色规则
+
+### 模块主色调
+
+一级导航菜单选中时的配色为该模块的主色调，通过 `data-module` 属性切换 CSS 变量实现全局主题色联动。
+
+| 模块 | ModuleKey | 主色调 | 色值 | 辅色调 | 辅色值 |
+|------|-----------|--------|------|--------|--------|
+| 工作台 | dashboard | 克莱因蓝 | `#002FA7` | — | — |
+| 采购 | purchase | 玫红 | `#CB405D` | — | — |
+| 销售 | sales | 青色 | `#0DAFC6` | — | — |
+| 商品 | product | 翡翠绿 | `#01795D` | 橙色 | `#FD742D` |
+| 人员 | personnel | 紫罗兰 | `#7C6BDB` | — | — |
+| 仓储 | inventory | 棕色 | `#5F4027` | — | — |
+| 财务 | finance | 深靛 | `#27254B` | — | — |
+| 统计 | statistics | 橙色 | `#F18F4D` | — | — |
+| 系统 | settings | 灰色 | `#6B7280` | — | — |
+
+### 模块色阶体系
+
+每个模块定义五级色阶，用于不同场景：
+
+| 级别 | CSS 变量后缀 | 用途 |
+|------|-------------|------|
+| lightest | `-lightest` | 浅底背景、标签背景 |
+| light | `-light` | 悬浮背景、次要高亮 |
+| base | `-base` | 主色调，按钮、选中态、强调 |
+| dark | `-dark` | 按钮悬浮态 |
+| darkest | `-darkest` | 深色文字、极端强调 |
+
+### 辅色调说明
+
+- **商品模块辅色调 `#FD742D`**：用于商品模块下的删除按钮、警告操作等需要与主色调区分的强调场景
+- 其他模块辅色调暂空，后续逐步补充
+
+### 模块色切换机制
+
+1. 根元素通过 `document.body.dataset.module = currentModule` 设置当前模块
+2. CSS 通过 `[data-module="xxx"]` 选择器切换 `--color-module-current-*` 变量
+3. 全局组件（按钮、标签、卡片等）使用 `var(--color-module-current-base)` 自动适配当前模块色
+
+### 相关文件
+
+- 色阶变量定义：`src/tokens/index.css`
+- 模块配置：`src/data/modules.tsx`
+- 模块切换逻辑：`src/App.tsx`
+- 模块 Hook：`src/hooks/useModule.ts`
+
+---
+
+## 茶类标签样式
+
+以"茶叶档案"菜单下"六大茶类"页面中的茶类标签为全局标准样式，所有涉及茶类分类展示的场景均使用 `<Tag category={TeaCategory} />` 组件。
+
+### 标签规格
+
+- 高度：24px
+- 内边距：0 8px
+- 圆角：4px（`var(--radius-sm)`）
+- 字号：12px（`var(--text-xs)`）
+- 字重：500（`var(--font-medium)`）
+- 边框：1px solid
+
+### 七大茶类配色
+
+| 茶类 | TeaCategory | 背景色 | 文字色 | 边框色 |
+|------|-------------|--------|--------|--------|
+| 绿茶 | green | `#F0F6E4` | `#5C7A2A` | `#D8E8C0` |
+| 白茶 | white | `#F9F3E8` | `#9A8450` | `#E8D8B8` |
+| 黄茶 | yellow | `#FAF3E0` | `#8A7530` | `#E8D8A0` |
+| 青茶 | oolong | `#EFF2E8` | `#3E4A28` | `#C8D0B0` |
+| 红茶 | red | `#F8ECEC` | `#7A2A28` | `#E0C0C0` |
+| 黑茶 | dark | `#F0EBE6` | `#3A2E20` | `#D0C8B8` |
+| 花草茶 | flower | `#FFF0F5` | `#B03070` | `#F0C0D8` |
+
+### CSS 类名映射
+
+| 茶类 | CSS 类名 |
+|------|---------|
+| 绿茶 | `.tag-green` |
+| 白茶 | `.tag-white` |
+| 黄茶 | `.tag-yellow` |
+| 青茶 | `.tag-oolong` |
+| 红茶 | `.tag-red` |
+| 黑茶 | `.tag-dark` |
+| 花草茶 | `.tag-flower` |
+
+### 使用规范
+
+1. 所有茶类分类展示统一使用 `<Tag category={TeaCategory.XXX} />` 组件，不得自定义样式
+2. 茶类标签颜色通过 CSS 变量 `--color-tea-{category}-bg/text/border` 控制
+3. 新增茶类需同步更新：`Tag.tsx` 组件、`index.css` 色值变量、`teaCategories.ts` 数据源
+
+### 相关文件
+
+- 标签组件：`src/components/common/Tag.tsx`
+- 色值变量：`src/tokens/index.css`（`--color-tea-*`）
+- 茶类数据源：`src/data/teaCategories.ts`
+- 六大茶类页面：`src/pages/product/ProductTeaCategory.tsx`
