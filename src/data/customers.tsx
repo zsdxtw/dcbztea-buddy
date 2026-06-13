@@ -55,7 +55,7 @@ export const CUSTOMER_TYPE_DESC: Record<CustomerItem['type'], string> = {
 export const LEVEL_COLORS: Record<string, { bg: string; color: string }> = {
   'S级': { bg: '#FEF2F4', color: '#CB405D' },
   'A级': { bg: 'var(--color-module-sales-lightest)', color: 'var(--color-module-sales-base)' },
-  'B级': { bg: '#EDF9FC', color: '#0DAFC6' },
+  'B级': { bg: '#EBF3FC', color: '#0F64B5' },
   'C级': { bg: 'var(--color-neutral-100)', color: 'var(--color-neutral-500)' },
 };
 

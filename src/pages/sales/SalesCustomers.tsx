@@ -14,8 +14,8 @@ import {
 } from '../../data/customers';
 
 /* ── 销售模块色 ── */
-const PRIMARY = '#0DAFC6';
-const PRIMARY_LIGHT = '#EDF9FC';
+const PRIMARY = '#0F64B5';
+const PRIMARY_LIGHT = '#EBF3FC';
 const SECONDARY = '#F26E95';
 const SECONDARY_LIGHT = '#FDF0EC';
 
