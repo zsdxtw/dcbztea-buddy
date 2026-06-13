@@ -733,6 +733,11 @@ tbody tr:last-child td { border-bottom: none; }
 @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+/* ── 通用文本链接按钮 ── */
+.link-button { background: transparent; border: none; padding: 2px 4px; color: var(--color-module-current-base); font-size: var(--text-sm); cursor: pointer; transition: color 0.2s ease; }
+.link-button:hover { color: var(--color-module-current-dark); }
+.link-button:focus { outline: none; }
+
 /* ── 茶种卡片悬停编辑按钮 ── */
 .tea-card-edit-btn { opacity: 0; transition: opacity 0.2s ease; }
 .tea-card-hover:hover .tea-card-edit-btn { opacity: 1; }

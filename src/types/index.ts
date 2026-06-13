@@ -509,6 +509,42 @@ export interface BankAccount {
   remark?: string;
 }
 
+/** 客户类型 */
+export type CustomerType = 'direct' | 'channel';
+
+/** 客户平台方 */
+export interface CustomerPlatform {
+  id: string;
+  name: string;
+  code: string;
+  contactPerson: string;
+  contactPhone: string;
+  cooperationDate: string;
+  remark?: string;
+}
+
+/** 客户 */
+export interface CustomerItem {
+  id: string;
+  name: string;
+  type: CustomerType;
+  region: string;
+  contactPerson: string;
+  contactPhone: string;
+  contactEmail?: string;
+  contactAddress?: string;
+  level: string;
+  orders: number;
+  totalAmount: number;
+  /** 直营客户可用的平台方列表；渠道客户为空 */
+  platforms: CustomerPlatform[];
+  cooperationDate: string;
+  status: 'active' | 'inactive';
+  settlementMethod?: string;
+  taxNo?: string;
+  remark?: string;
+}
+
 /** 供应商 */
 export interface SupplierItem {
   id: string;
