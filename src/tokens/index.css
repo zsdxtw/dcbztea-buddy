@@ -32,37 +32,43 @@
   --color-neutral-400: #A5A39A; --color-neutral-500: #8A877E; --color-neutral-600: #5C5A53;
   --color-neutral-700: #3D3B36; --color-neutral-800: #2A2824; --color-neutral-900: #1A1917;
 
-  /* ── 工作台模块色（克莱因蓝） ── */
-  --color-module-dashboard-lightest: #EDF1FA; --color-module-dashboard-light: #C8D5F2;
-  --color-module-dashboard-base: #002FA7; --color-module-dashboard-dark: #00268A;
-  --color-module-dashboard-darkest: #001A66;
+  /* ── 工作台模块色（主色 #023270 + 辅色 #FD7A99） ── */
+  --color-module-dashboard-lightest: #EDF4FC; --color-module-dashboard-light: #C8DEF4;
+  --color-module-dashboard-base: #023270; --color-module-dashboard-dark: #022860;
+  --color-module-dashboard-darkest: #011E50;
+  --color-module-dashboard-secondary: #FD7A99; --color-module-dashboard-secondary-light: #FDCCD8;
 
-  /* ── 模块色（采购） ── */
+  /* ── 模块色（采购）主色 #CB405D + 辅色 #0F64B5 ── */
   --color-module-purchase-lightest: #FEF2F4; --color-module-purchase-light: #FCE7EB;
   --color-module-purchase-base: #CB405D; --color-module-purchase-dark: #B3364F;
   --color-module-purchase-darkest: #8E283E;
+  --color-module-purchase-secondary: #0F64B5; --color-module-purchase-secondary-light: #D6E8F7;
 
-  /* ── 模块色（销售） ── */
+  /* ── 模块色（销售）主色 #0DAFC6 + 辅色 #F4A487 ── */
   --color-module-sales-lightest: #EDF9FC; --color-module-sales-light: #D0F2F8;
   --color-module-sales-base: #0DAFC6; --color-module-sales-dark: #0B97AB;
   --color-module-sales-darkest: #087A8A;
+  --color-module-sales-secondary: #F4A487; --color-module-sales-secondary-light: #FDF0EC;
 
-  /* ── 模块色（仓储） ── */
+  /* ── 模块色（仓储）主色 #5F4027 + 辅色 #FED6B8 ── */
   --color-module-inventory-lightest: #F8F3EF; --color-module-inventory-light: #EFE6DB;
   --color-module-inventory-base: #5F4027; --color-module-inventory-dark: #4F3520;
   --color-module-inventory-darkest: #3A2618;
+  --color-module-inventory-secondary: #FED6B8; --color-module-inventory-secondary-light: #FFF4EE;
 
-  /* ── 模块色（商品） ── */
+  /* ── 模块色（商品）主色 #01795D + 辅色 #FD742D ── */
   --color-module-product-lightest: #EDFAF5; --color-module-product-light: #D0F4E6;
   --color-module-product-base: #01795D; --color-module-product-dark: #01624B;
   --color-module-product-darkest: #01453A;
+  --color-module-product-secondary: #FD742D; --color-module-product-secondary-light: #FEF0E8;
 
-  /* ── 模块色（财务） ── */
+  /* ── 模块色（财务）主色 #27254B + 辅色 #7BA6D1 ── */
   --color-module-finance-lightest: #F0F0F6; --color-module-finance-light: #DCDCE8;
   --color-module-finance-base: #27254B; --color-module-finance-dark: #1F1D3E;
   --color-module-finance-darkest: #161530;
+  --color-module-finance-secondary: #7BA6D1; --color-module-finance-secondary-light: #E8EFF7;
 
-  /* ── 模块色（统计） ── */
+  /* ── 模块色（统计）主色 #F18F4D ── */
   --color-module-statistics-lightest: #FEF5EE; --color-module-statistics-light: #FDE8D6;
   --color-module-statistics-base: #F18F4D; --color-module-statistics-dark: #D87D3F;
   --color-module-statistics-darkest: #B5622A;
@@ -72,10 +78,11 @@
   --color-module-settings-base: #6B7280; --color-module-settings-dark: #5A6170;
   --color-module-settings-darkest: #3E4550;
 
-  /* ── 模块色（人员） ── */
-  --color-module-personnel-lightest: #F3F1FE; --color-module-personnel-light: #E4DFFC;
-  --color-module-personnel-base: #7C6BDB; --color-module-personnel-dark: #6A58C8;
-  --color-module-personnel-darkest: #5040A0;
+  /* ── 模块色（人员）主色 #9D73BD + 辅色 #7BA6D1 ── */
+  --color-module-personnel-lightest: #F5F1FC; --color-module-personnel-light: #E6DCF8;
+  --color-module-personnel-base: #9D73BD; --color-module-personnel-dark: #8A62A8;
+  --color-module-personnel-darkest: #704690;
+  --color-module-personnel-secondary: #7BA6D1; --color-module-personnel-secondary-light: #E8EFF7;
 
   /* ── 六大茶类专属色 ── */
   --color-tea-green: #7BA23F; --color-tea-white: #D6B577; --color-tea-yellow: #C9A84C;
