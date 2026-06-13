@@ -16,7 +16,7 @@ import {
 /* ── 销售模块色 ── */
 const PRIMARY = '#0DAFC6';
 const PRIMARY_LIGHT = '#EDF9FC';
-const SECONDARY = '#FE019A';
+const SECONDARY = '#F4A487';
 const SECONDARY_LIGHT = '#FDF0EC';
 
 /* ── Tab 配置 ── */
