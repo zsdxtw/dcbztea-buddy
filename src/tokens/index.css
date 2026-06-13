@@ -44,11 +44,11 @@
   --color-module-purchase-darkest: #8E283E;
   --color-module-purchase-secondary: #0F64B5; --color-module-purchase-secondary-light: #D6E8F7;
 
-  /* ── 模块色（销售）主色 #0F64B5 + 辅色 #F26E95 ── */
+  /* ── 模块色（销售）主色 #0F64B5 + 辅色 #CB405D ── */
   --color-module-sales-lightest: #EBF3FC; --color-module-sales-light: #C5DAF5;
   --color-module-sales-base: #0F64B5; --color-module-sales-dark: #0C5299;
   --color-module-sales-darkest: #093F7D;
-  --color-module-sales-secondary: #F26E95; --color-module-sales-secondary-light: #FDF0F5;
+  --color-module-sales-secondary: #CB405D; --color-module-sales-secondary-light: #FEF2F4;
 
   /* ── 模块色（仓储）主色 #5F4027 + 辅色 #FED6B8 ── */
   --color-module-inventory-lightest: #F8F3EF; --color-module-inventory-light: #EFE6DB;
