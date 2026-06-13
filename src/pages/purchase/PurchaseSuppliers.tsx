@@ -339,9 +339,15 @@ export default function PurchaseSuppliers() {
 
       {/* 新增供应商抽屉 */}
       {showAddDrawer && (
-        <div className="category-dialog-overlay" onClick={() => setShowAddDrawer(false)}>
-          <div className="category-dialog" onClick={e => e.stopPropagation()} style={{ maxWidth: 780, maxHeight: '90vh', overflow: 'auto' }}>
-            <h3 style={{ marginBottom: 'var(--space-4)' }}>新增供应商</h3>
+        <div className="drawer-overlay" onClick={() => setShowAddDrawer(false)}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
+            <div className="drawer-header">
+              <span className="drawer-title">新增供应商</span>
+              <button className="drawer-close" onClick={() => setShowAddDrawer(false)}>
+                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+            <div className="drawer-body">
 
             {/* 营业执照OCR */}
             <div style={{ background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
@@ -363,116 +369,134 @@ export default function PurchaseSuppliers() {
             </div>
 
             {/* 基本信息 */}
-            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>基本信息</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>供应商类型 *</label>
+            <div className="drawer-section-title">基本信息</div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field">
+                <label className="drawer-label">供应商类型 *</label>
                 <select className="filter-select" style={{ width: '100%' }}>
                   <option value="">请选择</option>
                   <option value="brand">品牌方</option>
                   <option value="partner">合作方</option>
                 </select>
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>名称 *</label>
+              <div className="drawer-form-field">
+                <label className="drawer-label">名称 *</label>
                 <input className="filter-input" placeholder="请输入供应商名称" style={{ width: '100%' }} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>统一社会信用代码 *</label>
+              <div className="drawer-form-field">
+                <label className="drawer-label">统一社会信用代码 *</label>
                 <input className="filter-input" placeholder="请输入18位信用代码" style={{ width: '100%' }} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>公司类型</label>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field">
+                <label className="drawer-label">公司类型</label>
                 <input className="filter-input" placeholder="如：有限责任公司" style={{ width: '100%' }} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>法定代表人</label>
+              <div className="drawer-form-field">
+                <label className="drawer-label">法定代表人</label>
                 <input className="filter-input" placeholder="请输入" style={{ width: '100%' }} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>成立日期</label>
+              <div className="drawer-form-field">
+                <label className="drawer-label">成立日期</label>
                 <input className="filter-input" placeholder="YYYY-MM-DD" style={{ width: '100%' }} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>注册资本</label>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field">
+                <label className="drawer-label">注册资本</label>
                 <input className="filter-input" placeholder="如：500万元" style={{ width: '100%' }} />
               </div>
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>注册地址</label>
+              <div className="drawer-form-field" style={{ flex: 2 }}>
+                <label className="drawer-label">注册地址</label>
                 <input className="filter-input" placeholder="请输入注册地址" style={{ width: '100%' }} />
               </div>
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>经营范围</label>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field">
+                <label className="drawer-label">经营范围</label>
                 <textarea className="filter-input" placeholder="请输入经营范围" style={{ width: '100%', minHeight: 60, resize: 'vertical' }} />
               </div>
             </div>
 
             {/* 联系信息 */}
-            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>联系信息</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>联系人 *</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>联系人职务</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>联系电话 *</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>联系邮箱</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div style={{ gridColumn: '1 / -1' }}><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>联系地址</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+            <div className="drawer-section-title">联系信息</div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">联系人 *</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field"><label className="drawer-label">联系人职务</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field"><label className="drawer-label">联系电话 *</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">联系邮箱</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field" style={{ flex: 2 }}><label className="drawer-label">联系地址</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
             </div>
 
             {/* 合作信息 */}
-            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>合作信息</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>合作时间</label><input className="filter-input" placeholder="YYYY-MM-DD" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>评价等级</label><select className="filter-select" style={{ width: '100%' }}><option value="">请选择</option><option value="S">S级</option><option value="A">A级</option><option value="B">B级</option><option value="C">C级</option><option value="D">D级</option></select></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>主营品类</label><input className="filter-input" placeholder="如：绿茶、红茶" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>结算方式</label><select className="filter-select" style={{ width: '100%' }}><option value="">请选择</option><option value="period">周期结</option><option value="prepaid">先款结</option><option value="invoice">见票结</option><option value="monthly">月结</option><option value="quarterly">季结</option></select></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>付款条件</label><input className="filter-input" placeholder="如：月结30天" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>交货周期</label><input className="filter-input" placeholder="如：3-5个工作日" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>最低起订额(元)</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} type="number" /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>一件代发</label><select className="filter-select" style={{ width: '100%' }}><option value="no">否</option><option value="yes">是</option></select></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>快递费结算</label><select className="filter-select" style={{ width: '100%' }}><option value="free">包邮</option><option value="not_free_fixed">不包邮(固定运费)</option><option value="not_free_ratio">不包邮(按比例)</option><option value="not_free_bear">不包邮(到付)</option></select></div>
-              <div style={{ gridColumn: '1 / -1' }}><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>退货政策</label><input className="filter-input" placeholder="如：质量问题7天内可退换" style={{ width: '100%' }} /></div>
-              <div style={{ gridColumn: '1 / -1' }}><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>质量保证</label><input className="filter-input" placeholder="如：符合GB/T标准" style={{ width: '100%' }} /></div>
+            <div className="drawer-section-title">合作信息</div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">合作时间</label><input className="filter-input" placeholder="YYYY-MM-DD" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field"><label className="drawer-label">评价等级</label><select className="filter-select" style={{ width: '100%' }}><option value="">请选择</option><option value="S">S级</option><option value="A">A级</option><option value="B">B级</option><option value="C">C级</option><option value="D">D级</option></select></div>
+              <div className="drawer-form-field"><label className="drawer-label">主营品类</label><input className="filter-input" placeholder="如：绿茶、红茶" style={{ width: '100%' }} /></div>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }}><option value="">请选择</option><option value="period">周期结</option><option value="prepaid">先款结</option><option value="invoice">见票结</option><option value="monthly">月结</option><option value="quarterly">季结</option></select></div>
+              <div className="drawer-form-field"><label className="drawer-label">付款条件</label><input className="filter-input" placeholder="如：月结30天" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field"><label className="drawer-label">交货周期</label><input className="filter-input" placeholder="如：3-5个工作日" style={{ width: '100%' }} /></div>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">最低起订额(元)</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} type="number" /></div>
+              <div className="drawer-form-field"><label className="drawer-label">一件代发</label><select className="filter-select" style={{ width: '100%' }}><option value="no">否</option><option value="yes">是</option></select></div>
+              <div className="drawer-form-field"><label className="drawer-label">快递费结算</label><select className="filter-select" style={{ width: '100%' }}><option value="free">包邮</option><option value="not_free_fixed">不包邮(固定运费)</option><option value="not_free_ratio">不包邮(按比例)</option><option value="not_free_bear">不包邮(到付)</option></select></div>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">退货政策</label><input className="filter-input" placeholder="如：质量问题7天内可退换" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field"><label className="drawer-label">质量保证</label><input className="filter-input" placeholder="如：符合GB/T标准" style={{ width: '100%' }} /></div>
             </div>
 
             {/* 税务与开票 */}
-            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>税务与开票</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>税务类型</label><select className="filter-select" style={{ width: '100%' }}><option value="small">小规模</option><option value="general">一般纳税人</option></select></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>开票抬头</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>税号</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>税率(%)</label><input className="filter-input" placeholder="如：13" style={{ width: '100%' }} type="number" /></div>
+            <div className="drawer-section-title">税务与开票</div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">税务类型</label><select className="filter-select" style={{ width: '100%' }}><option value="small">小规模</option><option value="general">一般纳税人</option></select></div>
+              <div className="drawer-form-field"><label className="drawer-label">开票抬头</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">税率(%)</label><input className="filter-input" placeholder="如：13" style={{ width: '100%' }} type="number" /></div>
             </div>
 
             {/* 结算银行账号 */}
-            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>结算银行账号</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>户名</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>账号</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>开户行</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
-              <div><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>行号</label><input className="filter-input" placeholder="请输入联行号" style={{ width: '100%' }} /></div>
-              <div style={{ gridColumn: '1 / -1' }}><label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>结算要求备注</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+            <div className="drawer-section-title">结算银行账号</div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">户名</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field"><label className="drawer-label">账号</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field"><label className="drawer-label">开户行</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
+            </div>
+            <div className="drawer-form-row">
+              <div className="drawer-form-field"><label className="drawer-label">行号</label><input className="filter-input" placeholder="请输入联行号" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-field" style={{ flex: 2 }}><label className="drawer-label">结算要求备注</label><input className="filter-input" placeholder="请输入" style={{ width: '100%' }} /></div>
             </div>
 
             {/* 仓库地址 */}
-            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>仓库地址（最多9个）</h4>
+            <div className="drawer-section-title">仓库地址（最多9个）</div>
             <div style={{ background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr 1fr 1fr auto', gap: 'var(--space-2)', alignItems: 'end', marginBottom: 'var(--space-2)' }}>
-                <div><label style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginBottom: 2 }}>仓库名称</label><input className="filter-input" placeholder="如：杭州仓" style={{ width: '100%' }} /></div>
-                <div><label style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginBottom: 2 }}>仓库地址</label><input className="filter-input" placeholder="请输入详细地址" style={{ width: '100%' }} /></div>
-                <div><label style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginBottom: 2 }}>联系人</label><input className="filter-input" placeholder="姓名" style={{ width: '100%' }} /></div>
-                <div><label style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginBottom: 2 }}>电话</label><input className="filter-input" placeholder="电话" style={{ width: '100%' }} /></div>
+              <div className="drawer-form-row" style={{ marginBottom: 'var(--space-2)' }}>
+                <div className="drawer-form-field"><label className="drawer-label" style={{ fontSize: 'var(--text-xs)' }}>仓库名称</label><input className="filter-input" placeholder="如：杭州仓" style={{ width: '100%' }} /></div>
+                <div className="drawer-form-field" style={{ flex: 2 }}><label className="drawer-label" style={{ fontSize: 'var(--text-xs)' }}>仓库地址</label><input className="filter-input" placeholder="请输入详细地址" style={{ width: '100%' }} /></div>
+                <div className="drawer-form-field"><label className="drawer-label" style={{ fontSize: 'var(--text-xs)' }}>联系人</label><input className="filter-input" placeholder="姓名" style={{ width: '100%' }} /></div>
+                <div className="drawer-form-field"><label className="drawer-label" style={{ fontSize: 'var(--text-xs)' }}>电话</label><input className="filter-input" placeholder="电话" style={{ width: '100%' }} /></div>
                 <Button size="sm">添加</Button>
               </div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>供应商仓库将同步至"仓储 &gt; 仓库设置"，作为合作仓库管理</div>
             </div>
 
             {/* 文件上传 */}
-            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>协议文件</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              <div style={{ border: '2px dashed var(--color-border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
+            <div className="drawer-section-title">协议文件</div>
+            <div className="drawer-form-row">
+              <div style={{ flex: 1, border: '2px dashed var(--color-border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4 }}>合作协议</div>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>点击或拖拽上传，支持多份</div>
               </div>
-              <div style={{ border: '2px dashed var(--color-border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
+              <div style={{ flex: 1, border: '2px dashed var(--color-border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4 }}>品牌授权协议</div>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>点击或拖拽上传，支持多份</div>
               </div>
@@ -480,11 +504,11 @@ export default function PurchaseSuppliers() {
 
             {/* 简介 */}
             <div style={{ marginBottom: 'var(--space-4)' }}>
-              <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>供应商简介</label>
+              <label className="drawer-label">供应商简介</label>
               <textarea className="filter-input" placeholder="请输入供应商简介" style={{ width: '100%', minHeight: 80, resize: 'vertical' }} />
             </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
+            </div>
+            <div className="drawer-footer">
               <Button variant="ghost" onClick={() => setShowAddDrawer(false)}>取消</Button>
               <Button onClick={() => setShowAddDrawer(false)}>保存</Button>
             </div>
