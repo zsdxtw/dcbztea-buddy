@@ -16,7 +16,7 @@ import {
 /* ── 销售模块色 ── */
 const PRIMARY = '#0DAFC6';
 const PRIMARY_LIGHT = '#EDF9FC';
-const SECONDARY = '#F4A487';
+const SECONDARY = '#F26E95';
 const SECONDARY_LIGHT = '#FDF0EC';
 
 /* ── Tab 配置 ── */
@@ -152,14 +152,23 @@ export default function SalesCustomers() {
       {/* ── 工具栏 ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
         <input className="filter-input" placeholder={`搜索${CUSTOMER_TYPE_LABELS[activeTab]}名称、联系人、地区...`} value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
-        <Button onClick={() => setShowAddDrawer(true)}>新增</Button>
+        <Button onClick={() => setShowAddDrawer(true)}>
+          <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+          新增
+        </Button>
         {deleteMode ? (
           <>
-            <Button style={{ background: '#F4A487', borderColor: '#F4A487' }} onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0}>删除所选({selectedForDelete.size})</Button>
+            <Button style={{ background: '#F26E95', borderColor: '#F26E95' }} onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0}>
+              <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              删除所选({selectedForDelete.size})
+            </Button>
             <Button variant="ghost" onClick={exitDeleteMode}>取消</Button>
           </>
         ) : (
-          <Button style={{ background: '#F4A487', borderColor: '#F4A487' }} onClick={enterDeleteMode}>删除</Button>
+          <Button style={{ background: '#F26E95', borderColor: '#F26E95' }} onClick={enterDeleteMode}>
+            <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            删除
+          </Button>
         )}
         <span style={{ marginLeft: 'auto', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-400)' }}>共 {filtered.length} 个客户</span>
       </div>
@@ -209,7 +218,7 @@ export default function SalesCustomers() {
             <p style={{ color: 'var(--color-neutral-600)', marginBottom: 'var(--space-4)' }}>确定要删除选中的 {selectedForDelete.size} 个客户吗？此操作不可撤销。</p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button style={{ background: '#F4A487', borderColor: '#F4A487' }} onClick={confirmDelete}>确认删除</Button>
+              <Button style={{ background: '#F26E95', borderColor: '#F26E95' }} onClick={confirmDelete}>确认删除</Button>
             </div>
           </div>
         </div>
