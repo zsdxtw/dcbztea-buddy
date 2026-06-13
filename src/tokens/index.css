@@ -68,21 +68,22 @@
   --color-module-finance-darkest: #161530;
   --color-module-finance-secondary: #7BA6D1; --color-module-finance-secondary-light: #E8EFF7;
 
-  /* ── 模块色（统计）主色 #F18F4D ── */
+  /* ── 模块色（统计）主色 #F18F4D + 辅色 #363636 ── */
   --color-module-statistics-lightest: #FEF5EE; --color-module-statistics-light: #FDE8D6;
   --color-module-statistics-base: #F18F4D; --color-module-statistics-dark: #D87D3F;
   --color-module-statistics-darkest: #B5622A;
+  --color-module-statistics-secondary: #363636; --color-module-statistics-secondary-light: #E8E8E8;
 
   /* ── 模块色（设置） ── */
   --color-module-settings-lightest: #F4F5F7; --color-module-settings-light: #E5E7EB;
   --color-module-settings-base: #6B7280; --color-module-settings-dark: #5A6170;
   --color-module-settings-darkest: #3E4550;
 
-  /* ── 模块色（人员）主色 #9D73BD + 辅色 #7BA6D1 ── */
+  /* ── 模块色（人员）主色 #9D73BD + 辅色 #FDDE83 ── */
   --color-module-personnel-lightest: #F5F1FC; --color-module-personnel-light: #E6DCF8;
   --color-module-personnel-base: #9D73BD; --color-module-personnel-dark: #8A62A8;
   --color-module-personnel-darkest: #704690;
-  --color-module-personnel-secondary: #7BA6D1; --color-module-personnel-secondary-light: #E8EFF7;
+  --color-module-personnel-secondary: #FDDE83; --color-module-personnel-secondary-light: #FEF9E8;
 
   /* ── 六大茶类专属色 ── */
   --color-tea-green: #7BA23F; --color-tea-white: #D6B577; --color-tea-yellow: #C9A84C;
