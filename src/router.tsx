@@ -42,10 +42,7 @@ import ProductManageTeaware from './pages/product/ProductManageTeaware';
 import ProductManagePeripheral from './pages/product/ProductManagePeripheral';
 import ProductManageOther from './pages/product/ProductManageOther';
 import ProductTeaDetail from './pages/product/ProductTeaDetail';
-import ProductCategoryTea from './pages/product/ProductCategoryTea';
-import ProductCategoryTeaware from './pages/product/ProductCategoryTeaware';
-import ProductCategoryPeripheral from './pages/product/ProductCategoryPeripheral';
-import ProductCategoryOther from './pages/product/ProductCategoryOther';
+import ProductCategory from './pages/product/ProductCategory';
 import ProductBrand from './pages/product/ProductBrand';
 import ProductBrandDetail from './pages/product/ProductBrandDetail';
 import ProductPrice from './pages/product/ProductPrice';
@@ -124,7 +121,7 @@ export const router = createBrowserRouter([
       { path: 'product', element: <ProductOverview /> },
       { path: 'product/product-overview', element: <ProductOverview /> },
       { path: 'product/product-manage', element: <Navigate to="product-manage-tea" replace /> },
-      { path: 'product/product-category', element: <Navigate to="product-category-tea" replace /> },
+      { path: 'product/product-category', element: <ProductCategory /> },
       { path: 'product/product-manage-tea', element: <ProductManageTea /> },
       { path: 'product/product-manage-teaware', element: <ProductManageTeaware /> },
       { path: 'product/product-manage-peripheral', element: <ProductManagePeripheral /> },
@@ -133,10 +130,6 @@ export const router = createBrowserRouter([
       { path: 'product/product-tea-category', element: <ProductTeaCategory /> },
       { path: 'product/product-tea-seven', element: <ProductTeaCategory /> },
       { path: 'product/product-tea-list', element: <ProductTeaList /> },
-      { path: 'product/product-category-tea', element: <ProductCategoryTea /> },
-      { path: 'product/product-category-teaware', element: <ProductCategoryTeaware /> },
-      { path: 'product/product-category-peripheral', element: <ProductCategoryPeripheral /> },
-      { path: 'product/product-category-other', element: <ProductCategoryOther /> },
       { path: 'product/product-brand', element: <ProductBrand /> },
       { path: 'product/product-brand/:id', element: <ProductBrandDetail /> },
       { path: 'product/product-price', element: <ProductPrice /> },
