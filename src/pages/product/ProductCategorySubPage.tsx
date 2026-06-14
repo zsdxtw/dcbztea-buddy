@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
 import Card from '../../components/common/Card';
-import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
 import { getTeaCategoryDetail } from '../../data/teaCategories';
 import {
@@ -249,7 +248,10 @@ export default function ProductCategorySubPage({ categoryType, rootNode, hideHea
                   <div className="detail-row">
                     <div className="detail-label">分类层级</div>
                     <div className="detail-value">
-                      <StatusTag variant="info" label={getLevelLabel(depth)} />
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '2px 10px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: '#FFF3EB', color: '#FD742D' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FD742D', flexShrink: 0 }}></span>
+                        {getLevelLabel(depth)}
+                      </span>
                     </div>
                   </div>
                   <div className="detail-row">
@@ -264,7 +266,10 @@ export default function ProductCategorySubPage({ categoryType, rootNode, hideHea
                     <div className="detail-row">
                       <div className="detail-label">发酵种类</div>
                       <div className="detail-value">
-                        <StatusTag variant="success" label={selectedNode.fermentation} />
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '2px 10px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: '#FFF3EB', color: '#FD742D' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FD742D', flexShrink: 0 }}></span>
+                        {selectedNode.fermentation}
+                      </span>
                       </div>
                     </div>
                   )}
