@@ -80,7 +80,7 @@ export default function SalesCustomers() {
   const quickAddPlatform = (shortName: string): string => {
     const id = `p_${Date.now()}`;
     const newPlatform = {
-      id, name: shortName, shortName, code: generatePlatformCode(),
+      id, name: shortName, shortName, code: generatePlatformCode(shortName, platforms.map(p => p.code)),
       contactPerson: '', contactPhone: '', contactAddress: '',
       cooperationDate: new Date().toISOString().slice(0, 10), commissionRate: '',
       bankAccounts: [], invoiceInfos: [], status: 'active' as const,
@@ -207,7 +207,7 @@ export default function SalesCustomers() {
               <div style={{ marginBottom: 'var(--space-4)' }}>
                 <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)' }}>关联平台（{detailCustomer.platformIds.length}）</h4>
                 <Card style={{ padding: 0 }}>
-                  <Table headers={['平台名称', '编号', '简称', '扣点', '联系人', '联系电话']}
+                  <Table headers={['平台名称', '编码', '简称', '扣点', '联系人', '联系电话']}
                     rows={detailCustomer.platformIds.map(id => {
                       const p = platforms.find(x => x.id === id);
                       return p ? [<span key="n" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>, <span key="c" className="mono">{p.code}</span>, <span key="s">{p.shortName}</span>, <span key="cr" style={{ color: SECONDARY }}>{p.commissionRate}</span>, <span key="cp">{p.contactPerson}</span>, <span key="cph" className="mono">{p.contactPhone}</span>] : [<span key="n">未知平台</span>];
@@ -309,7 +309,7 @@ function CreateDrawer({ customerType, platforms, onCancel, onSave, onQuickAddPla
                 </div>
               )}
               <div style={{ background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-                <Table headers={['选择', '平台名称', '编号', '简称', '扣点', '联系人']}
+                <Table headers={['选择', '平台名称', '编码', '简称', '扣点', '联系人']}
                   rows={platforms.map(p => {
                     const checked = form.platformIds.includes(p.id);
                     return [<input key="chk" type="checkbox" checked={checked} onChange={() => togglePlatform(p.id)} />, <span key="n" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>, <span key="c" className="mono">{p.code}</span>, <span key="s">{p.shortName}</span>, <span key="cr" style={{ color: SECONDARY }}>{p.commissionRate}</span>, <span key="cp">{p.contactPerson}</span>];

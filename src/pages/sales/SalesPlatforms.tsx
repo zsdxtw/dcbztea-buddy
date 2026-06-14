@@ -64,7 +64,7 @@ export default function SalesPlatforms() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
-        <input className="filter-input" placeholder="搜索平台名称、编号、联系人..." value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
+        <input className="filter-input" placeholder="搜索平台名称、编码、联系人..." value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
         <Button onClick={() => setShowAddDrawer(true)}>
           <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
           新增
@@ -88,7 +88,7 @@ export default function SalesPlatforms() {
 
       <Card style={{ padding: 0 }}>
         <Table
-          headers={[deleteMode ? '选择' : '序号', '平台名称', '编号', '简称', '联系人', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
+          headers={[deleteMode ? '选择' : '序号', '平台名称', '编码', '简称', '联系人', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
           rows={filtered.map((p, idx) => [
             deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(p.id)} onChange={() => toggleSelect(p.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
             <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>,
@@ -142,7 +142,7 @@ export default function SalesPlatforms() {
               <div style={grid2}>
                 <Field label="平台名称">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.name ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, name: e.target.value } : prev)} /> : <Text>{selected.name}</Text>}</Field>
                 <Field label="平台简称">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.shortName ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, shortName: e.target.value } : prev)} /> : <Text>{selected.shortName}</Text>}</Field>
-                <Field label="平台编号"><Text className="mono">{selected.code}</Text></Field>
+                <Field label="平台编码"><Text className="mono">{selected.code}</Text></Field>
                 <Field label="联系人">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactPerson ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /> : <Text>{selected.contactPerson}</Text>}</Field>
                 <Field label="联系电话">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactPhone ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /> : <Text>{selected.contactPhone}</Text>}</Field>
                 <Field label="联系地址">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactAddress ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /> : <Text>{selected.contactAddress || '—'}</Text>}</Field>
@@ -194,13 +194,13 @@ export default function SalesPlatforms() {
       )}
 
       {/* 新增抽屉 */}
-      {showAddDrawer && <AddPlatformDrawer onCancel={() => setShowAddDrawer(false)} onSave={item => { setData(prev => [item, ...prev]); setShowAddDrawer(false); }} />}
+      {showAddDrawer && <AddPlatformDrawer onCancel={() => setShowAddDrawer(false)} onSave={item => { setData(prev => [item, ...prev]); setShowAddDrawer(false); }} existingCodes={data.map(p => p.code)} />}
     </div>
   );
 }
 
 /* ── 新增平台抽屉 ── */
-function AddPlatformDrawer({ onCancel, onSave }: { onCancel: () => void; onSave: (item: PlatformItem) => void }) {
+function AddPlatformDrawer({ onCancel, onSave, existingCodes }: { onCancel: () => void; onSave: (item: PlatformItem) => void; existingCodes: string[] }) {
   const [form, setForm] = useState<Partial<PlatformItem>>({
     name: '', shortName: '', contactPerson: '', contactPhone: '', contactAddress: '',
     cooperationDate: new Date().toISOString().slice(0, 10), commissionRate: '', status: 'active',
@@ -228,7 +228,7 @@ function AddPlatformDrawer({ onCancel, onSave }: { onCancel: () => void; onSave:
   const handleSave = () => {
     if (!canSave) return;
     onSave({
-      id: `p_${Date.now()}`, name: form.name!, shortName: form.shortName!, code: generatePlatformCode(),
+      id: `p_${Date.now()}`, name: form.name!, shortName: form.shortName!, code: generatePlatformCode(form.shortName!, existingCodes),
       contactPerson: form.contactPerson ?? '', contactPhone: form.contactPhone ?? '', contactAddress: form.contactAddress ?? '',
       cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10), commissionRate: form.commissionRate ?? '',
       bankAccounts, invoiceInfos, status: 'active', remark: form.remark,
