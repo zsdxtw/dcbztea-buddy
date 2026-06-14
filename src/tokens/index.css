@@ -50,11 +50,11 @@
   --color-module-sales-darkest: #093F7D;
   --color-module-sales-secondary: #CB405D; --color-module-sales-secondary-light: #FEF2F4;
 
-  /* ── 模块色（仓储）主色 #5F4027 + 辅色 #FED6B8 ── */
-  --color-module-inventory-lightest: #F8F3EF; --color-module-inventory-light: #EFE6DB;
-  --color-module-inventory-base: #5F4027; --color-module-inventory-dark: #4F3520;
-  --color-module-inventory-darkest: #3A2618;
-  --color-module-inventory-secondary: #FED6B8; --color-module-inventory-secondary-light: #FFF4EE;
+  /* ── 模块色（仓储）主色 #F18F4D + 辅色 #363636 ── */
+  --color-module-inventory-lightest: #FEF5EE; --color-module-inventory-light: #FDE8D6;
+  --color-module-inventory-base: #F18F4D; --color-module-inventory-dark: #D87D3F;
+  --color-module-inventory-darkest: #B5622A;
+  --color-module-inventory-secondary: #363636; --color-module-inventory-secondary-light: #E8E8E8;
 
   /* ── 模块色（商品）主色 #01795D + 辅色 #FD742D ── */
   --color-module-product-lightest: #EDFAF5; --color-module-product-light: #D0F4E6;
@@ -68,11 +68,11 @@
   --color-module-finance-darkest: #161530;
   --color-module-finance-secondary: #7BA6D1; --color-module-finance-secondary-light: #E8EFF7;
 
-  /* ── 模块色（统计）主色 #F18F4D + 辅色 #363636 ── */
-  --color-module-statistics-lightest: #FEF5EE; --color-module-statistics-light: #FDE8D6;
-  --color-module-statistics-base: #F18F4D; --color-module-statistics-dark: #D87D3F;
-  --color-module-statistics-darkest: #B5622A;
-  --color-module-statistics-secondary: #363636; --color-module-statistics-secondary-light: #E8E8E8;
+  /* ── 模块色（统计）主色 #5F4027 + 辅色 #FED6B8 ── */
+  --color-module-statistics-lightest: #F8F3EF; --color-module-statistics-light: #EFE6DB;
+  --color-module-statistics-base: #5F4027; --color-module-statistics-dark: #4F3520;
+  --color-module-statistics-darkest: #3A2618;
+  --color-module-statistics-secondary: #FED6B8; --color-module-statistics-secondary-light: #FFF4EE;
 
   /* ── 模块色（设置） ── */
   --color-module-settings-lightest: #F4F5F7; --color-module-settings-light: #E5E7EB;
