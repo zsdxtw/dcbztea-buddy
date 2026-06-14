@@ -53,6 +53,7 @@ export default function ProductCategory() {
         key={activeTab}
         categoryType={currentTab.key}
         rootNode={currentTab.rootNode}
+        hideHeader
       />
     </>
   );

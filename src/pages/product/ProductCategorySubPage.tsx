@@ -17,10 +17,11 @@ import {
 interface ProductCategorySubPageProps {
   categoryType: ProductCategoryType;
   rootNode: CategoryNode;
+  hideHeader?: boolean;
 }
 
 /** 分类管理子页面（茶叶/茶具/茶周边/其他） */
-export default function ProductCategorySubPage({ categoryType, rootNode }: ProductCategorySubPageProps) {
+export default function ProductCategorySubPage({ categoryType, rootNode, hideHeader }: ProductCategorySubPageProps) {
   const label = productCategoryLabels[categoryType];
   const breadcrumb = productCategoryBreadcrumbs[categoryType];
 
@@ -204,7 +205,7 @@ export default function ProductCategorySubPage({ categoryType, rootNode }: Produ
 
   return (
     <>
-      <ContentHeader title={breadcrumb} breadcrumbs={['商品', '分类管理', breadcrumb]} />
+      {!hideHeader && <ContentHeader title={breadcrumb} breadcrumbs={['商品', '分类管理', breadcrumb]} />}
       <div className="content-body">
         <div className="category-layout">
           {/* 左侧分类树 - 直接展示二级分类 */}
