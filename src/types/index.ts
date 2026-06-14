@@ -512,14 +512,35 @@ export interface BankAccount {
 /** 客户类型 */
 export type CustomerType = 'direct' | 'channel';
 
-/** 客户平台方 */
-export interface CustomerPlatform {
+/** 平台结算账户 */
+export interface PlatformBankAccount {
+  accountName: string;
+  accountNo: string;
+  bankName: string;
+  bankNo: string;
+}
+
+/** 平台发票信息 */
+export interface PlatformInvoiceInfo {
+  invoiceEntity: string;
+  taxNo: string;
+  taxRate: string;
+}
+
+/** 平台 */
+export interface PlatformItem {
   id: string;
   name: string;
+  shortName: string;
   code: string;
   contactPerson: string;
   contactPhone: string;
+  contactAddress: string;
   cooperationDate: string;
+  commissionRate: string;
+  bankAccounts: PlatformBankAccount[];
+  invoiceInfos: PlatformInvoiceInfo[];
+  status: 'active' | 'inactive';
   remark?: string;
 }
 
@@ -536,8 +557,8 @@ export interface CustomerItem {
   level: string;
   orders: number;
   totalAmount: number;
-  /** 直营客户可用的平台方列表；渠道客户为空 */
-  platforms: CustomerPlatform[];
+  /** 直营客户关联的平台ID列表；渠道客户为空 */
+  platformIds: string[];
   cooperationDate: string;
   status: 'active' | 'inactive';
   settlementMethod?: string;
