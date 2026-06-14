@@ -366,7 +366,33 @@ body {
   padding: var(--space-5) var(--space-7); background: var(--color-neutral-0);
   border-bottom: 1px solid var(--color-neutral-200); display: flex;
   align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: var(--z-sticky);
+  overflow: hidden;
 }
+/* ── 工作台 Banner 中式纹样 ── */
+[data-module="dashboard"] .content-header {
+  background: linear-gradient(135deg, #023270 0%, #0a4a8c 40%, #023270 100%);
+  border-bottom-color: #023270;
+}
+[data-module="dashboard"] .content-header::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; opacity: 0.08; pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5L35 15L45 15L37 22L40 32L30 26L20 32L23 22L15 15L25 15Z' fill='%23fff' fill-opacity='0.6'/%3E%3Ccircle cx='8' cy='8' r='2' fill='%23fff' fill-opacity='0.3'/%3E%3Ccircle cx='52' cy='52' r='2' fill='%23fff' fill-opacity='0.3'/%3E%3Cpath d='M5 45Q10 40 15 45Q20 50 25 45' stroke='%23fff' stroke-opacity='0.3' fill='none' stroke-width='0.8'/%3E%3Cpath d='M35 45Q40 40 45 45Q50 50 55 45' stroke='%23fff' stroke-opacity='0.3' fill='none' stroke-width='0.8'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+[data-module="dashboard"] .content-header::after {
+  content: '';
+  position: absolute; right: 0; top: 0; bottom: 0; width: 320px; z-index: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(253,122,153,0.06) 100%);
+}
+[data-module="dashboard"] .content-header > * { position: relative; z-index: 1; }
+[data-module="dashboard"] .breadcrumb,
+[data-module="dashboard"] .breadcrumb-current { color: rgba(255,255,255,0.65); }
+[data-module="dashboard"] .breadcrumb-separator { color: rgba(255,255,255,0.4); }
+[data-module="dashboard"] .page-title { color: #fff; }
+[data-module="dashboard"] .page-title-accent { background-color: #FD7A99; }
+[data-module="dashboard"] .content-header-actions .btn { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+[data-module="dashboard"] .content-header-actions .btn:hover { background: rgba(255,255,255,0.25); }
 .content-header-left { display: flex; align-items: center; gap: var(--space-4); }
 .breadcrumb { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--color-neutral-600); }
 .breadcrumb-separator { font-size: var(--text-xs); }
