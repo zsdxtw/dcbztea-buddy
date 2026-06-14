@@ -57,7 +57,7 @@ export default function SalesPlatforms() {
 
   return (
     <div>
-      <ContentHeader title="平台管理" breadcrumbs={['销售', '平台管理']} />
+      <ContentHeader title="平台方管理" breadcrumbs={['销售', '平台方管理']} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
         {stats.map((s, i) => <StatCard key={i} data={s} />)}
@@ -88,13 +88,14 @@ export default function SalesPlatforms() {
 
       <Card style={{ padding: 0 }}>
         <Table
-          headers={[deleteMode ? '选择' : '序号', '平台名称', '编码', '简称', '联系人', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
+          headers={[deleteMode ? '选择' : '序号', '平台名称', '编码', '简称', '联系人', '联系人职务', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
           rows={filtered.map((p, idx) => [
             deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(p.id)} onChange={() => toggleSelect(p.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
             <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>,
             <span key="code" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.code}</span>,
             <span key="sn">{p.shortName}</span>,
             <span key="cp">{p.contactPerson}</span>,
+            <span key="cpo" style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-xs)' }}>{p.contactPosition || '—'}</span>,
             <span key="cph" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.contactPhone}</span>,
             <span key="cr" style={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{p.commissionRate}</span>,
             <span key="ba" className="mono">{p.bankAccounts.length}个</span>,
@@ -144,6 +145,7 @@ export default function SalesPlatforms() {
                 <Field label="平台简称">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.shortName ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, shortName: e.target.value } : prev)} /> : <Text>{selected.shortName}</Text>}</Field>
                 <Field label="平台编码"><Text className="mono">{selected.code}</Text></Field>
                 <Field label="联系人">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactPerson ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /> : <Text>{selected.contactPerson}</Text>}</Field>
+                <Field label="联系人职务">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactPosition ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPosition: e.target.value } : prev)} /> : <Text>{selected.contactPosition || '—'}</Text>}</Field>
                 <Field label="联系电话">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactPhone ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /> : <Text>{selected.contactPhone}</Text>}</Field>
                 <Field label="联系地址">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactAddress ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /> : <Text>{selected.contactAddress || '—'}</Text>}</Field>
                 <Field label="合作日期">{editing ? <input className="filter-input" style={{ width: '100%' }} type="date" value={editForm?.cooperationDate ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, cooperationDate: e.target.value } : prev)} /> : <Text>{selected.cooperationDate}</Text>}</Field>
@@ -202,7 +204,7 @@ export default function SalesPlatforms() {
 /* ── 新增平台抽屉 ── */
 function AddPlatformDrawer({ onCancel, onSave, existingCodes }: { onCancel: () => void; onSave: (item: PlatformItem) => void; existingCodes: string[] }) {
   const [form, setForm] = useState<Partial<PlatformItem>>({
-    name: '', shortName: '', contactPerson: '', contactPhone: '', contactAddress: '',
+    name: '', shortName: '', contactPerson: '', contactPosition: '', contactPhone: '', contactAddress: '',
     cooperationDate: new Date().toISOString().slice(0, 10), commissionRate: '', status: 'active',
     bankAccounts: [], invoiceInfos: [], remark: '',
   });
@@ -229,7 +231,7 @@ function AddPlatformDrawer({ onCancel, onSave, existingCodes }: { onCancel: () =
     if (!canSave) return;
     onSave({
       id: `p_${Date.now()}`, name: form.name!, shortName: form.shortName!, code: generatePlatformCode(form.shortName!, existingCodes),
-      contactPerson: form.contactPerson ?? '', contactPhone: form.contactPhone ?? '', contactAddress: form.contactAddress ?? '',
+      contactPerson: form.contactPerson ?? '', contactPosition: form.contactPosition ?? '', contactPhone: form.contactPhone ?? '', contactAddress: form.contactAddress ?? '',
       cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10), commissionRate: form.commissionRate ?? '',
       bankAccounts, invoiceInfos, status: 'active', remark: form.remark,
     } as PlatformItem);
@@ -248,6 +250,7 @@ function AddPlatformDrawer({ onCancel, onSave, existingCodes }: { onCancel: () =
             <Field label="平台名称 *"><input className="filter-input" style={{ width: '100%' }} value={form.name ?? ''} onChange={e => update('name', e.target.value)} placeholder="请输入平台全称" /></Field>
             <Field label="平台简称 *"><input className="filter-input" style={{ width: '100%' }} value={form.shortName ?? ''} onChange={e => update('shortName', e.target.value)} placeholder="如：京东慧采" /></Field>
             <Field label="联系人"><input className="filter-input" style={{ width: '100%' }} value={form.contactPerson ?? ''} onChange={e => update('contactPerson', e.target.value)} /></Field>
+            <Field label="联系人职务"><input className="filter-input" style={{ width: '100%' }} value={form.contactPosition ?? ''} onChange={e => update('contactPosition', e.target.value)} placeholder="如：采购总监" /></Field>
             <Field label="联系电话"><input className="filter-input" style={{ width: '100%' }} value={form.contactPhone ?? ''} onChange={e => update('contactPhone', e.target.value)} /></Field>
             <Field label="联系地址" full><input className="filter-input" style={{ width: '100%' }} value={form.contactAddress ?? ''} onChange={e => update('contactAddress', e.target.value)} /></Field>
             <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={form.cooperationDate ?? ''} onChange={e => update('cooperationDate', e.target.value)} /></Field>

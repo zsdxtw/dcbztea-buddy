@@ -237,7 +237,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'sales-quotations', label: '报价管理', icon: <QuotationIcon /> },
       { key: 'sales-outbound', label: '出库管理', icon: <OutboundIcon /> },
       { key: 'sales-customers', label: '客户管理', icon: <CustomersIcon /> },
-      { key: 'sales-platforms', label: '平台管理', icon: <PlatformIcon /> },
+      { key: 'sales-platforms', label: '平台方管理', icon: <PlatformIcon /> },
       { key: 'sales-return', label: '销售退货', icon: <ReturnIcon /> },
       { key: 'sales-performance', label: '业绩统计', icon: <PerformanceIcon /> },
     ],

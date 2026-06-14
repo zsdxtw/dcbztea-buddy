@@ -534,6 +534,7 @@ export interface PlatformItem {
   shortName: string;
   code: string;
   contactPerson: string;
+  contactPosition: string;
   contactPhone: string;
   contactAddress: string;
   cooperationDate: string;
@@ -563,6 +564,8 @@ export interface CustomerItem {
   status: 'active' | 'inactive';
   settlementMethod?: string;
   taxNo?: string;
+  /** 客户来源 */
+  source?: string;
   remark?: string;
 }
 

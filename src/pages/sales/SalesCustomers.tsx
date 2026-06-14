@@ -81,7 +81,7 @@ export default function SalesCustomers() {
     const id = `p_${Date.now()}`;
     const newPlatform = {
       id, name: shortName, shortName, code: generatePlatformCode(shortName, platforms.map(p => p.code)),
-      contactPerson: '', contactPhone: '', contactAddress: '',
+      contactPerson: '', contactPosition: '', contactPhone: '', contactAddress: '',
       cooperationDate: new Date().toISOString().slice(0, 10), commissionRate: '',
       bankAccounts: [], invoiceInfos: [], status: 'active' as const,
     };
@@ -145,7 +145,7 @@ export default function SalesCustomers() {
 
       <Card style={{ padding: 0 }}>
         <Table
-          headers={[...(deleteMode ? ['选择'] : ['序号']), '客户名称', ...(activeTab === 'direct' ? ['平台方'] : []), '地区', '联系人', '联系电话', '等级', '订单数', '累计金额', '状态', '操作']}
+          headers={[...(deleteMode ? ['选择'] : ['序号']), '客户名称', ...(activeTab === 'direct' ? ['平台方'] : []), '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
           rows={filtered.map((c, idx) => {
             const cells: React.ReactNode[] = [
               deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(c.id)} onChange={() => toggleSelect(c.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
@@ -156,6 +156,7 @@ export default function SalesCustomers() {
               <span key="region">{c.region}</span>,
               <span key="cp">{c.contactPerson}</span>,
               <span key="cph" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{c.contactPhone}</span>,
+              <span key="src" style={{ fontSize: 'var(--text-xs)', color: c.source ? 'var(--color-neutral-700)' : 'var(--color-neutral-300)' }}>{c.source || '—'}</span>,
               <span key="lv">{levelTag(c.level)}</span>,
               <span key="ord" className="mono">{c.orders}</span>,
               <span key="amt" className="mono" style={{ fontWeight: 'var(--font-medium)', color: SECONDARY }}>¥{(c.totalAmount / 10000).toFixed(1)}万</span>,
@@ -198,7 +199,7 @@ export default function SalesCustomers() {
               <button className="drawer-close" onClick={() => setDetailCustomer(null)}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              {([['联系邮箱', detailCustomer.contactEmail || '—'], ['联系地址', detailCustomer.contactAddress || '—'], ['结算方式', detailCustomer.settlementMethod || '—'], ['税号', detailCustomer.taxNo || '—'], ['合作日期', detailCustomer.cooperationDate], ['累计金额', `¥${(detailCustomer.totalAmount / 10000).toFixed(1)}万`]] as [string, string][]).map(([label, value]) => (
+              {([['联系邮箱', detailCustomer.contactEmail || '—'], ['联系地址', detailCustomer.contactAddress || '—'], ['结算方式', detailCustomer.settlementMethod || '—'], ['客户来源', detailCustomer.source || '—'], ['税号', detailCustomer.taxNo || '—'], ['合作日期', detailCustomer.cooperationDate], ['累计金额', `¥${(detailCustomer.totalAmount / 10000).toFixed(1)}万`]] as [string, string][]).map(([label, value]) => (
                 <div key={label} style={{ fontSize: 'var(--text-sm)' }}><span style={{ color: 'var(--color-neutral-500)' }}>{label}：</span><span style={{ color: 'var(--color-neutral-800)', fontWeight: 'var(--font-medium)' }}>{value}</span></div>
               ))}
               {detailCustomer.remark && <div style={{ gridColumn: '1 / -1', fontSize: 'var(--text-sm)' }}><span style={{ color: 'var(--color-neutral-500)' }}>备注：</span><span style={{ color: 'var(--color-neutral-800)' }}>{detailCustomer.remark}</span></div>}
@@ -243,7 +244,7 @@ function CreateDrawer({ customerType, platforms, onCancel, onSave, onQuickAddPla
   const [form, setForm] = useState<CustomerItem>({
     id: `c_${Date.now()}`, name: '', type: customerType, region: '', contactPerson: '', contactPhone: '',
     contactEmail: '', contactAddress: '', level: 'B级', orders: 0, totalAmount: 0, platformIds: [],
-    cooperationDate: new Date().toISOString().slice(0, 10), status: 'active', settlementMethod: '月结', taxNo: '', remark: '',
+    cooperationDate: new Date().toISOString().slice(0, 10), status: 'active', settlementMethod: '月结', taxNo: '', source: '', remark: '',
   });
   const [quickPlatformName, setQuickPlatformName] = useState('');
 
@@ -284,11 +285,12 @@ function CreateDrawer({ customerType, platforms, onCancel, onSave, onQuickAddPla
           <div className="drawer-section-title">合作信息</div>
           <div className="drawer-form-row">
             <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }} value={form.settlementMethod || ''} onChange={e => update('settlementMethod', e.target.value)}><option value="月结">月结</option><option value="预付">预付</option><option value="季度">季度结算</option><option value="现款">现款</option></select></div>
+            <div className="drawer-form-field"><label className="drawer-label">客户来源</label><select className="filter-select" style={{ width: '100%' }} value={form.source || ''} onChange={e => update('source', e.target.value)}><option value="">请选择</option><option value="主动开发">主动开发</option><option value="展会拓客">展会拓客</option><option value="老客户转介">老客户转介</option><option value="平台引流">平台引流</option><option value="线上咨询">线上咨询</option><option value="其他">其他</option></select></div>
             <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>
-            <div className="drawer-form-field"><label className="drawer-label">状态</label><select className="filter-select" style={{ width: '100%' }} value={form.status} onChange={e => update('status', e.target.value as CustomerItem['status'])}><option value="active">合作中</option><option value="inactive">已暂停</option></select></div>
           </div>
           <div className="drawer-form-row">
             <div className="drawer-form-field" style={{ flex: 1 }}><label className="drawer-label">备注</label><input className="filter-input" style={{ width: '100%' }} value={form.remark || ''} onChange={e => update('remark', e.target.value)} /></div>
+            <div className="drawer-form-field"><label className="drawer-label">状态</label><select className="filter-select" style={{ width: '100%' }} value={form.status} onChange={e => update('status', e.target.value as CustomerItem['status'])}><option value="active">合作中</option><option value="inactive">已暂停</option></select></div>
           </div>
 
           {customerType === 'direct' && (
