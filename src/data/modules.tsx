@@ -53,6 +53,9 @@ const OutboundIcon = () => (
 const CustomersIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M2 16a5 5 0 0110 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="15" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.2"/></svg>
 );
+const PlatformIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M7 6V4a1.5 1.5 0 011.5-1.5h3A1.5 1.5 0 0113 4v2" stroke="currentColor" strokeWidth="1.2"/><path d="M10 9.5v2M9 10.5h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
 const StockIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M3 9h14M7 5V3h6v2" stroke="currentColor" strokeWidth="1.3"/></svg>
 );
@@ -89,6 +92,9 @@ const TeaCategoryAnalysisIcon = () => (
 const SpecsIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg>
 );
+const PriceIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v14M6 7h8M6 13h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="14" cy="13" r="3" stroke="currentColor" strokeWidth="1.3"/></svg>
+);
 const ReceivableIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><path d="M4 7l6-4 6 4v6l-6 4-6-4V7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>
 );
@@ -100,6 +106,9 @@ const ReconciliationIcon = () => (
 );
 const SalesAnalysisIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-5 3 2 4-6 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+);
+const BrandAnalysisIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M10 3l6 3.5v7L10 17l-6-3.5v-7L10 3z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.0"/></svg>
 );
 const PurchaseAnalysisIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="10" width="4" height="7" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="8" y="6" width="4" height="11" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="13" y="3" width="4" height="14" rx="0.5" stroke="currentColor" strokeWidth="1.3"/></svg>
@@ -185,6 +194,12 @@ const UserManagementIcon = () => (
 const DataBackupIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/><path d="M10 1v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
 );
+const PersonnelTabIcon = () => (
+  <svg viewBox="0 0 18 18" fill="none"><circle cx="6" cy="6" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M1 15a5 5 0 0110 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="14" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.2"/><path d="M12 14a4 4 0 015 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
+const TeaProfessionalIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" strokeWidth="1.3"/><path d="M3 18a7 7 0 0114 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><path d="M14 4l2-2M16 4l-2-2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
 
 /* ── 模块配置 ── */
 
@@ -222,6 +237,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'sales-quotations', label: '报价管理', icon: <QuotationIcon /> },
       { key: 'sales-outbound', label: '出库管理', icon: <OutboundIcon /> },
       { key: 'sales-customers', label: '客户管理', icon: <CustomersIcon /> },
+      { key: 'sales-platforms', label: '平台方管理', icon: <PlatformIcon /> },
       { key: 'sales-return', label: '销售退货', icon: <ReturnIcon /> },
       { key: 'sales-performance', label: '业绩统计', icon: <PerformanceIcon /> },
     ],
@@ -246,16 +262,19 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '商品',
     menus: [
       { key: 'product-overview', label: '商品概览', icon: <OverviewIcon /> },
-      { key: 'product-list', label: '商品列表', icon: <ProductListIcon /> },
-      { key: 'product-tea-category', label: '茶类档案', icon: <CategoryIcon />, children: [
+      { key: 'product-manage', label: '商品管理', icon: <ProductListIcon />, children: [
+        { key: 'product-manage-tea', label: '茶叶', icon: <ProductListIcon /> },
+        { key: 'product-manage-teaware', label: '茶具', icon: <ProductListIcon /> },
+        { key: 'product-manage-peripheral', label: '茶周边', icon: <ProductListIcon /> },
+        { key: 'product-manage-other', label: '其他', icon: <ProductListIcon /> },
+      ] },
+      { key: 'product-category', label: '分类管理', icon: <ProductCategoryIcon /> },
+      { key: 'product-brand', label: '品牌管理', icon: <BrandIcon /> },
+      { key: 'product-price', label: '价格管理', icon: <PriceIcon /> },
+      { key: 'product-tea-category', label: '茶叶档案', icon: <CategoryIcon />, children: [
         { key: 'product-tea-seven', label: '六大茶类', icon: <CategoryIcon /> },
         { key: 'product-tea-list', label: '茶种大全', icon: <CategoryIcon /> },
       ] },
-      { key: 'product-grade', label: '品级管理', icon: <GradeIcon /> },
-      { key: 'product-specs', label: '规格管理', icon: <SpecsIcon /> },
-      { key: 'product-category', label: '分类管理', icon: <ProductCategoryIcon /> },
-      { key: 'product-brand', label: '品牌管理', icon: <BrandIcon /> },
-      { key: 'product-unit', label: '单位管理', icon: <UnitIcon /> },
     ],
   },
   [ModuleKey.FINANCE]: {
@@ -278,6 +297,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '统计',
     menus: [
       { key: 'statistics-sales', label: '销售分析', icon: <SalesAnalysisIcon /> },
+      { key: 'statistics-brand', label: '品牌分析', icon: <BrandAnalysisIcon /> },
       { key: 'statistics-purchase', label: '采购分析', icon: <PurchaseAnalysisIcon /> },
       { key: 'statistics-inventory', label: '库存分析', icon: <InventoryAnalysisIcon /> },
       { key: 'statistics-finance', label: '财务报表', icon: <FinanceReportIcon /> },
@@ -295,6 +315,14 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'settings-about', label: '关于', icon: <AboutIcon /> },
       { key: 'settings-user-management', label: '用户管理', icon: <UserManagementIcon /> },
       { key: 'settings-data-backup', label: '数据备份', icon: <DataBackupIcon /> },
+      { key: 'settings-unit', label: '单位设置', icon: <UnitIcon /> },
+    ],
+  },
+  [ModuleKey.PERSONNEL]: {
+    key: ModuleKey.PERSONNEL,
+    label: '人员',
+    menus: [
+      { key: 'personnel-tea-professional', label: '茶人管理', icon: <TeaProfessionalIcon /> },
     ],
   },
 };
@@ -309,8 +337,9 @@ export const TOPNAV_TABS: Array<{ key: ModuleKey; label: string; icon: React.Rea
   { key: ModuleKey.DASHBOARD, label: '工作台', icon: <DashboardTabIcon /> },
   { key: ModuleKey.PURCHASE, label: '采购', icon: <PurchaseTabIcon /> },
   { key: ModuleKey.SALES, label: '销售', icon: <SalesTabIcon /> },
-  { key: ModuleKey.INVENTORY, label: '仓储', icon: <InventoryTabIcon /> },
   { key: ModuleKey.PRODUCT, label: '商品', icon: <ProductTabIcon /> },
+  { key: ModuleKey.INVENTORY, label: '仓储', icon: <InventoryTabIcon /> },
+  { key: ModuleKey.PERSONNEL, label: '人员', icon: <PersonnelTabIcon /> },
   { key: ModuleKey.FINANCE, label: '财务', icon: <FinanceTabIcon /> },
   { key: ModuleKey.STATISTICS, label: '统计', icon: <StatisticsTabIcon /> },
   { key: ModuleKey.SETTINGS, label: '系统', icon: <SettingsTabIcon /> },

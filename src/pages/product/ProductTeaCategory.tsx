@@ -7,7 +7,7 @@ import Button from '../../components/common/Button';
 import { teaCategories as initialTeaCategories } from '../../data/teaCategories';
 import type { TeaCategoryDetail } from '../../types';
 
-/** 茶类档案页面 */
+/** 茶叶档案页面 */
 export default function ProductTeaCategory() {
   const [categories, setCategories] = useState<TeaCategoryDetail[]>(initialTeaCategories);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
@@ -35,7 +35,7 @@ export default function ProductTeaCategory() {
 
   return (
     <>
-      <ContentHeader title="六大茶类" breadcrumbs={['商品', '茶类档案', '六大茶类']} />
+      <ContentHeader title="六大茶类" breadcrumbs={['商品', '茶叶档案', '六大茶类']} />
       <div className="content-body">
         <Card title="六大茶类及花草茶">
           <Table

@@ -153,7 +153,7 @@ export default function ProductTeaList() {
 
   return (
     <>
-      <ContentHeader title="茶种大全" breadcrumbs={['商品', '茶类档案', '茶种大全']} />
+      <ContentHeader title="茶种大全" breadcrumbs={['商品', '茶叶档案', '茶种大全']} />
       <div className="content-body">
         {/* 筛选区 */}
         <Card>

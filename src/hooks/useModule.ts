@@ -19,6 +19,7 @@ export function useModule() {
     [ModuleKey.FINANCE]: '财务',
     [ModuleKey.STATISTICS]: '统计',
     [ModuleKey.SETTINGS]: '设置',
+    [ModuleKey.PERSONNEL]: '人员',
   };
 
   return {

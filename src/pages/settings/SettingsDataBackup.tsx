@@ -61,7 +61,7 @@ export default function SettingsDataBackup() {
               <StatusTag variant={backupStatusToVariant(b.status)} label={backupStatusLabel(b.status)} />,
               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                 <Button variant="ghost" size="sm">恢复</Button>
-                <Button variant="ghost" size="sm" style={{ color: '#FD742D' }}>删除</Button>
+                <Button variant="ghost" size="sm" style={{ color: '#E41726' }}>删除</Button>
               </div>,
             ])}
           />

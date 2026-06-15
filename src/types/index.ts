@@ -8,6 +8,7 @@ export enum ModuleKey {
   FINANCE = 'finance',
   STATISTICS = 'statistics',
   SETTINGS = 'settings',
+  PERSONNEL = 'personnel',
 }
 
 /** 六大茶类 */
@@ -119,7 +120,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 export type ButtonSize = 'default' | 'sm';
 
 /** 状态标签变体 */
-export type StatusVariant = 'success' | 'warning' | 'error' | 'info';
+export type StatusVariant = 'success' | 'warning' | 'error' | 'info' | 'default';
 
 /** 通知类型 */
 export enum NotificationType {
@@ -345,4 +346,268 @@ export interface BrandItem {
   supplierCount: number;
   website: string;
   cooperationDate: string;
+}
+
+/** 茶叶商品 */
+export interface TeaProduct {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+  categories: string[];
+  brand: string;
+  series: string;
+  packageUnit: string;
+  barcode69: string;
+  model: string;
+  spec: string;
+  /** 每份规格 */
+  perUnitSpec: {
+    netWeight: number;       // 净重
+    netWeightUnit: string;   // 净重单位
+    grossWeight: number;     // 毛重
+    grossWeightUnit: string; // 毛重单位
+    length: number;          // 长
+    width: number;           // 宽
+    height: number;          // 高
+    dimensionUnit: string;   // 尺寸单位
+  };
+  /** 每箱规格（箱规） */
+  perBoxSpec: {
+    quantity: number;        // 每箱数量
+    netWeight: number;       // 净重 = 每份净重 × 数量
+    netWeightUnit: string;   // 净重单位
+    grossWeight: number;     // 毛重 = 每份毛重 × 数量
+    grossWeightUnit: string; // 毛重单位
+    length: number;          // 长
+    width: number;           // 宽
+    height: number;          // 高
+    dimensionUnit: string;   // 尺寸单位
+  };
+  weight: number;
+  volume: { length: number; width: number; height: number };
+  quantityPerUnit: number;
+  grade: string;
+  origin: string;
+  shelfLife: number;
+  taxRate: number;
+  packageList: string;
+  marketPrice: number;
+  tmallPrice: number;
+  tmallUrl: string;
+  jdPrice: number;
+  jdUrl: string;
+  shelfStatus: 'on' | 'off';
+  purchaseStatus: 'available' | 'stopped';
+  productionStatus: 'producing' | 'stopped';
+  mainImages: string[];
+  detailImages: string[];
+  displayImageIndex: number;
+  stockAlert: number;
+  stock: number;
+  reservedStock: number;
+  totalSales: number;
+  features: string;
+  includesTeaware: boolean;
+  remark: string;
+}
+
+/** 茶人类型 */
+export type TeaProfessionalType = 'tea_artist' | 'tea_evaluator' | 'tea_maker' | 'tea_sommelier';
+
+/** 茶人证书 */
+export interface TeaCertificate {
+  name: string;
+  level: string;
+  issuer: string;
+  issueDate: string;
+  certNo: string;
+}
+
+/** 茶人获奖记录 */
+export interface TeaAward {
+  name: string;
+  level: string;
+  awardDate: string;
+  organization: string;
+}
+
+/** 茶人服务报价 */
+export interface TeaServiceQuote {
+  serviceType: string;
+  duration: string;
+  price: number;
+  unit: string;
+  remark: string;
+}
+
+/** 茶人 */
+export interface TeaProfessional {
+  id: string;
+  name: string;
+  type: TeaProfessionalType[];
+  gender: 'male' | 'female';
+  photo: string;
+  region: string;
+  height: number;
+  weight: number;
+  birthDate: string;
+  phone: string;
+  email: string;
+  idCard: string;
+  address: string;
+  certificates: TeaCertificate[];
+  specialties: string[];
+  awards: TeaAward[];
+  serviceQuotes: TeaServiceQuote[];
+  introduction: string;
+  status: 'active' | 'inactive';
+}
+
+/** 供应商类型 */
+export type SupplierType = 'brand' | 'partner';
+
+/** 供应商评价等级 */
+export type SupplierGrade = 'S' | 'A' | 'B' | 'C' | 'D';
+
+/** 税务类型 */
+export type TaxType = 'small' | 'general';
+
+/** 结算方式 */
+export type SettlementMethod = 'period' | 'prepaid' | 'invoice' | 'monthly' | 'quarterly';
+
+/** 快递费结算方式 */
+export type ShippingSettlement = 'free' | 'not_free_fixed' | 'not_free_ratio' | 'not_free_bear';
+
+/** 仓库信息 */
+export interface SupplierWarehouse {
+  id: string;
+  name: string;
+  address: string;
+  contactPerson: string;
+  contactPhone: string;
+  isDefault: boolean;
+}
+
+/** 开票信息 */
+export interface InvoiceInfo {
+  title: string;
+  taxNo: string;
+  taxRate: number;
+  address?: string;
+  phone?: string;
+  bankName?: string;
+  bankAccount?: string;
+}
+
+/** 结算银行账号 */
+export interface BankAccount {
+  accountName: string;
+  accountNo: string;
+  bankName: string;
+  bankNo: string;
+  remark?: string;
+}
+
+/** 客户类型 */
+export type CustomerType = 'direct' | 'channel';
+
+/** 平台结算账户 */
+export interface PlatformBankAccount {
+  accountName: string;
+  accountNo: string;
+  bankName: string;
+  bankNo: string;
+}
+
+/** 平台发票信息 */
+export interface PlatformInvoiceInfo {
+  invoiceEntity: string;
+  taxNo: string;
+  taxRate: string;
+}
+
+/** 平台 */
+export interface PlatformItem {
+  id: string;
+  name: string;
+  shortName: string;
+  code: string;
+  contactPerson: string;
+  contactPosition: string;
+  contactPhone: string;
+  contactAddress: string;
+  cooperationDate: string;
+  commissionRate: string;
+  bankAccounts: PlatformBankAccount[];
+  invoiceInfos: PlatformInvoiceInfo[];
+  status: 'active' | 'inactive';
+  remark?: string;
+}
+
+/** 客户 */
+export interface CustomerItem {
+  id: string;
+  name: string;
+  type: CustomerType;
+  region: string;
+  contactPerson: string;
+  contactPhone: string;
+  contactEmail?: string;
+  contactAddress?: string;
+  level: string;
+  orders: number;
+  totalAmount: number;
+  /** 直营客户关联的平台ID列表；渠道客户为空 */
+  platformIds: string[];
+  cooperationDate: string;
+  status: 'active' | 'inactive';
+  settlementMethod?: string;
+  taxNo?: string;
+  /** 客户来源 */
+  source?: string;
+  remark?: string;
+}
+
+/** 供应商 */
+export interface SupplierItem {
+  id: string;
+  type: SupplierType;
+  name: string;
+  unifiedCreditCode: string;
+  cooperationAgreements: string[];
+  brandAuthAgreements: string[];
+  businessLicense: string;
+  registeredAddress: string;
+  legalRepresentative: string;
+  establishmentDate: string;
+  registeredCapital: string;
+  companyType: string;
+  businessScope: string;
+  contactPerson: string;
+  contactPosition: string;
+  contactAddress: string;
+  contactPhone: string;
+  contactEmail: string;
+  warehouses: SupplierWarehouse[];
+  taxType: TaxType;
+  invoiceInfo: InvoiceInfo;
+  cooperationDate: string;
+  grade: SupplierGrade;
+  mainCategories: string[];
+  introduction: string;
+  settlementMethod: SettlementMethod;
+  bankAccount: BankAccount;
+  shippingSettlement: ShippingSettlement;
+  shippingFee?: number;
+  shippingRemark?: string;
+  supportDropship: boolean;
+  qualificationStatus: 'qualified' | 'pending' | 'expired';
+  paymentTerms: string;
+  deliveryCycle: string;
+  minOrderAmount: number;
+  returnPolicy: string;
+  qualityGuarantee: string;
+  remark: string;
+  status: 'active' | 'inactive';
 }

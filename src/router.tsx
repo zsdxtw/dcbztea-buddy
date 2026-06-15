@@ -21,6 +21,7 @@ import SalesOrders from './pages/sales/SalesOrders';
 import SalesQuotations from './pages/sales/SalesQuotations';
 import SalesOutbound from './pages/sales/SalesOutbound';
 import SalesCustomers from './pages/sales/SalesCustomers';
+import SalesPlatforms from './pages/sales/SalesPlatforms';
 import SalesReturn from './pages/sales/SalesReturn';
 import SalesPerformance from './pages/sales/SalesPerformance';
 
@@ -35,15 +36,17 @@ import InventoryOutboundRecord from './pages/inventory/InventoryOutboundRecord';
 import InventoryAlertSettings from './pages/inventory/InventoryAlertSettings';
 
 import ProductOverview from './pages/product/ProductOverview';
-import ProductList from './pages/product/ProductList';
 import ProductTeaCategory from './pages/product/ProductTeaCategory';
 import ProductTeaList from './pages/product/ProductTeaList';
-import ProductGrade from './pages/product/ProductGrade';
-import ProductSpecs from './pages/product/ProductSpecs';
+import ProductManageTea from './pages/product/ProductManageTea';
+import ProductManageTeaware from './pages/product/ProductManageTeaware';
+import ProductManagePeripheral from './pages/product/ProductManagePeripheral';
+import ProductManageOther from './pages/product/ProductManageOther';
+import ProductTeaDetail from './pages/product/ProductTeaDetail';
 import ProductCategory from './pages/product/ProductCategory';
 import ProductBrand from './pages/product/ProductBrand';
 import ProductBrandDetail from './pages/product/ProductBrandDetail';
-import ProductUnit from './pages/product/ProductUnit';
+import ProductPrice from './pages/product/ProductPrice';
 
 import FinanceOverview from './pages/finance/FinanceOverview';
 import FinanceReceivable from './pages/finance/FinanceReceivable';
@@ -56,6 +59,7 @@ import FinanceInvoice from './pages/finance/FinanceInvoice';
 import FinanceAccount from './pages/finance/FinanceAccount';
 
 import StatisticsSales from './pages/statistics/StatisticsSales';
+import StatisticsBrandAnalysis from './pages/statistics/StatisticsBrandAnalysis';
 import StatisticsPurchase from './pages/statistics/StatisticsPurchase';
 import StatisticsInventory from './pages/statistics/StatisticsInventory';
 import StatisticsFinance from './pages/statistics/StatisticsFinance';
@@ -68,6 +72,9 @@ import SettingsLogs from './pages/settings/SettingsLogs';
 import SettingsAbout from './pages/settings/SettingsAbout';
 import SettingsUserManagement from './pages/settings/SettingsUserManagement';
 import SettingsDataBackup from './pages/settings/SettingsDataBackup';
+import SettingsUnit from './pages/settings/SettingsUnit';
+
+import PersonnelTeaProfessional from './pages/personnel/PersonnelTeaProfessional';
 
 export const router = createBrowserRouter([
   {
@@ -98,6 +105,7 @@ export const router = createBrowserRouter([
       { path: 'sales/sales-quotations', element: <SalesQuotations /> },
       { path: 'sales/sales-outbound', element: <SalesOutbound /> },
       { path: 'sales/sales-customers', element: <SalesCustomers /> },
+      { path: 'sales/sales-platforms', element: <SalesPlatforms /> },
       { path: 'sales/sales-return', element: <SalesReturn /> },
       { path: 'sales/sales-performance', element: <SalesPerformance /> },
       /* ── 仓储 ── */
@@ -114,16 +122,19 @@ export const router = createBrowserRouter([
       /* ── 商品 ── */
       { path: 'product', element: <ProductOverview /> },
       { path: 'product/product-overview', element: <ProductOverview /> },
-      { path: 'product/product-list', element: <ProductList /> },
+      { path: 'product/product-manage', element: <Navigate to="product-manage-tea" replace /> },
+      { path: 'product/product-category', element: <ProductCategory /> },
+      { path: 'product/product-manage-tea', element: <ProductManageTea /> },
+      { path: 'product/product-manage-teaware', element: <ProductManageTeaware /> },
+      { path: 'product/product-manage-peripheral', element: <ProductManagePeripheral /> },
+      { path: 'product/product-manage-other', element: <ProductManageOther /> },
+      { path: 'product/product-tea-detail/:id', element: <ProductTeaDetail /> },
       { path: 'product/product-tea-category', element: <ProductTeaCategory /> },
       { path: 'product/product-tea-seven', element: <ProductTeaCategory /> },
       { path: 'product/product-tea-list', element: <ProductTeaList /> },
-      { path: 'product/product-grade', element: <ProductGrade /> },
-      { path: 'product/product-specs', element: <ProductSpecs /> },
-      { path: 'product/product-category', element: <ProductCategory /> },
       { path: 'product/product-brand', element: <ProductBrand /> },
       { path: 'product/product-brand/:id', element: <ProductBrandDetail /> },
-      { path: 'product/product-unit', element: <ProductUnit /> },
+      { path: 'product/product-price', element: <ProductPrice /> },
       /* ── 财务 ── */
       { path: 'finance', element: <FinanceOverview /> },
       { path: 'finance/finance-overview', element: <FinanceOverview /> },
@@ -138,6 +149,7 @@ export const router = createBrowserRouter([
       /* ── 统计 ── */
       { path: 'statistics', element: <StatisticsSales /> },
       { path: 'statistics/statistics-sales', element: <StatisticsSales /> },
+      { path: 'statistics/statistics-brand', element: <StatisticsBrandAnalysis /> },
       { path: 'statistics/statistics-purchase', element: <StatisticsPurchase /> },
       { path: 'statistics/statistics-inventory', element: <StatisticsInventory /> },
       { path: 'statistics/statistics-finance', element: <StatisticsFinance /> },
@@ -151,6 +163,10 @@ export const router = createBrowserRouter([
       { path: 'settings/settings-about', element: <SettingsAbout /> },
       { path: 'settings/settings-user-management', element: <SettingsUserManagement /> },
       { path: 'settings/settings-data-backup', element: <SettingsDataBackup /> },
+      { path: 'settings/settings-unit', element: <SettingsUnit /> },
+      /* ── 人员 ── */
+      { path: 'personnel', element: <PersonnelTeaProfessional /> },
+      { path: 'personnel/personnel-tea-professional', element: <PersonnelTeaProfessional /> },
     ],
   },
 ]);

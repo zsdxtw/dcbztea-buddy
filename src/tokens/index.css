@@ -32,45 +32,58 @@
   --color-neutral-400: #A5A39A; --color-neutral-500: #8A877E; --color-neutral-600: #5C5A53;
   --color-neutral-700: #3D3B36; --color-neutral-800: #2A2824; --color-neutral-900: #1A1917;
 
-  /* ── 工作台模块色（克莱因蓝） ── */
-  --color-module-dashboard-lightest: #EDF1FA; --color-module-dashboard-light: #C8D5F2;
-  --color-module-dashboard-base: #002FA7; --color-module-dashboard-dark: #00268A;
-  --color-module-dashboard-darkest: #001A66;
+  /* ── 工作台模块色（主色 #023270 + 辅色 #FD7A99） ── */
+  --color-module-dashboard-lightest: #EDF4FC; --color-module-dashboard-light: #C8DEF4;
+  --color-module-dashboard-base: #023270; --color-module-dashboard-dark: #022860;
+  --color-module-dashboard-darkest: #011E50;
+  --color-module-dashboard-secondary: #FD7A99; --color-module-dashboard-secondary-light: #FDCCD8;
 
-  /* ── 模块色（采购） ── */
+  /* ── 模块色（采购）主色 #CB405D + 辅色 #0F64B5 ── */
   --color-module-purchase-lightest: #FEF2F4; --color-module-purchase-light: #FCE7EB;
   --color-module-purchase-base: #CB405D; --color-module-purchase-dark: #B3364F;
   --color-module-purchase-darkest: #8E283E;
+  --color-module-purchase-secondary: #0F64B5; --color-module-purchase-secondary-light: #D6E8F7;
 
-  /* ── 模块色（销售） ── */
-  --color-module-sales-lightest: #EDF9FC; --color-module-sales-light: #D0F2F8;
-  --color-module-sales-base: #0DAFC6; --color-module-sales-dark: #0B97AB;
-  --color-module-sales-darkest: #087A8A;
+  /* ── 模块色（销售）主色 #0F64B5 + 辅色 #CB405D ── */
+  --color-module-sales-lightest: #EBF3FC; --color-module-sales-light: #C5DAF5;
+  --color-module-sales-base: #0F64B5; --color-module-sales-dark: #0C5299;
+  --color-module-sales-darkest: #093F7D;
+  --color-module-sales-secondary: #CB405D; --color-module-sales-secondary-light: #FEF2F4;
 
-  /* ── 模块色（仓储） ── */
-  --color-module-inventory-lightest: #F8F3EF; --color-module-inventory-light: #EFE6DB;
-  --color-module-inventory-base: #5F4027; --color-module-inventory-dark: #4F3520;
-  --color-module-inventory-darkest: #3A2618;
+  /* ── 模块色（仓储）主色 #FD742D + 辅色 #01795D ── */
+  --color-module-inventory-lightest: #FFF3EB; --color-module-inventory-light: #FEDCC4;
+  --color-module-inventory-base: #FD742D; --color-module-inventory-dark: #E5621F;
+  --color-module-inventory-darkest: #C04F14;
+  --color-module-inventory-secondary: #01795D; --color-module-inventory-secondary-light: #EDFAF5;
 
-  /* ── 模块色（商品） ── */
+  /* ── 模块色（商品）主色 #01795D + 辅色 #FD742D ── */
   --color-module-product-lightest: #EDFAF5; --color-module-product-light: #D0F4E6;
   --color-module-product-base: #01795D; --color-module-product-dark: #01624B;
   --color-module-product-darkest: #01453A;
+  --color-module-product-secondary: #FD742D; --color-module-product-secondary-light: #FEF0E8;
 
-  /* ── 模块色（财务） ── */
+  /* ── 模块色（财务）主色 #27254B + 辅色 #7BA6D1 ── */
   --color-module-finance-lightest: #F0F0F6; --color-module-finance-light: #DCDCE8;
   --color-module-finance-base: #27254B; --color-module-finance-dark: #1F1D3E;
   --color-module-finance-darkest: #161530;
+  --color-module-finance-secondary: #7BA6D1; --color-module-finance-secondary-light: #E8EFF7;
 
-  /* ── 模块色（统计） ── */
-  --color-module-statistics-lightest: #FEF5EE; --color-module-statistics-light: #FDE8D6;
-  --color-module-statistics-base: #F18F4D; --color-module-statistics-dark: #D87D3F;
-  --color-module-statistics-darkest: #B5622A;
+  /* ── 模块色（统计）主色 #5F4027 + 辅色 #FED6B8 ── */
+  --color-module-statistics-lightest: #F8F3EF; --color-module-statistics-light: #EFE6DB;
+  --color-module-statistics-base: #5F4027; --color-module-statistics-dark: #4F3520;
+  --color-module-statistics-darkest: #3A2618;
+  --color-module-statistics-secondary: #FED6B8; --color-module-statistics-secondary-light: #FFF4EE;
 
   /* ── 模块色（设置） ── */
   --color-module-settings-lightest: #F4F5F7; --color-module-settings-light: #E5E7EB;
   --color-module-settings-base: #6B7280; --color-module-settings-dark: #5A6170;
   --color-module-settings-darkest: #3E4550;
+
+  /* ── 模块色（人员）主色 #9D73BD + 辅色 #FDDE83 ── */
+  --color-module-personnel-lightest: #F5F1FC; --color-module-personnel-light: #E6DCF8;
+  --color-module-personnel-base: #9D73BD; --color-module-personnel-dark: #8A62A8;
+  --color-module-personnel-darkest: #704690;
+  --color-module-personnel-secondary: #FDDE83; --color-module-personnel-secondary-light: #FEF9E8;
 
   /* ── 六大茶类专属色 ── */
   --color-tea-green: #7BA23F; --color-tea-white: #D6B577; --color-tea-yellow: #C9A84C;
@@ -188,6 +201,13 @@
   --color-module-current-light: var(--color-module-settings-light);
   --color-module-current-dark: var(--color-module-settings-dark);
   --color-module-current-darkest: var(--color-module-settings-darkest);
+}
+[data-module="personnel"] {
+  --color-module-current-base: var(--color-module-personnel-base);
+  --color-module-current-lightest: var(--color-module-personnel-lightest);
+  --color-module-current-light: var(--color-module-personnel-light);
+  --color-module-current-dark: var(--color-module-personnel-dark);
+  --color-module-current-darkest: var(--color-module-personnel-darkest);
 }
 
 /* ═══ 基础重置 ═══ */
@@ -444,6 +464,8 @@ tbody tr:last-child td { border-bottom: none; }
 .status-error .status-tag-dot { background: var(--color-semantic-error); }
 .status-info { background: var(--color-semantic-info-bg); color: var(--color-semantic-info); }
 .status-info .status-tag-dot { background: var(--color-semantic-info); }
+.status-default { background: var(--color-neutral-100); color: var(--color-neutral-500); }
+.status-default .status-tag-dot { background: var(--color-neutral-400); }
 
 /* ── 网格 ── */
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
@@ -622,12 +644,13 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ═══ 品牌排名横向柱状图 ═══ */
 .rank-section { margin-top: 0; margin-bottom: var(--space-6); }
-.rank-section-header { display: flex; align-items: center; justify-content: flex-end; margin-bottom: var(--space-4); }
-.rank-period-toggle { display: flex; border: 1px solid var(--color-neutral-200); border-radius: var(--radius-md); overflow: hidden; }
-.rank-period-btn { padding: var(--space-1) var(--space-4); font-size: var(--text-sm); font-family: var(--font-family-sans); border: none; background: var(--color-neutral-0); color: var(--color-neutral-500); cursor: pointer; transition: var(--transition-fast); }
-.rank-period-btn.active { background: var(--color-module-current-base); color: var(--color-neutral-0); }
-.rank-period-btn:not(.active):hover { background: var(--color-neutral-50); }
 .rank-charts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+.rank-period-toggle { display: flex; align-items: center; gap: var(--space-2); }
+.rank-period-btn { padding: 0; font-size: var(--text-xs); font-family: var(--font-family-sans); border: none; background: none; color: var(--color-neutral-400); cursor: pointer; transition: var(--transition-fast); line-height: 1; }
+.rank-period-btn.active { color: var(--color-module-current-base); font-weight: var(--font-medium); }
+.rank-period-btn:not(.active):hover { color: var(--color-neutral-600); }
+.rank-period-btn + .rank-period-btn { position: relative; padding-left: calc(var(--space-2) + 1px); }
+.rank-period-btn + .rank-period-btn::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 1px; height: 10px; background: var(--color-neutral-300); }
 .rank-chart-card .card-body { padding: var(--space-4) var(--space-5); }
 .rank-chart { display: flex; flex-direction: column; gap: var(--space-3); }
 .rank-chart-row { display: flex; align-items: center; gap: var(--space-3); }
@@ -708,7 +731,16 @@ tbody tr:last-child td { border-bottom: none; }
 .drawer-form-field { flex: 1; min-width: 0; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ── 通用文本链接按钮 ── */
+.link-button { background: transparent; border: none; padding: 2px 4px; color: var(--color-module-current-base); font-size: var(--text-sm); cursor: pointer; transition: color 0.2s ease; }
+.link-button:hover { color: var(--color-module-current-dark); }
+.link-button:focus { outline: none; }
 
 /* ── 茶种卡片悬停编辑按钮 ── */
 .tea-card-edit-btn { opacity: 0; transition: opacity 0.2s ease; }
 .tea-card-hover:hover .tea-card-edit-btn { opacity: 1; }
+
+/* ── 图片设为展示图悬停提示 ── */
+div:hover > .img-hover-label { opacity: 1 !important; }
