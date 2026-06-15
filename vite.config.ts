@@ -7,14 +7,11 @@ export default defineConfig({
     port: 5173,
     host: '0.0.0.0',
     open: false,
-    allowedHosts: true,
     strictPort: true,
-    cors: true,
-    hmr: { host: 'localhost', port: 5173 },
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
+  },
+  preview: {
+    port: 5173,
+    host: '0.0.0.0',
+    strictPort: true,
   },
 });
