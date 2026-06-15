@@ -8,7 +8,9 @@ export default defineConfig({
     host: '0.0.0.0',
     open: false,
     allowedHosts: 'all',
-    strictPort: false,
+    strictPort: true,
+    cors: true,
+    hmr: { host: 'localhost', port: 5173 },
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
