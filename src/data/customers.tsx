@@ -36,11 +36,13 @@ export const customerItems: CustomerItem[] = [
 export const CUSTOMER_TYPE_LABELS: Record<CustomerItem['type'], string> = {
   direct: '直营客户',
   channel: '渠道客户',
+  platform: '平台客户',
 };
 
 export const CUSTOMER_TYPE_DESC: Record<CustomerItem['type'], string> = {
   direct: '客情自有，直接发货',
   channel: '客情非自有，进行二次售卖',
+  platform: '电商平台，企业采购渠道',
 };
 
 export const LEVEL_COLORS: Record<string, { bg: string; color: string }> = {

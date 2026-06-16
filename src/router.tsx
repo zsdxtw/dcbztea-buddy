@@ -21,7 +21,6 @@ import SalesOrders from './pages/sales/SalesOrders';
 import SalesQuotations from './pages/sales/SalesQuotations';
 import SalesOutbound from './pages/sales/SalesOutbound';
 import SalesCustomers from './pages/sales/SalesCustomers';
-import SalesPlatforms from './pages/sales/SalesPlatforms';
 import SalesReturn from './pages/sales/SalesReturn';
 import SalesPerformance from './pages/sales/SalesPerformance';
 
@@ -105,7 +104,7 @@ export const router = createBrowserRouter([
       { path: 'sales/sales-quotations', element: <SalesQuotations /> },
       { path: 'sales/sales-outbound', element: <SalesOutbound /> },
       { path: 'sales/sales-customers', element: <SalesCustomers /> },
-      { path: 'sales/sales-platforms', element: <SalesPlatforms /> },
+      { path: 'sales/sales-platforms', element: <Navigate to="/sales/sales-customers" replace /> },
       { path: 'sales/sales-return', element: <SalesReturn /> },
       { path: 'sales/sales-performance', element: <SalesPerformance /> },
       /* ── 仓储 ── */
