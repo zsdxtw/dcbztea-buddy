@@ -221,11 +221,11 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     menus: [
       { key: 'purchase-overview', label: '采购概览', icon: <OverviewIcon /> },
       { key: 'purchase-orders', label: '采购订单', icon: <OrdersIcon /> },
+      { key: 'purchase-pricing', label: '采购报（调）价', icon: <PriceIcon /> },
       { key: 'purchase-inbound', label: '入库管理', icon: <InboundIcon /> },
-      { key: 'purchase-quality', label: '茶叶质检', icon: <QualityIcon /> },
       { key: 'purchase-suppliers', label: '供应商管理', icon: <SuppliersIcon /> },
+      { key: 'purchase-reconciliation', label: '供应商对账', icon: <ReconciliationIcon /> },
       { key: 'purchase-return', label: '采购退货', icon: <ReturnIcon /> },
-      { key: 'purchase-price-trend', label: '价格走势', icon: <PriceTrendIcon /> },
     ],
   },
   [ModuleKey.SALES]: {

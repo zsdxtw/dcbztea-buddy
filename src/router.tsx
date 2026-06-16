@@ -10,11 +10,11 @@ import DashboardOperationLog from './pages/dashboard/DashboardOperationLog';
 
 import PurchaseOverview from './pages/purchase/PurchaseOverview';
 import PurchaseOrders from './pages/purchase/PurchaseOrders';
+import PurchasePricing from './pages/purchase/PurchasePricing';
 import PurchaseInbound from './pages/purchase/PurchaseInbound';
-import PurchaseQuality from './pages/purchase/PurchaseQuality';
 import PurchaseSuppliers from './pages/purchase/PurchaseSuppliers';
+import PurchaseReconciliation from './pages/purchase/PurchaseReconciliation';
 import PurchaseReturn from './pages/purchase/PurchaseReturn';
-import PurchasePriceTrend from './pages/purchase/PurchasePriceTrend';
 
 import SalesOverview from './pages/sales/SalesOverview';
 import SalesOrders from './pages/sales/SalesOrders';
@@ -92,11 +92,11 @@ export const router = createBrowserRouter([
       { path: 'purchase', element: <PurchaseOverview /> },
       { path: 'purchase/purchase-overview', element: <PurchaseOverview /> },
       { path: 'purchase/purchase-orders', element: <PurchaseOrders /> },
+      { path: 'purchase/purchase-pricing', element: <PurchasePricing /> },
       { path: 'purchase/purchase-inbound', element: <PurchaseInbound /> },
-      { path: 'purchase/purchase-quality', element: <PurchaseQuality /> },
       { path: 'purchase/purchase-suppliers', element: <PurchaseSuppliers /> },
+      { path: 'purchase/purchase-reconciliation', element: <PurchaseReconciliation /> },
       { path: 'purchase/purchase-return', element: <PurchaseReturn /> },
-      { path: 'purchase/purchase-price-trend', element: <PurchasePriceTrend /> },
       /* ── 销售 ── */
       { path: 'sales', element: <SalesOverview /> },
       { path: 'sales/sales-overview', element: <SalesOverview /> },
