@@ -116,21 +116,22 @@ export default function PurchaseSuppliers() {
   };
 
   return (
-    <div>
+    <>
       <ContentHeader title="供应商管理" breadcrumbs={['采购', '供应商管理']} />
 
+      <div className="content-body">
       {/* 统计卡片 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+      <div className="stat-cards">
         {stats.map((s, i) => <StatCard key={i} data={s} />)}
       </div>
 
       {/* 类型筛选卡片 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
         {TYPE_FILTER.map(tf => {
           const count = tf.key === 'all' ? supplierItems.length : supplierItems.filter(s => s.type === tf.key).length;
           const isActive = activeType === tf.key;
           return (
-            <div key={tf.key} style={{ cursor: 'pointer', border: isActive ? `2px solid ${tf.color}` : '1px solid var(--color-border-primary)', background: isActive ? `${tf.color}08` : 'var(--color-bg-primary)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', boxShadow: 'var(--shadow-sm)' }} onClick={() => setActiveType(isActive ? 'all' : tf.key)}>
+            <div key={tf.key} style={{ cursor: 'pointer', border: isActive ? `2px solid ${tf.color}` : '1px solid var(--color-border-primary)', background: isActive ? `${tf.color}08` : 'var(--color-bg-primary)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }} onClick={() => setActiveType(isActive ? 'all' : tf.key)}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span style={{ fontWeight: 'var(--font-semibold)', fontSize: 'var(--text-base)', color: 'var(--color-text-primary)' }}>{tf.label}</span>
                 <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: tf.color }}>{count}</span>
@@ -142,7 +143,7 @@ export default function PurchaseSuppliers() {
       </div>
 
       {/* 工具栏 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
         <input className="filter-input" placeholder="搜索名称、信用代码、联系人..." value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 260 }} />
         <select className="filter-select" value={filterGrade} onChange={e => setFilterGrade(e.target.value)}>
           <option value="">全部等级</option>
@@ -650,6 +651,7 @@ export default function PurchaseSuppliers() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
