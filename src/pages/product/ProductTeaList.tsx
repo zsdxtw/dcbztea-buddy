@@ -186,14 +186,14 @@ export default function ProductTeaList() {
             <Button onClick={handleOpenAdd}><svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>新增</Button>
             {deleteMode ? (
               <>
-                <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+                <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>
                   <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   删除所选({selectedForDelete.size})
                 </Button>
                 <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
               </>
             ) : (
-              <Button onClick={handleEnterDeleteMode} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+              <Button onClick={handleEnterDeleteMode} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>
                 <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 删除
               </Button>
@@ -215,8 +215,8 @@ export default function ProductTeaList() {
                   >
                     <div style={{
                       width: 18, height: 18, borderRadius: 'var(--radius-sm)',
-                      border: `2px solid ${isSelected ? '#FD742D' : 'var(--color-neutral-300)'}`,
-                      background: isSelected ? '#FD742D' : 'var(--color-neutral-0)',
+                      border: `2px solid ${isSelected ? '#eb5c20' : 'var(--color-neutral-300)'}`,
+                      background: isSelected ? '#eb5c20' : 'var(--color-neutral-0)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'var(--transition-fast)',
                     }}>
@@ -224,7 +224,7 @@ export default function ProductTeaList() {
                     </div>
                   </div>
                 )}
-                <Card style={isSelected ? { outline: '2px solid #FD742D', borderRadius: 'var(--radius-lg)' } : undefined}>
+                <Card style={isSelected ? { outline: '2px solid #eb5c20', borderRadius: 'var(--radius-lg)' } : undefined}>
                   {/* 茶种图片 */}
                   <div style={{ width: '100%', aspectRatio: '1 / 1', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: 'var(--space-3)', background: 'var(--color-neutral-100)', position: 'relative' }}>
                     <img
@@ -305,7 +305,7 @@ export default function ProductTeaList() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
+              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>确认删除</Button>
             </div>
           </div>
         </div>
@@ -369,11 +369,11 @@ export default function ProductTeaList() {
               </div>
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
-                  <label className="drawer-label">茶种名称 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">茶种名称 <span style={{ color: '#eb5c20' }}>*</span></label>
                   <input className="detail-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="请输入茶种名称" />
                 </div>
                 <div className="drawer-form-field">
-                  <label className="drawer-label">茶类 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">茶类 <span style={{ color: '#eb5c20' }}>*</span></label>
                   <select className="detail-input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value as TeaCategory })}>
                     {Object.values(TeaCategory).map((cat) => (
                       <option key={cat} value={cat}>{getTeaCategoryLabel(cat)}</option>

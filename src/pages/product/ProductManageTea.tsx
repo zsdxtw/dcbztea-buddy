@@ -739,7 +739,7 @@ export default function ProductManageTea() {
             </Button>
             {deleteMode ? (
               <>
-                <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+                <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>
                   <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                     <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -748,7 +748,7 @@ export default function ProductManageTea() {
                 <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
               </>
             ) : (
-              <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleEnterDeleteMode}>
+              <Button style={{ background: '#eb5c20', borderColor: '#eb5c20' }} onClick={handleEnterDeleteMode}>
                 <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                   <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -783,8 +783,8 @@ export default function ProductManageTea() {
                 style={{
                   background: 'var(--color-neutral-0)',
                   borderRadius: 'var(--radius-lg)',
-                  border: `1px solid ${isSelected ? '#FD742D' : 'var(--color-neutral-100)'}`,
-                  outline: isSelected ? '2px solid #FD742D' : undefined,
+                  border: `1px solid ${isSelected ? '#eb5c20' : 'var(--color-neutral-100)'}`,
+                  outline: isSelected ? '2px solid #eb5c20' : undefined,
                   overflow: 'hidden',
                   cursor: deleteMode ? 'default' : 'pointer',
                   transition: 'box-shadow var(--transition-fast), transform var(--transition-fast)',
@@ -816,8 +816,8 @@ export default function ProductManageTea() {
                   >
                     <div style={{
                       width: 18, height: 18, borderRadius: 'var(--radius-sm)',
-                      border: `2px solid ${isSelected ? '#FD742D' : 'var(--color-neutral-300)'}`,
-                      background: isSelected ? '#FD742D' : 'var(--color-neutral-0)',
+                      border: `2px solid ${isSelected ? '#eb5c20' : 'var(--color-neutral-300)'}`,
+                      background: isSelected ? '#eb5c20' : 'var(--color-neutral-0)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'var(--transition-fast)',
                     }}>
@@ -915,7 +915,7 @@ export default function ProductManageTea() {
                     gap: 'var(--space-1)',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-1)', flexShrink: 0, minWidth: 0 }}>
-                      <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: '#FD742D', flexShrink: 0 }}>
+                      <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: '#eb5c20', flexShrink: 0 }}>
                         ¥{product.marketPrice}
                       </span>
                       {product.spec && (
@@ -958,7 +958,7 @@ export default function ProductManageTea() {
                   <div style={{ width: 1, background: 'var(--color-neutral-100)' }} />
                   <div style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)', marginBottom: 2 }}>自有库存</div>
-                      <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: product.stock < product.stockAlert ? '#FD742D' : 'var(--color-neutral-700)' }}>{product.stock}</div>
+                      <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: product.stock < product.stockAlert ? '#eb5c20' : 'var(--color-neutral-700)' }}>{product.stock}</div>
                     </div>
                   <div style={{ width: 1, background: 'var(--color-neutral-100)' }} />
                   <div style={{ textAlign: 'center' }}>
@@ -1057,7 +1057,7 @@ export default function ProductManageTea() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
+              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>确认删除</Button>
             </div>
           </div>
         </div>
@@ -1132,7 +1132,7 @@ export default function ProductManageTea() {
               <div style={sectionTitleStyle}>基本信息</div>
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
-                  <label className="drawer-label">商品名称 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">商品名称 <span style={{ color: '#eb5c20' }}>*</span></label>
                   <input className="detail-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="请输入商品名称" />
                 </div>
               </div>
@@ -1140,7 +1140,7 @@ export default function ProductManageTea() {
               {/* 一级分类（多选，茶叶必选） */}
               <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
                 <div className="drawer-form-field" style={{ width: '100%' }}>
-                  <label className="drawer-label">一级分类 <span style={{ color: '#FD742D' }}>*</span>（茶叶必选）</label>
+                  <label className="drawer-label">一级分类 <span style={{ color: '#eb5c20' }}>*</span>（茶叶必选）</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
                     {(Object.keys(productCategoryLabels) as ProductCategoryType[]).map((key) => (
                       <label key={key} style={{
@@ -1170,7 +1170,7 @@ export default function ProductManageTea() {
               {/* 二级分类（多选，按一级分类分组） */}
               <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
                 <div className="drawer-form-field" style={{ width: '100%' }}>
-                  <label className="drawer-label">二级分类 <span style={{ color: '#FD742D' }}>*</span>（多选）</label>
+                  <label className="drawer-label">二级分类 <span style={{ color: '#eb5c20' }}>*</span>（多选）</label>
                   {l2Options.map(({ l1, l1Label, nodes }) => (
                     <div key={l1} style={{ marginBottom: 'var(--space-2)' }}>
                       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginBottom: '4px', fontWeight: 'var(--font-medium)' }}>{l1Label}</div>
@@ -1246,7 +1246,7 @@ export default function ProductManageTea() {
               {/* 品牌 + 系列 */}
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
-                  <label className="drawer-label">品牌 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">品牌 <span style={{ color: '#eb5c20' }}>*</span></label>
                   <select
                     className="detail-input"
                     value={form.brand}
@@ -1441,7 +1441,7 @@ export default function ProductManageTea() {
               <div style={sectionTitleStyle}>价格信息</div>
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
-                  <label className="drawer-label">市场价(元) <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">市场价(元) <span style={{ color: '#eb5c20' }}>*</span></label>
                   <input className="detail-input" type="number" value={form.marketPrice || ''} onChange={(e) => setForm({ ...form, marketPrice: Number(e.target.value) })} placeholder="0" />
                 </div>
                 <div className="drawer-form-field">

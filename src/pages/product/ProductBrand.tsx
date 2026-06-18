@@ -166,7 +166,7 @@ export default function ProductBrand() {
           </Button>
           {deleteMode ? (
             <>
-              <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+              <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>
                 <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                   <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -175,7 +175,7 @@ export default function ProductBrand() {
               <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
             </>
           ) : (
-            <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleEnterDeleteMode}>
+            <Button style={{ background: '#eb5c20', borderColor: '#eb5c20' }} onClick={handleEnterDeleteMode}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                 <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -311,13 +311,13 @@ export default function ProductBrand() {
                   <input className="detail-input" value={nextCode} readOnly style={{ background: 'var(--color-neutral-100)', color: 'var(--color-neutral-500)' }} />
                 </div>
                 <div className="drawer-form-field">
-                  <label className="drawer-label">品牌名称 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">品牌名称 <span style={{ color: '#eb5c20' }}>*</span></label>
                   <input className="detail-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="请输入品牌名称" />
                 </div>
               </div>
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
-                  <label className="drawer-label">品牌所属 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">品牌所属 <span style={{ color: '#eb5c20' }}>*</span></label>
                   <input className="detail-input" value={form.owner} onChange={(e) => setForm({ ...form, owner: e.target.value })} placeholder="请输入所属公司" />
                 </div>
                 <div className="drawer-form-field">
@@ -452,7 +452,7 @@ export default function ProductBrand() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
+              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>确认删除</Button>
             </div>
           </div>
         </div>
