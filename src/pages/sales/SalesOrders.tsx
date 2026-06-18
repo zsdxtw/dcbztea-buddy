@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
-import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Tag from '../../components/common/Tag';
@@ -8,31 +7,6 @@ import Button from '../../components/common/Button';
 import StatusTag, { orderStatusToVariant, orderStatusLabel } from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
 import { TeaCategory, OrderStatus } from '../../types';
-import type { StatCardData } from '../../types';
-
-/* ── 统计卡片 ── */
-const stats: StatCardData[] = [
-  {
-    label: '订单总数', value: '58',
-    trend: { direction: 'up', value: '+8 单' },
-    icon: <svg viewBox="0 0 18 18" fill="none"><rect x="4" y="2" width="10" height="14" rx="2" stroke="currentColor" strokeWidth="1.3"/></svg>,
-  },
-  {
-    label: '销售总额', value: '1,285,600', unit: '¥',
-    trend: { direction: 'up', value: '12.5%' },
-    icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 14l3-4 3 2 3-5 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-  },
-  {
-    label: '待审核', value: '5',
-    trend: { direction: 'down', value: '2 单' },
-    icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M7 8h4M7 11h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>,
-  },
-  {
-    label: '运输中', value: '3',
-    trend: { direction: 'up', value: '+1 单' },
-    icon: <svg viewBox="0 0 18 18" fill="none"><path d="M2 12h10l4-4H6L2 12zM6 8l2-4h8l-2 4" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>,
-  },
-];
 
 /* ── 客户类型 ── */
 type CustomerType = 'direct' | 'channel' | 'platform';
@@ -247,10 +221,6 @@ export default function SalesOrders() {
         actions={<Button><PlusIcon />新建销售单</Button>}
       />
       <div className="content-body">
-        <div className="stat-cards">
-          {stats.map((s, i) => <StatCard key={i} data={s} />)}
-        </div>
-
         <FilterBar>
           <FilterInput placeholder="搜索订单编号、客户..." />
           <FilterSelect options={['全部状态', '待审核', '待确认', '运输中', '已完成', '已取消']} />

@@ -15,6 +15,27 @@ const stats: StatCardData[] = [
   { label: '利润率', value: '34.0', unit: '%', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M9 2l2.5 5 5.5.8-4 3.9.9 5.5L9 14.7 5.1 17.2l.9-5.5-4-3.9L7.5 7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg> },
 ];
 
+const purchasePaymentStats: StatCardData[] = [
+  { label: '待付款', value: '312,800', unit: '¥', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M5 8h2M5 11h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+  { label: '本月已付', value: '458,200', unit: '¥', trend: { direction: 'up', value: '12.5%' }, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 14l3-4 3 2 3-5 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+  { label: '付款单数', value: '15', unit: '笔', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="4" y="2" width="10" height="14" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M7 6h4M7 9h4M7 12h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+  { label: '逾期', value: '2', unit: '笔', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M9 6v4M9 12.5v.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+];
+
+const salesCollectionStats: StatCardData[] = [
+  { label: '待回款', value: '586,200', unit: '¥', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M5 8h2M5 11h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+  { label: '本月已收', value: '698,500', unit: '¥', trend: { direction: 'up', value: '22.3%' }, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 14l3-4 3 2 3-5 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+  { label: '回款单数', value: '22', unit: '笔', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="4" y="2" width="10" height="14" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M7 6h4M7 9h4M7 12h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+  { label: '逾期', value: '3', unit: '笔', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M9 6v4M9 12.5v.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+];
+
+const otherReceivableStats: StatCardData[] = [
+  { label: '应收余额', value: '45,600', unit: '¥', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M5 8h2M5 11h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+  { label: '本月新增', value: '12,800', unit: '¥', trend: { direction: 'up', value: '3 笔' }, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 14l3-4 3 2 3-5 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+  { label: '本月收回', value: '8,500', unit: '¥', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+  { label: '逾期', value: '1', unit: '笔', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M9 6v4M9 12.5v.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+];
+
 const revenueTrendData = {
   labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月'],
   series: [
@@ -55,6 +76,23 @@ export default function FinanceOverview() {
         <div className="stat-cards">
           {stats.map((s, i) => <StatCard key={i} data={s} />)}
         </div>
+        <div className="grid-2">
+          <Card title="采购付款">
+            <div className="stat-cards">
+              {purchasePaymentStats.map((s, i) => <StatCard key={i} data={s} />)}
+            </div>
+          </Card>
+          <Card title="销售回款">
+            <div className="stat-cards">
+              {salesCollectionStats.map((s, i) => <StatCard key={i} data={s} />)}
+            </div>
+          </Card>
+        </div>
+        <Card title="其他应收" style={{ marginTop: 'var(--space-4)' }}>
+          <div className="stat-cards">
+            {otherReceivableStats.map((s, i) => <StatCard key={i} data={s} />)}
+          </div>
+        </Card>
         <div className="grid-2">
           <Card title="收支趋势">
             <LineChart data={revenueTrendData} />
