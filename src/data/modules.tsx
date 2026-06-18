@@ -253,6 +253,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       ] },
       { key: 'inventory-check', label: '库存盘点', icon: <CheckIcon /> },
       { key: 'inventory-io-record', label: '出入库记录', icon: <InboundRecordIcon /> },
+      { key: 'inventory-warehouse-settings', label: '仓库设置', icon: <WarehouseSettingsIcon /> },
       { key: 'inventory-alert-settings', label: '预警设置', icon: <AlertSettingsIcon /> },
     ],
   },

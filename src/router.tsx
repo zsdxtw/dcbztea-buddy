@@ -31,6 +31,7 @@ import InventoryTransfer from './pages/inventory/InventoryTransfer';
 import InventoryCheck from './pages/inventory/InventoryCheck';
 import InventoryIORecord from './pages/inventory/InventoryIORecord';
 import InventoryAlertSettings from './pages/inventory/InventoryAlertSettings';
+import InventorySettings from './pages/inventory/InventorySettings';
 
 import ProductOverview from './pages/product/ProductOverview';
 import ProductTeaCategory from './pages/product/ProductTeaCategory';
@@ -113,6 +114,7 @@ export const router = createBrowserRouter([
       { path: 'inventory/inventory-transfer', element: <InventoryTransfer /> },
       { path: 'inventory/inventory-check', element: <InventoryCheck /> },
       { path: 'inventory/inventory-io-record', element: <InventoryIORecord /> },
+      { path: 'inventory/inventory-warehouse-settings', element: <InventorySettings /> },
       { path: 'inventory/inventory-alert-settings', element: <InventoryAlertSettings /> },
       /* ── 商品 ── */
       { path: 'product', element: <ProductOverview /> },

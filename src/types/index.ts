@@ -489,6 +489,26 @@ export interface SupplierWarehouse {
   isDefault: boolean;
 }
 
+/** 仓库归属类型：自有仓库 / 合作仓库（供应商仓库） */
+export type WarehouseCategory = 'own' | 'partner';
+
+/** 仓库信息（仓库设置模块统一结构） */
+export interface Warehouse {
+  id: string;
+  name: string;
+  code: string;
+  address: string;
+  manager: string;
+  phone: string;
+  category: WarehouseCategory;
+  enabled: boolean;
+  isDefault: boolean;
+  /** 合作仓库关联的供应商 ID（自有仓库为空） */
+  supplierId?: string;
+  /** 合作仓库关联的供应商名称（自有仓库为空） */
+  supplierName?: string;
+}
+
 /** 开票信息 */
 export interface InvoiceInfo {
   title: string;
