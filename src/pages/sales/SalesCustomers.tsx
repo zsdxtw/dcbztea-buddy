@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
+import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
-import type { CustomerItem, CustomerType, PlatformItem, PlatformBankAccount, PlatformInvoiceInfo } from '../../types';
+import type { StatCardData, CustomerItem, CustomerType, PlatformItem, PlatformBankAccount, PlatformInvoiceInfo } from '../../types';
 import { customerItems as initialCustomers, CUSTOMER_TYPE_LABELS, CUSTOMER_TYPE_DESC, LEVEL_COLORS } from '../../data/customers';
 import { platformItems as globalPlatforms, generatePlatformCode } from '../../data/platforms';
 
@@ -43,6 +44,20 @@ export default function SalesCustomers() {
   }, [tabCustomers, keyword]);
 
   const getPlatformName = (id: string) => platforms.find(p => p.id === id)?.shortName ?? id;
+
+  const stats: StatCardData[] = useMemo(() => {
+    const direct = data.filter(c => c.type === 'direct');
+    const channel = data.filter(c => c.type === 'channel');
+    const withPlatform = direct.filter(c => c.platformIds.length > 0).length;
+    const activeCount = data.filter(c => c.status === 'active').length;
+    const platformActive = platforms.filter(p => p.status === 'active').length;
+    return [
+      { label: '客户总数', value: String(data.length + platforms.length), unit: '家', trend: { direction: 'up', value: `合作中 ${activeCount + platformActive}` }, icon: <IconUsers /> },
+      { label: '直营客户', value: String(direct.length), unit: '家', trend: { direction: 'up', value: `含平台方 ${withPlatform}` }, icon: <IconHome /> },
+      { label: '渠道客户', value: String(channel.length), unit: '家', trend: { direction: 'up', value: `合作中 ${channel.filter(c => c.status === 'active').length}` }, icon: <IconChannel /> },
+      { label: '平台客户', value: String(platforms.length), unit: '家', trend: { direction: 'up', value: `在册 ${platformActive}` }, icon: <IconPlatform /> },
+    ];
+  }, [data, platforms]);
 
   const enterDeleteMode = () => { setDeleteMode(true); setSelectedForDelete(new Set()); };
   const exitDeleteMode = () => { setDeleteMode(false); setSelectedForDelete(new Set()); };
@@ -112,6 +127,10 @@ export default function SalesCustomers() {
   return (
     <div>
       <ContentHeader title="客户管理" breadcrumbs={['销售', '客户管理']} />
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+        {stats.map((s, i) => <StatCard key={i} data={s} />)}
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
         {TABS.map(t => {
@@ -591,4 +610,8 @@ function Field({ label, children, full }: { label: string; children: React.React
 function Text({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) { return <div className={className} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-800)', fontWeight: 'var(--font-medium)', ...style }}>{children}</div>; }
 function EmptyText({ children }: { children: React.ReactNode }) { return <div style={{ padding: 'var(--space-3)', textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-400)' }}>{children}</div>; }
 
-
+/* ── SVG 图标 ── */
+function IconUsers() { return <svg viewBox="0 0 18 18" fill="none"><circle cx="7" cy="6.5" r="2.8" stroke="currentColor" strokeWidth="1.3" /><path d="M1 15c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /><circle cx="13" cy="7" r="2.2" stroke="currentColor" strokeWidth="1.2" /><path d="M13 11c2 0 4 1.5 4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg>; }
+function IconHome() { return <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg>; }
+function IconChannel() { return <svg viewBox="0 0 18 18" fill="none"><path d="M2 10l3 2 3-4 3 5 3-3 2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><circle cx="4" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.3" /></svg>; }
+function IconPlatform() { return <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" /><path d="M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5" stroke="currentColor" strokeWidth="1.3" /><path d="M9 8v2M8 9h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg>; }

@@ -1,10 +1,19 @@
 import { useState } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
+import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import type { StatCardData } from '../../types';
+
+const stats: StatCardData[] = [
+  { label: '应收余额', value: '45,600', unit: '¥', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M5 8h2M5 11h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+  { label: '本月新增', value: '12,800', unit: '¥', trend: { direction: 'up', value: '3 笔' }, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 14l3-4 3 2 3-5 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+  { label: '本月收回', value: '8,500', unit: '¥', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+  { label: '逾期', value: '1', unit: '笔', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M9 6v4M9 12.5v.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+];
 
 interface OtherReceivableRecord {
   code: string;
@@ -66,6 +75,9 @@ export default function FinanceOtherReceivable() {
     <>
       <ContentHeader title="其他应收" breadcrumbs={['财务', '结算管理', '其他应收']} actions={<><Button variant="ghost">导出</Button><Button><PlusIcon />新建应收</Button></>} />
       <div className="content-body">
+        <div className="stat-cards">
+          {stats.map((s, i) => <StatCard key={i} data={s} />)}
+        </div>
         <FilterBar>
           <FilterInput placeholder="搜索单号、往来单位、事由..." />
           <FilterSelect options={['全部状态', '待收款', '已收款', '已逾期']} />

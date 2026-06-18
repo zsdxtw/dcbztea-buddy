@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
+import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
@@ -7,6 +8,7 @@ import Tag from '../../components/common/Tag';
 import StatusTag, { orderStatusToVariant, orderStatusLabel } from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
 import { TeaCategory, OrderStatus } from '../../types';
+import type { StatCardData } from '../../types';
 
 /* ── 模拟数据 ── */
 interface PurchaseOrder {
@@ -165,6 +167,30 @@ const mockOrders: PurchaseOrder[] = [
   },
 ];
 
+/* ── 统计数据 ── */
+const stats: StatCardData[] = [
+  {
+    label: '订单总数', value: '47', unit: '单',
+    trend: { direction: 'up', value: '+5单' },
+    icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M3 9h12M7 5V3h4v2" stroke="currentColor" strokeWidth="1.3"/></svg>,
+  },
+  {
+    label: '采购总额', value: '856,200', unit: '¥',
+    trend: { direction: 'down', value: '3.2%' },
+    icon: <svg viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9l7-7 7 7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 13a4 4 0 018 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>,
+  },
+  {
+    label: '待审核', value: '6', unit: '单',
+    trend: { direction: 'down', value: '3单' },
+    icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.3"/><path d="M9 6v3l2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  },
+  {
+    label: '运输中', value: '4', unit: '单',
+    trend: { direction: 'up', value: '+1单' },
+    icon: <svg viewBox="0 0 18 18" fill="none"><path d="M2 13h10V5H2v8zM12 8h3l2 3v2h-5V8z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><circle cx="5.5" cy="14.5" r="1.5" stroke="currentColor" strokeWidth="1.2"/><circle cx="14" cy="14.5" r="1.5" stroke="currentColor" strokeWidth="1.2"/></svg>,
+  },
+];
+
 export default function PurchaseOrders() {
   const [showDetail, setShowDetail] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
@@ -198,6 +224,11 @@ export default function PurchaseOrders() {
         }
       />
       <div className="content-body">
+        {/* 统计卡片 */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+          {stats.map((s, i) => <StatCard key={i} data={s} />)}
+        </div>
+
         {/* 筛选栏 */}
         <FilterBar>
           <FilterInput placeholder="搜索订单编号、供应商..." />

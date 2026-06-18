@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
+import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
@@ -14,6 +15,7 @@ import {
   QUALIFICATION_STATUS_LABELS,
 } from '../../data/suppliers';
 import type { SupplierItem, SupplierType, SupplierGrade, SupplierWarehouse } from '../../types';
+import type { StatCardData } from '../../types';
 
 /* ── 供应商类型筛选配置 ── */
 const TYPE_FILTER: { key: SupplierType | 'all'; label: string; color: string; desc: string }[] = [
@@ -46,6 +48,36 @@ export default function PurchaseSuppliers() {
       return true;
     });
   }, [activeType, keyword, filterGrade]);
+
+  // 统计
+  const stats: StatCardData[] = useMemo(() => {
+    const brandCount = supplierItems.filter(s => s.type === 'brand').length;
+    const partnerCount = supplierItems.filter(s => s.type === 'partner').length;
+    const activeCount = supplierItems.filter(s => s.status === 'active').length;
+    const gradeA = supplierItems.filter(s => s.grade === 'A' || s.grade === 'S').length;
+    return [
+      {
+        label: '品牌方', value: String(brandCount), unit: '家',
+        trend: { direction: 'up', value: `在册 ${supplierItems.filter(s => s.type === 'brand' && s.status === 'active').length} 家` },
+        icon: <svg viewBox="0 0 18 18" fill="none"><path d="M9 2L3 5v5c0 5 3.5 7.5 7 9 3.5-1.5 7-4 7-9V5L9 2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>,
+      },
+      {
+        label: '合作方', value: String(partnerCount), unit: '家',
+        trend: { direction: 'up', value: `在册 ${supplierItems.filter(s => s.type === 'partner' && s.status === 'active').length} 家` },
+        icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M2 16a5 5 0 0110 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="14" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.2"/></svg>,
+      },
+      {
+        label: '在册供应商', value: String(activeCount), unit: '家',
+        trend: { direction: 'up', value: `总计 ${supplierItems.length} 家` },
+        icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M3 9h12M7 5V3h4v2" stroke="currentColor" strokeWidth="1.3"/></svg>,
+      },
+      {
+        label: 'A级以上', value: String(gradeA), unit: '家',
+        trend: { direction: 'up', value: `占比 ${(gradeA / supplierItems.length * 100).toFixed(0)}%` },
+        icon: <svg viewBox="0 0 18 18" fill="none"><path d="M9 2l2.5 5 5.5.8-4 3.9.9 5.5L9 14.7 5.1 17.2l.9-5.5-4-3.9L7.5 7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>,
+      },
+    ];
+  }, []);
 
   // 删除
   const handleEnterDeleteMode = () => { setDeleteMode(true); setSelectedForDelete(new Set()); };
@@ -86,6 +118,11 @@ export default function PurchaseSuppliers() {
   return (
     <div>
       <ContentHeader title="供应商管理" breadcrumbs={['采购', '供应商管理']} />
+
+      {/* 统计卡片 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+        {stats.map((s, i) => <StatCard key={i} data={s} />)}
+      </div>
 
       {/* 类型筛选卡片 */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
