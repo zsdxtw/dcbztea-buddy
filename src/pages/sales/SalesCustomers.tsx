@@ -125,20 +125,21 @@ export default function SalesCustomers() {
   const togglePlatformSelect = (id: string) => setSelectedForDelete(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   return (
-    <div>
+    <>
       <ContentHeader title="客户管理" breadcrumbs={['销售', '客户管理']} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
-        {stats.map((s, i) => <StatCard key={i} data={s} />)}
-      </div>
+      <div className="content-body">
+        <div className="stat-cards">
+          {stats.map((s, i) => <StatCard key={i} data={s} />)}
+        </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
         {TABS.map(t => {
           const count = t.key === 'platform' ? platforms.length : data.filter(c => c.type === t.key).length;
           const isActive = activeTab === t.key;
           const withPlatform = t.key === 'direct' ? data.filter(c => c.type === 'direct' && c.platformIds.length > 0).length : 0;
           return (
-            <div key={t.key} onClick={() => { setActiveTab(t.key); setKeyword(''); }} style={{ cursor: 'pointer', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', border: isActive ? `2px solid ${PRIMARY}` : '1px solid var(--color-neutral-200)', background: isActive ? `${PRIMARY}08` : 'var(--color-neutral-0)', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition-fast)' }}>
+            <div key={t.key} onClick={() => { setActiveTab(t.key); setKeyword(''); }} style={{ cursor: 'pointer', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', border: isActive ? `2px solid ${PRIMARY}` : '1px solid var(--color-neutral-200)', background: isActive ? `${PRIMARY}08` : 'var(--color-neutral-0)', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition-fast)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                   <span style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)', background: isActive ? PRIMARY_LIGHT : 'var(--color-neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isActive ? PRIMARY : 'var(--color-neutral-500)', transition: 'var(--transition-fast)' }}>{t.icon}</span>
@@ -158,7 +159,7 @@ export default function SalesCustomers() {
       {activeTab === 'platform' ? (
         /* ── 平台客户列表 ── */
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
             <input className="filter-input" placeholder="搜索平台名称、编码、联系人..." value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
             <Button onClick={() => setShowAddPlatformDrawer(true)}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
@@ -204,7 +205,7 @@ export default function SalesCustomers() {
       ) : (
         /* ── 直营/渠道客户列表 ── */
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
             <input className="filter-input" placeholder={`搜索${CUSTOMER_TYPE_LABELS[activeTab]}名称、联系人、地区...`} value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
             <Button onClick={() => setShowAddDrawer(true)}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
@@ -393,7 +394,8 @@ export default function SalesCustomers() {
 
       {/* 新增平台抽屉 */}
       {showAddPlatformDrawer && <AddPlatformDrawer onCancel={() => setShowAddPlatformDrawer(false)} onSave={item => { setPlatforms(prev => [item, ...prev]); setShowAddPlatformDrawer(false); }} existingCodes={platforms.map(p => p.code)} />}
-    </div>
+      </div>
+    </>
   );
 }
 
