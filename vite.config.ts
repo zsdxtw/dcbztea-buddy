@@ -5,13 +5,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: '::',
+    host: '0.0.0.0',
     open: false,
     strictPort: true,
   },
   preview: {
     port: 3000,
-    host: '::',
+    host: '0.0.0.0',
     strictPort: true,
   },
 });
