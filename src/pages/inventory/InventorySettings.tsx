@@ -14,6 +14,7 @@ import {
   WAREHOUSE_CATEGORY_LABELS,
   WAREHOUSE_CATEGORY_COLORS,
 } from '../../data/warehouses';
+import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 import type { Warehouse, WarehouseCategory, StatCardData } from '../../types';
 
 type TabKey = WarehouseCategory;
@@ -31,6 +32,9 @@ const emptyForm: Warehouse = {
   name: '',
   code: '',
   address: '',
+  province: '',
+  city: '',
+  district: '',
   manager: '',
   phone: '',
   category: 'independent',
@@ -147,7 +151,10 @@ export default function InventorySettings() {
               rows={ownList.map(w => [
                 <span style={{ fontWeight: 'var(--font-medium)' }}>{w.name}</span>,
                 <span className="mono">{w.code}</span>,
-                <span style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-sm)' }}>{w.address}</span>,
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>{[w.province, w.city, w.district].filter(Boolean).join(' / ')}</span>
+                  <span style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-sm)' }}>{w.address}</span>
+                </div>,
                 w.manager,
                 <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>{w.phone}</span>,
                 <span
@@ -307,7 +314,7 @@ export default function InventorySettings() {
       {/* 新增/编辑抽屉 */}
       {showDrawer && (
         <div className="drawer-overlay" onClick={() => setShowDrawer(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 520 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 600 }}>
             <div className="drawer-header">
               <span className="drawer-title">{editing ? '编辑仓库' : '新增仓库'}</span>
               <button className="drawer-close" onClick={() => setShowDrawer(false)}>×</button>
@@ -323,8 +330,32 @@ export default function InventorySettings() {
                   <input className="filter-input" style={inputStyle} placeholder="如：WH-HZ-01" value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} />
                 </div>
               </div>
+              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)', margin: 'var(--space-4) 0 var(--space-2)' }}>仓库地址</div>
+              <div className="drawer-form-row" style={{ marginBottom: 'var(--space-2)' }}>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">省份 <span style={{ color: 'var(--color-semantic-error)' }}>*</span></label>
+                  <select className="filter-select" style={inputStyle} value={form.province} onChange={e => setForm({ ...form, province: e.target.value, city: '', district: '' })}>
+                    <option value="">请选择省份</option>
+                    {PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">城市 <span style={{ color: 'var(--color-semantic-error)' }}>*</span></label>
+                  <select className="filter-select" style={inputStyle} value={form.city} onChange={e => setForm({ ...form, city: e.target.value, district: '' })} disabled={!form.province}>
+                    <option value="">请选择城市</option>
+                    {form.province && getCityNames(form.province).map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">区县</label>
+                  <select className="filter-select" style={inputStyle} value={form.district} onChange={e => setForm({ ...form, district: e.target.value })} disabled={!form.city}>
+                    <option value="">请选择区县</option>
+                    {form.province && form.city && getDistricts(form.province, form.city).map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+              </div>
               <div className="drawer-form-field" style={{ marginBottom: 'var(--space-4)' }}>
-                <label className="drawer-label">仓库地址</label>
+                <label className="drawer-label">详细地址</label>
                 <input className="filter-input" style={inputStyle} placeholder="请输入详细地址" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} />
               </div>
               <div className="drawer-form-row">

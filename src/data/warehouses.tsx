@@ -9,12 +9,12 @@ import { storeItems } from './stores';
 
 /** 独立仓库初始数据（自有的纯仓库） */
 export const independentWarehouses: Warehouse[] = [
-  { id: 'wh-ind-01', name: '杭州总仓', code: 'WH-HZ-01', address: '杭州市西湖区龙井路88号', manager: '李仓管', phone: '0571-8766****', category: 'independent', enabled: true, isDefault: true },
-  { id: 'wh-ind-02', name: '武夷仓区', code: 'WH-WY-01', address: '武夷山市星村镇茶博路12号', manager: '张仓管', phone: '0599-512****', category: 'independent', enabled: true, isDefault: false },
-  { id: 'wh-ind-03', name: '苏州分仓', code: 'WH-SZ-01', address: '苏州市吴中区洞庭山路56号', manager: '王仓管', phone: '0512-662****', category: 'independent', enabled: true, isDefault: false },
-  { id: 'wh-ind-04', name: '福鼎分仓', code: 'WH-FD-01', address: '福鼎市点头镇茶青市场旁', manager: '陈仓管', phone: '0593-787****', category: 'independent', enabled: true, isDefault: false },
-  { id: 'wh-ind-05', name: '云南总仓', code: 'WH-YN-01', address: '勐海县勐海镇茶厂路33号', manager: '刘仓管', phone: '0691-512****', category: 'independent', enabled: true, isDefault: false },
-  { id: 'wh-ind-06', name: '安溪分仓', code: 'WH-AX-01', address: '安溪县感德镇茶叶市场7号', manager: '赵仓管', phone: '0595-232****', category: 'independent', enabled: false, isDefault: false },
+  { id: 'wh-ind-01', name: '杭州总仓', code: 'WH-HZ-01', province: '浙江', city: '杭州市', district: '西湖区', address: '龙井路88号', manager: '李仓管', phone: '0571-8766****', category: 'independent', enabled: true, isDefault: true },
+  { id: 'wh-ind-02', name: '武夷仓区', code: 'WH-WY-01', province: '福建', city: '南平市', district: '武夷山市', address: '星村镇茶博路12号', manager: '张仓管', phone: '0599-512****', category: 'independent', enabled: true, isDefault: false },
+  { id: 'wh-ind-03', name: '苏州分仓', code: 'WH-SZ-01', province: '江苏', city: '苏州市', district: '吴中区', address: '洞庭山路56号', manager: '王仓管', phone: '0512-662****', category: 'independent', enabled: true, isDefault: false },
+  { id: 'wh-ind-04', name: '福鼎分仓', code: 'WH-FD-01', province: '福建', city: '宁德市', district: '福鼎市', address: '点头镇茶青市场旁', manager: '陈仓管', phone: '0593-787****', category: 'independent', enabled: true, isDefault: false },
+  { id: 'wh-ind-05', name: '云南总仓', code: 'WH-YN-01', province: '云南', city: '西双版纳州', district: '勐海县', address: '勐海镇茶厂路33号', manager: '刘仓管', phone: '0691-512****', category: 'independent', enabled: true, isDefault: false },
+  { id: 'wh-ind-06', name: '安溪分仓', code: 'WH-AX-01', province: '福建', city: '泉州市', district: '安溪县', address: '感德镇茶叶市场7号', manager: '赵仓管', phone: '0595-232****', category: 'independent', enabled: false, isDefault: false },
 ];
 
 /** 自有仓库（仅独立仓库，门店仓库由门店数据派生） */

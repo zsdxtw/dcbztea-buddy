@@ -8,6 +8,7 @@ import type { BrandItem } from '../../types';
 import { TeaCategory } from '../../types';
 import { getTeaCategoryLabel } from '../../data/teaCategories';
 import { teaCategoryData, teawareCategoryData, teaPeripheralCategoryData, otherCategoryData } from '../../data/productCategories';
+import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 
 /** 通过茶类中文名称获取 TeaCategory 枚举 */
 function nameToTeaCategory(name: string): TeaCategory | undefined {
@@ -32,7 +33,7 @@ const brandItems: BrandItem[] = [
     id: '1', code: '001', name: '西湖牌', logo: '', owner: '杭州西湖茶叶有限公司',
     introduction: '始创于1949年，西湖龙井茶核心产区标杆品牌，传承传统炒制技艺', requirements: '需提供原产地证明，品质符合GB/T 18650标准', policy: '年度返利3%，季度结算', series: ['明前龙井', '雨前龙井', '龙井红茶'],
     trademarkCert: ['西湖龙井地理标志.pdf'], jdStoreUrl: 'https://xihupai.jd.com', tmallStoreUrl: 'https://xihupai.tmall.com',
-    contactPerson: '王明华', contactPhone: '0571-8765****', address: '浙江省杭州市西湖区龙井路88号',
+    contactPerson: '王明华', contactPhone: '0571-8765****', province: '浙江', city: '杭州市', district: '西湖区', address: '龙井路88号',
     mainCategories: ['绿茶'], productCount: 8, supplierCount: 3,
     website: 'https://www.xihupai.com', cooperationDate: '2023-03-15',
   },
@@ -40,7 +41,7 @@ const brandItems: BrandItem[] = [
     id: '2', code: '002', name: '八马', logo: '', owner: '八马茶业股份有限公司',
     introduction: '中国茶业领军品牌，铁观音十三代传人，全国连锁门店超3000家', requirements: '需具备八马品牌授权书，门店面积不低于80㎡', policy: '首批进货额≥50万，年度返利5%', series: ['赛珍珠铁观音', '浓香铁观音', '陈皮普洱'],
     trademarkCert: ['八马商标注册证.pdf'], jdStoreUrl: 'https://bama.jd.com', tmallStoreUrl: 'https://bama.tmall.com',
-    contactPerson: '林文杰', contactPhone: '0595-2345****', address: '福建省泉州市安溪县八马茶业大厦',
+    contactPerson: '林文杰', contactPhone: '0595-2345****', province: '福建', city: '泉州市', district: '安溪县', address: '八马茶业大厦',
     mainCategories: ['青茶'], productCount: 12, supplierCount: 4,
     website: 'https://www.bama.com', cooperationDate: '2022-08-01',
   },
@@ -48,7 +49,7 @@ const brandItems: BrandItem[] = [
     id: '3', code: '003', name: '张一元', logo: '', owner: '北京张一元茶叶有限责任公司',
     introduction: '百年老字号，始创于1900年，茉莉花茶制作技艺入选国家级非遗', requirements: '需通过品牌方资质审核，具备冷链仓储条件', policy: '年度返利4%，季度结算，提供品牌宣传支持', series: ['茉莉龙毫', '茉莉毛尖', '茉莉云雾'],
     trademarkCert: ['张一元商标注册证.pdf'], jdStoreUrl: 'https://zhangyiyuan.jd.com', tmallStoreUrl: 'https://zhangyiyuan.tmall.com',
-    contactPerson: '赵国强', contactPhone: '010-6303****', address: '北京市西城区大栅栏街22号',
+    contactPerson: '赵国强', contactPhone: '010-6303****', province: '北京', city: '北京市', district: '西城区', address: '大栅栏街22号',
     mainCategories: ['绿茶', '花草茶'], productCount: 6, supplierCount: 2,
     website: 'https://www.zhangyiyuan.com', cooperationDate: '2023-01-10',
   },
@@ -56,7 +57,7 @@ const brandItems: BrandItem[] = [
     id: '6', code: '006', name: '大益', logo: '', owner: '云南大益茶业集团有限公司',
     introduction: '普洱茶行业标杆，勐海茶厂传承，7542被誉为评判普洱茶的标准', requirements: '需具备普洱茶专业仓储，温湿度可调控', policy: '首批进货额≥80万，年度返利6%，提供品鉴培训', series: ['7542生茶', '7572熟茶', '金针白莲'],
     trademarkCert: ['大益商标注册证.pdf'], jdStoreUrl: 'https://dayi.jd.com', tmallStoreUrl: 'https://dayi.tmall.com',
-    contactPerson: '吴远之', contactPhone: '0691-512****', address: '云南省西双版纳州勐海县勐海茶厂',
+    contactPerson: '吴远之', contactPhone: '0691-512****', province: '云南', city: '西双版纳州', district: '勐海县', address: '勐海茶厂',
     mainCategories: ['黑茶'], productCount: 10, supplierCount: 3,
     website: 'https://www.dayi.com', cooperationDate: '2022-05-18',
   },
@@ -105,6 +106,9 @@ export default function ProductBrandDetail() {
   const [seriesList, setSeriesList] = useState<string[]>([]);
   const [newSeries, setNewSeries] = useState('');
   const [showSeriesInput, setShowSeriesInput] = useState(false);
+  const [editProvince, setEditProvince] = useState('');
+  const [editCity, setEditCity] = useState('');
+  const [editDistrict, setEditDistrict] = useState('');
 
   const brand = brandItems.find((b) => b.id === id);
 
@@ -123,6 +127,13 @@ export default function ProductBrandDetail() {
 
   const handleRemoveSeries = (index: number) => {
     setSeriesList(seriesList.filter((_, i) => i !== index));
+  };
+
+  const handleEnterEdit = () => {
+    setEditProvince(brand?.province || '');
+    setEditCity(brand?.city || '');
+    setEditDistrict(brand?.district || '');
+    setEditing(true);
   };
 
   if (!brand) {
@@ -154,7 +165,7 @@ export default function ProductBrandDetail() {
           ) : (
             <>
               <Button variant="ghost" onClick={() => navigate('/product/product-brand')}>返回列表</Button>
-              <Button onClick={() => setEditing(true)}>编辑品牌</Button>
+              <Button onClick={handleEnterEdit}>编辑品牌</Button>
             </>
           )
         }
@@ -273,7 +284,25 @@ export default function ProductBrandDetail() {
                 </EditRow>
                 <EditRow label="联系人"><input className="detail-input" defaultValue={brand.contactPerson} /></EditRow>
                 <EditRow label="联系电话"><input className="detail-input" defaultValue={brand.contactPhone} /></EditRow>
-                <EditRow label="地址" span><input className="detail-input" defaultValue={brand.address} /></EditRow>
+                <EditRow label="省份">
+                  <select className="detail-select" value={editProvince} onChange={(e) => { setEditProvince(e.target.value); setEditCity(''); setEditDistrict(''); }}>
+                    <option value="">请选择省份</option>
+                    {PROVINCE_NAMES.map((p) => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </EditRow>
+                <EditRow label="城市">
+                  <select className="detail-select" value={editCity} onChange={(e) => { setEditCity(e.target.value); setEditDistrict(''); }} disabled={!editProvince}>
+                    <option value="">请选择城市</option>
+                    {editProvince && getCityNames(editProvince).map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </EditRow>
+                <EditRow label="区县">
+                  <select className="detail-select" value={editDistrict} onChange={(e) => setEditDistrict(e.target.value)} disabled={!editCity}>
+                    <option value="">请选择区县</option>
+                    {editProvince && editCity && getDistricts(editProvince, editCity).map((d) => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </EditRow>
+                <EditRow label="详细地址" span><input className="detail-input" defaultValue={brand.address} /></EditRow>
               </div>
             ) : (
               <div className="detail-grid">
@@ -294,7 +323,7 @@ export default function ProductBrandDetail() {
                 </DetailRow>
                 <DetailRow label="联系人"><span style={{ fontWeight: 'var(--font-medium)' }}>{brand.contactPerson}</span></DetailRow>
                 <DetailRow label="联系电话"><span className="mono">{brand.contactPhone}</span></DetailRow>
-                <DetailRow label="地址" span>{brand.address || <span style={{ color: 'var(--color-neutral-400)' }}>未填写</span>}</DetailRow>
+                <DetailRow label="地址" span>{[brand.province, brand.city, brand.district].filter(Boolean).join('/')}{brand.address ? ` ${brand.address}` : ''}</DetailRow>
               </div>
             )}
           </Card>

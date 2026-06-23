@@ -340,6 +340,12 @@ export interface BrandItem {
   tmallStoreUrl: string;
   contactPerson: string;
   contactPhone: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   address: string;
   mainCategories: string[];
   productCount: number;
@@ -449,6 +455,12 @@ export interface TeaProfessional {
   gender: 'male' | 'female';
   photo: string;
   region: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   height: number;
   weight: number;
   birthDate: string;
@@ -483,6 +495,9 @@ export type ShippingSettlement = 'free' | 'not_free_fixed' | 'not_free_ratio' | 
 export interface SupplierWarehouse {
   id: string;
   name: string;
+  province?: string;
+  city?: string;
+  district?: string;
   address: string;
   contactPerson: string;
   contactPhone: string;
@@ -498,6 +513,12 @@ export interface Warehouse {
   name: string;
   code: string;
   address: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   manager: string;
   phone: string;
   category: WarehouseCategory;
@@ -656,6 +677,12 @@ export interface SupplierItem {
   cooperationAgreements: string[];
   brandAuthAgreements: string[];
   businessLicense: string;
+  /** 注册地址-省份 */
+  registeredProvince?: string;
+  /** 注册地址-城市 */
+  registeredCity?: string;
+  /** 注册地址-区县 */
+  registeredDistrict?: string;
   registeredAddress: string;
   legalRepresentative: string;
   establishmentDate: string;
@@ -664,6 +691,12 @@ export interface SupplierItem {
   businessScope: string;
   contactPerson: string;
   contactPosition: string;
+  /** 联系地址-省份 */
+  contactProvince?: string;
+  /** 联系地址-城市 */
+  contactCity?: string;
+  /** 联系地址-区县 */
+  contactDistrict?: string;
   contactAddress: string;
   contactPhone: string;
   contactEmail: string;

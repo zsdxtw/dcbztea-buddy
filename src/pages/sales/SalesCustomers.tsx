@@ -243,7 +243,7 @@ export default function SalesCustomers() {
                 ];
                 if (activeTab === 'direct') cells.push(<span key="pf">{platformTags(c.platformIds)}</span>);
                 cells.push(
-                  <span key="region">{c.region}</span>,
+                  <span key="region" style={{ fontSize: 'var(--text-sm)' }}>{[c.province, c.city, c.district].filter(Boolean).join(' / ') || c.region}</span>,
                   <span key="cp">{c.contactPerson}</span>,
                   <span key="cph" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{c.contactPhone}</span>,
                   <span key="src" style={{ fontSize: 'var(--text-xs)', color: c.source ? 'var(--color-neutral-700)' : 'var(--color-neutral-300)' }}>{c.source || '—'}</span>,
