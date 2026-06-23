@@ -129,9 +129,7 @@ export default function SalesCustomers() {
       <ContentHeader title="客户管理" breadcrumbs={['销售', '客户管理']} />
 
       <div className="content-body">
-        <div className="stat-cards"></div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
         {TABS.map(t => {
           const count = t.key === 'platform' ? platforms.length : data.filter(c => c.type === t.key).length;
           const isActive = activeTab === t.key;
