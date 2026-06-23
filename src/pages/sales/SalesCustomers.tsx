@@ -129,9 +129,7 @@ export default function SalesCustomers() {
       <ContentHeader title="客户管理" breadcrumbs={['销售', '客户管理']} />
 
       <div className="content-body">
-        <div className="stat-cards">
-          {stats.map((s, i) => <StatCard key={i} data={s} />)}
-        </div>
+        <div className="stat-cards"></div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
         {TABS.map(t => {
