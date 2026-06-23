@@ -9,6 +9,7 @@ import SettingsSection from '../../components/settings/SettingsSection';
 import SettingsRow from '../../components/settings/SettingsRow';
 import {
   ownWarehouses,
+  getStoreWarehouses,
   getPartnerWarehouses,
   WAREHOUSE_CATEGORY_LABELS,
   WAREHOUSE_CATEGORY_COLORS,
@@ -17,17 +18,13 @@ import type { Warehouse, WarehouseCategory, StatCardData } from '../../types';
 
 type TabKey = WarehouseCategory;
 
-const stats = (ownList: Warehouse[], partnerList: Warehouse[]): StatCardData[] => {
-  const independentList = ownList.filter(w => w.category === 'independent');
-  const storeList = ownList.filter(w => w.category === 'store');
-  return [
-    { label: '仓库总数', value: String(ownList.length + partnerList.length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M3 9h12" stroke="currentColor" strokeWidth="1.3"/></svg> },
-    { label: '独立仓库', value: String(independentList.length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M9 2L3 5v5c0 5 3.5 7.5 7 9 3.5-1.5 7-4 7-9V5L9 2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg> },
-    { label: '门店仓库', value: String(storeList.length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 7l1.5-3h9L15 7M3 7v8h12V7M3 7h12" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><path d="M7 15v-4h4v4" stroke="currentColor" strokeWidth="1.3"/></svg> },
-    { label: '合作仓库', value: String(partnerList.length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M2 16a5 5 0 0110 0M14 10h4M16 8v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
-    { label: '启用仓库', value: String([...ownList, ...partnerList].filter(w => w.enabled).length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
-  ];
-};
+const stats = (ownList: Warehouse[], storeList: Warehouse[], partnerList: Warehouse[]): StatCardData[] => [
+  { label: '仓库总数', value: String(ownList.length + storeList.length + partnerList.length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M3 9h12" stroke="currentColor" strokeWidth="1.3"/></svg> },
+  { label: '独立仓库', value: String(ownList.length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M9 2L3 5v5c0 5 3.5 7.5 7 9 3.5-1.5 7-4 7-9V5L9 2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg> },
+  { label: '门店仓库', value: String(storeList.length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 7l1.5-3h9L15 7M3 7v8h12V7M3 7h12" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><path d="M7 15v-4h4v4" stroke="currentColor" strokeWidth="1.3"/></svg> },
+  { label: '合作仓库', value: String(partnerList.length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M2 16a5 5 0 0110 0M14 10h4M16 8v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> },
+  { label: '启用仓库', value: String([...ownList, ...storeList, ...partnerList].filter(w => w.enabled).length), unit: '个', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+];
 
 const emptyForm: Warehouse = {
   id: '',
@@ -44,6 +41,7 @@ const emptyForm: Warehouse = {
 export default function InventorySettings() {
   const [tab, setTab] = useState<TabKey>('independent');
   const [ownList, setOwnList] = useState<Warehouse[]>(ownWarehouses);
+  const storeList = useMemo(() => getStoreWarehouses(), []);
   const partnerList = useMemo(() => getPartnerWarehouses(), []);
   const [showDrawer, setShowDrawer] = useState(false);
   const [editing, setEditing] = useState<Warehouse | null>(null);
@@ -65,11 +63,8 @@ export default function InventorySettings() {
 
   const openAdd = () => {
     setEditing(null);
-    // 新增时默认仓库类型为当前 Tab（合作仓库 Tab 不显示新增按钮）
-    const cat: WarehouseCategory = tab === 'store' ? 'store' : 'independent';
-    const seq = ownList.filter(w => w.category === cat).length + 1;
-    const prefix = cat === 'store' ? 'ST' : 'HZ';
-    setForm({ ...emptyForm, category: cat, code: `WH-${prefix}-${String(seq).padStart(2, '0')}` });
+    const seq = ownList.filter(w => w.category === 'independent').length + 1;
+    setForm({ ...emptyForm, category: 'independent', code: `WH-HZ-${String(seq).padStart(2, '0')}` });
     setShowDrawer(true);
   };
 
@@ -83,7 +78,6 @@ export default function InventorySettings() {
     if (!form.name.trim() || !form.code.trim()) return;
     if (editing) {
       setOwnList(prev => prev.map(w => w.id === editing.id ? { ...form } : w));
-      // 若设为默认，取消其他默认
       if (form.isDefault) {
         setOwnList(prev => prev.map(w => w.id === editing.id ? { ...w, isDefault: true } : { ...w, isDefault: false }));
       }
@@ -108,25 +102,22 @@ export default function InventorySettings() {
     color: 'var(--color-neutral-700)', background: 'var(--color-neutral-0)',
   };
 
-  // 当前 Tab 的自有仓库列表（独立/门店）
-  const currentOwnList = useMemo(() => ownList.filter(w => w.category === tab), [ownList, tab]);
-
   return (
     <>
       <ContentHeader
         title="仓库设置"
         breadcrumbs={['仓储', '仓库设置']}
-        actions={tab !== 'partner' ? <Button onClick={openAdd}><PlusIcon />新增仓库</Button> : undefined}
+        actions={tab === 'independent' ? <Button onClick={openAdd}><PlusIcon />新增仓库</Button> : undefined}
       />
       <div className="content-body">
         <div className="stat-cards">
-          {stats(ownList, partnerList).map((s, i) => <StatCard key={i} data={s} />)}
+          {stats(ownList, storeList, partnerList).map((s, i) => <StatCard key={i} data={s} />)}
         </div>
 
         {/* Tab 切换 */}
         <div style={{ display: 'flex', gap: 'var(--space-1)', marginBottom: 'var(--space-4)', borderBottom: '1px solid var(--color-neutral-200)' }}>
           {(['independent', 'store', 'partner'] as TabKey[]).map(k => {
-            const count = k === 'partner' ? partnerList.length : ownList.filter(w => w.category === k).length;
+            const count = k === 'independent' ? ownList.length : k === 'store' ? storeList.length : partnerList.length;
             return (
               <button
                 key={k}
@@ -148,12 +139,12 @@ export default function InventorySettings() {
           })}
         </div>
 
-        {/* 独立仓库 / 门店仓库表格（可增删改查） */}
-        {tab !== 'partner' && (
-          <Card title={WAREHOUSE_CATEGORY_LABELS[tab]}>
+        {/* 独立仓库表格（可增删改查） */}
+        {tab === 'independent' && (
+          <Card title="独立仓库">
             <Table
               headers={['仓库名称', '仓库编码', '地址', '负责人', '电话', '默认', '状态', '操作']}
-              rows={currentOwnList.map(w => [
+              rows={ownList.map(w => [
                 <span style={{ fontWeight: 'var(--font-medium)' }}>{w.name}</span>,
                 <span className="mono">{w.code}</span>,
                 <span style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-sm)' }}>{w.address}</span>,
@@ -176,6 +167,41 @@ export default function InventorySettings() {
                   <Button variant="ghost" size="sm" onClick={() => openEdit(w)}>编辑</Button>
                   <Button variant="ghost" size="sm" style={{ color: 'var(--color-semantic-error)' }} onClick={() => setDeleteTarget(w)}>删除</Button>
                 </div>,
+              ])}
+            />
+          </Card>
+        )}
+
+        {/* 门店仓库表格（来自门店管理，只读） */}
+        {tab === 'store' && (
+          <Card title="门店仓库" headerRight={
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>
+              数据联动自「销售 &gt; 门店管理」，请在门店管理中维护
+            </span>
+          }>
+            <Table
+              headers={['仓库名称', '仓库编码', '地址', '负责人', '电话', '来源门店', '状态']}
+              rows={storeList.map(w => [
+                <span style={{ fontWeight: 'var(--font-medium)' }}>{w.name}</span>,
+                <span className="mono">{w.code}</span>,
+                <span style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-sm)' }}>{w.address}</span>,
+                w.manager,
+                <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>{w.phone}</span>,
+                <span style={{
+                  padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-medium)', background: `${WAREHOUSE_CATEGORY_COLORS.store}15`,
+                  color: WAREHOUSE_CATEGORY_COLORS.store, border: `1px solid ${WAREHOUSE_CATEGORY_COLORS.store}30`,
+                }}>
+                  {w.supplierName}
+                </span>,
+                <span style={{
+                  padding: '2px 8px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-medium)',
+                  background: w.enabled ? '#E8F5E9' : '#FFF3E0',
+                  color: w.enabled ? '#2E7D32' : '#E65100',
+                }}>
+                  {w.enabled ? '启用' : '停用'}
+                </span>,
               ])}
             />
           </Card>
@@ -289,25 +315,13 @@ export default function InventorySettings() {
             <div className="drawer-body">
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
-                  <label className="drawer-label">仓库类型 <span style={{ color: 'var(--color-semantic-error)' }}>*</span></label>
-                  <select
-                    className="filter-select"
-                    style={inputStyle}
-                    value={form.category}
-                    onChange={e => setForm({ ...form, category: e.target.value as WarehouseCategory })}
-                  >
-                    <option value="independent">独立仓库（自有的纯仓库）</option>
-                    <option value="store">门店仓库（自有的在茶叶门店的仓库）</option>
-                  </select>
+                  <label className="drawer-label">仓库名称 <span style={{ color: 'var(--color-semantic-error)' }}>*</span></label>
+                  <input className="filter-input" style={inputStyle} placeholder="如：杭州总仓" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                 </div>
                 <div className="drawer-form-field">
                   <label className="drawer-label">仓库编码 <span style={{ color: 'var(--color-semantic-error)' }}>*</span></label>
                   <input className="filter-input" style={inputStyle} placeholder="如：WH-HZ-01" value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} />
                 </div>
-              </div>
-              <div className="drawer-form-field" style={{ marginBottom: 'var(--space-4)' }}>
-                <label className="drawer-label">仓库名称 <span style={{ color: 'var(--color-semantic-error)' }}>*</span></label>
-                <input className="filter-input" style={inputStyle} placeholder="如：杭州总仓" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
               </div>
               <div className="drawer-form-field" style={{ marginBottom: 'var(--space-4)' }}>
                 <label className="drawer-label">仓库地址</label>

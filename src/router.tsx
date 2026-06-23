@@ -21,6 +21,7 @@ import SalesOrders from './pages/sales/SalesOrders';
 import SalesPricing from './pages/sales/SalesPricing';
 import SalesReconciliation from './pages/sales/SalesReconciliation';
 import SalesCustomers from './pages/sales/SalesCustomers';
+import SalesStores from './pages/sales/SalesStores';
 import SalesReturn from './pages/sales/SalesReturn';
 
 import InventoryOverview from './pages/inventory/InventoryOverview';
@@ -103,6 +104,7 @@ export const router = createBrowserRouter([
       { path: 'sales/sales-pricing', element: <SalesPricing /> },
       { path: 'sales/sales-customers', element: <SalesCustomers /> },
       { path: 'sales/sales-platforms', element: <Navigate to="/sales/sales-customers" replace /> },
+      { path: 'sales/sales-stores', element: <SalesStores /> },
       { path: 'sales/sales-reconciliation', element: <SalesReconciliation /> },
       { path: 'sales/sales-return', element: <SalesReturn /> },
       /* ── 仓储 ── */

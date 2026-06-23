@@ -53,6 +53,9 @@ const OutboundIcon = () => (
 const CustomersIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M2 16a5 5 0 0110 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="15" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.2"/></svg>
 );
+const StoreIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M3 8l1.5-4h11L17 8M3 8v9h14V8M3 8h14" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><path d="M8 17v-5h4v5" stroke="currentColor" strokeWidth="1.3"/></svg>
+);
 const PlatformIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M7 6V4a1.5 1.5 0 011.5-1.5h3A1.5 1.5 0 0113 4v2" stroke="currentColor" strokeWidth="1.2"/><path d="M10 9.5v2M9 10.5h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
 );
@@ -236,6 +239,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'sales-orders', label: '销售订单', icon: <OrdersIcon /> },
       { key: 'sales-pricing', label: '销售报（调）价', icon: <QuotationIcon /> },
       { key: 'sales-customers', label: '客户管理', icon: <CustomersIcon /> },
+      { key: 'sales-stores', label: '门店管理', icon: <StoreIcon /> },
       { key: 'sales-reconciliation', label: '客户对账', icon: <ReconciliationIcon /> },
       { key: 'sales-return', label: '销售退货', icon: <ReturnIcon /> },
     ],

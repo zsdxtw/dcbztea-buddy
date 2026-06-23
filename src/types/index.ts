@@ -616,6 +616,37 @@ export interface CustomerItem {
   remark?: string;
 }
 
+/** 门店（线下茶叶店） */
+export interface StoreItem {
+  id: string;
+  /** 门店编号（MD-XXXX） */
+  code: string;
+  /** 门店名称 */
+  name: string;
+  /** 省份 */
+  province: string;
+  /** 城市 */
+  city: string;
+  /** 区县 */
+  district: string;
+  /** 详细地址 */
+  address: string;
+  /** 店长/负责人 */
+  manager: string;
+  /** 联系电话 */
+  phone: string;
+  /** 营业时间 */
+  businessHours: string;
+  /** 开业日期 */
+  openingDate: string;
+  /** 门店面积（㎡） */
+  area: number;
+  /** 营业状态 */
+  status: 'active' | 'inactive';
+  /** 备注 */
+  remark?: string;
+}
+
 /** 供应商 */
 export interface SupplierItem {
   id: string;
