@@ -489,8 +489,8 @@ export interface SupplierWarehouse {
   isDefault: boolean;
 }
 
-/** 仓库归属类型：自有仓库 / 合作仓库（供应商仓库） */
-export type WarehouseCategory = 'own' | 'partner';
+/** 仓库归属类型：独立仓库（自有的纯仓库）/ 门店仓库（自有的在茶叶门店的仓库）/ 合作仓库（供应商的合作仓库） */
+export type WarehouseCategory = 'independent' | 'store' | 'partner';
 
 /** 仓库信息（仓库设置模块统一结构） */
 export interface Warehouse {
@@ -503,9 +503,9 @@ export interface Warehouse {
   category: WarehouseCategory;
   enabled: boolean;
   isDefault: boolean;
-  /** 合作仓库关联的供应商 ID（自有仓库为空） */
+  /** 合作仓库关联的供应商 ID（独立/门店仓库为空） */
   supplierId?: string;
-  /** 合作仓库关联的供应商名称（自有仓库为空） */
+  /** 合作仓库关联的供应商名称（独立/门店仓库为空） */
   supplierName?: string;
 }
 
