@@ -547,16 +547,29 @@ export interface PlatformInvoiceInfo {
   taxRate: string;
 }
 
+/** 客户结算账户（与平台结算账户结构一致） */
+export type CustomerBankAccount = PlatformBankAccount;
+
+/** 客户发票信息（与平台发票信息结构一致） */
+export type CustomerInvoiceInfo = PlatformInvoiceInfo;
+
 /** 平台 */
 export interface PlatformItem {
   id: string;
   name: string;
   shortName: string;
+  /** 平台编号（原 code 字段，规则：VPT-简称首字母-XXXXX） */
   code: string;
   contactPerson: string;
   contactPosition: string;
   contactPhone: string;
   contactAddress: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   cooperationDate: string;
   commissionRate: string;
   bankAccounts: PlatformBankAccount[];
@@ -569,8 +582,18 @@ export interface PlatformItem {
 export interface CustomerItem {
   id: string;
   name: string;
+  /** 客户简称 */
+  shortName?: string;
+  /** 客户编号（直营VZY/渠道VQD-简称首字母-XXXXX） */
+  customerCode?: string;
   type: CustomerType;
   region: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   contactPerson: string;
   contactPhone: string;
   contactEmail?: string;
@@ -586,6 +609,10 @@ export interface CustomerItem {
   taxNo?: string;
   /** 客户来源 */
   source?: string;
+  /** 结算账户列表 */
+  bankAccounts?: CustomerBankAccount[];
+  /** 发票信息列表 */
+  invoiceInfos?: CustomerInvoiceInfo[];
   remark?: string;
 }
 
