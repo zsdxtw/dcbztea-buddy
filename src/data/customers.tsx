@@ -73,29 +73,47 @@ const channelCustomers: CustomerItem[] = [
   },
 ];
 
-/** 所有客户（按建档顺序，用于统筹编号） */
-const allCustomersOrdered: CustomerItem[] = [
+/* ── 个人客户 ── */
+const personalCustomers: CustomerItem[] = [
+  { id: 'c16', name: '张伟', shortName: '张伟', type: 'personal', region: '北京', province: '北京', city: '北京市', district: '朝阳区', contactPerson: '张伟', contactPhone: '138****1234', contactEmail: 'zhangwei@email.com', contactAddress: '建国路88号', level: 'B级', orders: 5, totalAmount: 18600, platformIds: [], cooperationDate: '2024-06-10', status: 'active', source: '线上咨询', remark: '个人茶友，偏好绿茶' },
+  { id: 'c17', name: '李娜', shortName: '李娜', type: 'personal', region: '上海', province: '上海', city: '上海市', district: '徐汇区', contactPerson: '李娜', contactPhone: '139****5678', contactEmail: 'lina@email.com', contactAddress: '漕溪北路120号', level: 'A级', orders: 12, totalAmount: 45200, platformIds: [], cooperationDate: '2023-10-15', status: 'active', source: '老客户转介', remark: '高端个人客户，常购白茶' },
+  { id: 'c18', name: '王强', shortName: '王强', type: 'personal', region: '广州', province: '广东', city: '广州市', district: '海珠区', contactPerson: '王强', contactPhone: '137****9012', contactAddress: '新港中路200号', level: 'C级', orders: 3, totalAmount: 8800, platformIds: [], cooperationDate: '2024-09-01', status: 'active', source: '线上咨询' },
+  { id: 'c19', name: '赵敏', shortName: '赵敏', type: 'personal', region: '成都', province: '四川', city: '成都市', district: '锦江区', contactPerson: '赵敏', contactPhone: '136****3456', contactEmail: 'zhaomin@email.com', contactAddress: '春熙路50号', level: 'B级', orders: 8, totalAmount: 23400, platformIds: [], cooperationDate: '2024-02-20', status: 'active', source: '展会拓客', remark: '红茶爱好者' },
+  { id: 'c20', name: '陈刚', shortName: '陈刚', type: 'personal', region: '杭州', province: '浙江', city: '杭州市', district: '滨江区', contactPerson: '陈刚', contactPhone: '135****7890', contactAddress: '江南大道100号', level: 'A级', orders: 15, totalAmount: 56800, platformIds: [], cooperationDate: '2023-07-08', status: 'inactive', source: '主动开发', remark: '已暂停采购' },
+];
+
+/** 为各类型客户按类型内顺序生成编号（4位，各类型从0001起） */
+function assignCodes(items: CustomerItem[]) {
+  const counters: Record<string, number> = {};
+  items.forEach(c => {
+    counters[c.type] = (counters[c.type] ?? 0) + 1;
+    c.customerCode = generateCustomerCode(c.type, c.shortName || c.name, counters[c.type]);
+  });
+}
+
+/** 所有客户（按建档顺序） */
+const allCustomers: CustomerItem[] = [
   ...directNoPlatform,
   ...directWithPlatform,
   ...channelCustomers,
+  ...personalCustomers,
 ];
 
-/** 为所有客户生成统筹编号（00001 起，3 类客户统筹排序） */
-allCustomersOrdered.forEach((c, idx) => {
-  c.customerCode = generateCustomerCode(c.type, c.shortName || c.name, idx + 1);
-});
+assignCodes(allCustomers);
 
-export const customerItems: CustomerItem[] = allCustomersOrdered;
+export const customerItems: CustomerItem[] = allCustomers;
 
 export const CUSTOMER_TYPE_LABELS: Record<CustomerItem['type'], string> = {
   direct: '直营客户',
   channel: '渠道客户',
+  personal: '个人客户',
   platform: '平台客户',
 };
 
 export const CUSTOMER_TYPE_DESC: Record<CustomerItem['type'], string> = {
   direct: '客情自有，自己维护的终端客户',
   channel: '客情非自有，卖给渠道二次销售',
+  personal: '个人茶友，终端散客消费者',
   platform: '京东慧采、史泰博、齐心、易积通等中间商',
 };
 

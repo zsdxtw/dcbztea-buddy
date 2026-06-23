@@ -18,6 +18,7 @@ const SECONDARY_LIGHT = '#FEF2F4';
 const TABS: { key: CustomerType; label: string; desc: string; icon: React.ReactNode }[] = [
   { key: 'direct', label: '直营客户', desc: CUSTOMER_TYPE_DESC.direct, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg> },
   { key: 'channel', label: '渠道客户', desc: CUSTOMER_TYPE_DESC.channel, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M2 10l3 2 3-4 3 5 3-3 2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><circle cx="4" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.3" /></svg> },
+  { key: 'personal', label: '个人客户', desc: CUSTOMER_TYPE_DESC.personal, icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" strokeWidth="1.3" /><path d="M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg> },
   { key: 'platform', label: '平台客户', desc: CUSTOMER_TYPE_DESC.platform, icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" /><path d="M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5" stroke="currentColor" strokeWidth="1.3" /><path d="M9 8v2M8 9h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg> },
 ];
 
@@ -50,6 +51,7 @@ export default function SalesCustomers() {
   const stats: StatCardData[] = useMemo(() => {
     const direct = data.filter(c => c.type === 'direct');
     const channel = data.filter(c => c.type === 'channel');
+    const personal = data.filter(c => c.type === 'personal');
     const withPlatform = direct.filter(c => c.platformIds.length > 0).length;
     const activeCount = data.filter(c => c.status === 'active').length;
     const platformActive = platforms.filter(p => p.status === 'active').length;
@@ -57,6 +59,7 @@ export default function SalesCustomers() {
       { label: '客户总数', value: String(data.length + platforms.length), unit: '家', trend: { direction: 'up', value: `合作中 ${activeCount + platformActive}` }, icon: <IconUsers /> },
       { label: '直营客户', value: String(direct.length), unit: '家', trend: { direction: 'up', value: `含平台方 ${withPlatform}` }, icon: <IconHome /> },
       { label: '渠道客户', value: String(channel.length), unit: '家', trend: { direction: 'up', value: `合作中 ${channel.filter(c => c.status === 'active').length}` }, icon: <IconChannel /> },
+      { label: '个人客户', value: String(personal.length), unit: '人', trend: { direction: 'up', value: `合作中 ${personal.filter(c => c.status === 'active').length}` }, icon: <IconPersonal /> },
       { label: '平台客户', value: String(platforms.length), unit: '家', trend: { direction: 'up', value: `在册 ${platformActive}` }, icon: <IconPlatform /> },
     ];
   }, [data, platforms]);
@@ -101,7 +104,7 @@ export default function SalesCustomers() {
   /** 简易新增平台（只输入简称） */
   const quickAddPlatform = (shortName: string): string => {
     const id = `p_${Date.now()}`;
-    const sequence = data.length + platforms.length + 1;
+    const sequence = platforms.length + 1;
     const newPlatform: PlatformItem = {
       id, name: shortName, shortName, code: generateCustomerCode('platform', shortName, sequence),
       contactPerson: '', contactPosition: '', contactPhone: '', contactAddress: '',
@@ -133,7 +136,7 @@ export default function SalesCustomers() {
       <ContentHeader title="客户管理" breadcrumbs={['销售', '客户管理']} />
 
       <div className="content-body">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
         {TABS.map(t => {
           const count = t.key === 'platform' ? platforms.length : data.filter(c => c.type === t.key).length;
           const isActive = activeTab === t.key;
@@ -294,9 +297,9 @@ export default function SalesCustomers() {
                 ['所在地区', [detailCustomer.province, detailCustomer.city, detailCustomer.district].filter(Boolean).join(' / ') || detailCustomer.region || '—'],
                 ['联系邮箱', detailCustomer.contactEmail || '—'],
                 ['联系地址', detailCustomer.contactAddress || '—'],
-                ['结算方式', detailCustomer.settlementMethod || '—'],
+                ...(detailCustomer.type !== 'personal' ? [['结算方式', detailCustomer.settlementMethod || '—']] as [string, string][] : []),
                 ['客户来源', detailCustomer.source || '—'],
-                ['税号', detailCustomer.taxNo || '—'],
+                ...(detailCustomer.type !== 'personal' ? [['税号', detailCustomer.taxNo || '—']] as [string, string][] : []),
                 ['合作日期', detailCustomer.cooperationDate],
                 ['累计金额', `¥${(detailCustomer.totalAmount / 10000).toFixed(1)}万`],
               ] as [string, string][]).map(([label, value]) => (
@@ -305,7 +308,9 @@ export default function SalesCustomers() {
               {detailCustomer.remark && <div style={{ gridColumn: '1 / -1', fontSize: 'var(--text-sm)' }}><span style={{ color: 'var(--color-neutral-500)' }}>备注：</span><span style={{ color: 'var(--color-neutral-800)' }}>{detailCustomer.remark}</span></div>}
             </div>
 
-            {/* 结算账户 */}
+            {/* 结算账户与发票信息（个人客户不展示） */}
+            {detailCustomer.type !== 'personal' && (
+              <>
             <div style={{ marginBottom: 'var(--space-4)' }}>
               <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)' }}>结算账户（{(detailCustomer.bankAccounts ?? []).length}）</h4>
               {(detailCustomer.bankAccounts ?? []).length === 0 ? (
@@ -345,6 +350,8 @@ export default function SalesCustomers() {
                 </div>
               )}
             </div>
+              </>
+            )}
 
             {detailCustomer.type === 'direct' && detailCustomer.platformIds.length > 0 && (
               <div style={{ marginBottom: 'var(--space-4)' }}>
@@ -444,14 +451,14 @@ export default function SalesCustomers() {
 
       {/* 新增客户抽屉 */}
       {showAddDrawer && (
-        <CreateDrawer customerType={activeTab} platforms={platforms} sequence={data.length + platforms.length + 1} onCancel={() => setShowAddDrawer(false)}
+        <CreateDrawer customerType={activeTab} platforms={platforms} sequence={data.filter(c => c.type === activeTab).length + 1} onCancel={() => setShowAddDrawer(false)}
           onSave={item => { setData(prev => [item, ...prev]); setShowAddDrawer(false); }}
           onQuickAddPlatform={quickAddPlatform}
         />
       )}
 
       {/* 新增平台抽屉 */}
-      {showAddPlatformDrawer && <AddPlatformDrawer onCancel={() => setShowAddPlatformDrawer(false)} onSave={item => { setPlatforms(prev => [item, ...prev]); setShowAddPlatformDrawer(false); }} sequence={data.length + platforms.length + 1} />}
+      {showAddPlatformDrawer && <AddPlatformDrawer onCancel={() => setShowAddPlatformDrawer(false)} onSave={item => { setPlatforms(prev => [item, ...prev]); setShowAddPlatformDrawer(false); }} sequence={platforms.length + 1} />}
       </div>
     </>
   );
@@ -480,7 +487,8 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
 
   const update = <K extends keyof CustomerItem>(k: K, v: CustomerItem[K]) => setForm(prev => ({ ...prev, [k]: v }));
   const togglePlatform = (id: string) => setForm(prev => ({ ...prev, platformIds: prev.platformIds.includes(id) ? prev.platformIds.filter(x => x !== id) : [...prev.platformIds, id] }));
-  const canSave = form.name.trim().length > 0 && (form.shortName ?? '').trim().length > 0 && form.contactPerson.trim().length > 0;
+  const isPersonal = customerType === 'personal';
+  const canSave = form.name.trim().length > 0 && (form.shortName ?? '').trim().length > 0 && (isPersonal || form.contactPerson.trim().length > 0);
 
   const previewCode = (form.shortName ?? '').trim() ? generateCustomerCode(customerType, form.shortName!.trim(), sequence) : '—';
 
@@ -511,7 +519,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
     const shortName = form.shortName!.trim();
     const customerCode = generateCustomerCode(customerType, shortName, sequence);
     const region = form.city ? form.city.replace(/市$/, '') : (form.province || '');
-    onSave({ ...form, shortName, customerCode, region, bankAccounts, invoiceInfos });
+    onSave({ ...form, shortName, customerCode, region, contactPerson: isPersonal ? shortName : form.contactPerson, bankAccounts: isPersonal ? [] : bankAccounts, invoiceInfos: isPersonal ? [] : invoiceInfos });
   };
 
   return (
@@ -532,7 +540,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
             <div className="drawer-form-field" style={{ flex: 1 }}><label className="drawer-label">客户编号（自动生成）</label><input className="filter-input" style={{ width: '100%' }} value={previewCode} readOnly placeholder="输入客户简称后自动生成" /></div>
           </div>
           <div className="drawer-form-row">
-            <div className="drawer-form-field"><label className="drawer-label">联系人 *</label><input className="filter-input" style={{ width: '100%' }} value={form.contactPerson} onChange={e => update('contactPerson', e.target.value)} /></div>
+            {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">联系人 *</label><input className="filter-input" style={{ width: '100%' }} value={form.contactPerson} onChange={e => update('contactPerson', e.target.value)} /></div>}
             <div className="drawer-form-field"><label className="drawer-label">联系电话</label><input className="filter-input" style={{ width: '100%' }} value={form.contactPhone} onChange={e => update('contactPhone', e.target.value)} /></div>
             <div className="drawer-form-field"><label className="drawer-label">联系邮箱</label><input className="filter-input" style={{ width: '100%' }} value={form.contactEmail || ''} onChange={e => update('contactEmail', e.target.value)} /></div>
           </div>
@@ -547,9 +555,9 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
           </div>
           <div className="drawer-section-title">合作信息</div>
           <div className="drawer-form-row">
-            <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }} value={form.settlementMethod || ''} onChange={e => update('settlementMethod', e.target.value)}><option value="月结">月结</option><option value="预付">预付</option><option value="季度">季度结算</option><option value="现款">现款</option></select></div>
+            {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }} value={form.settlementMethod || ''} onChange={e => update('settlementMethod', e.target.value)}><option value="月结">月结</option><option value="预付">预付</option><option value="季度">季度结算</option><option value="现款">现款</option></select></div>}
             <div className="drawer-form-field"><label className="drawer-label">客户来源</label><select className="filter-select" style={{ width: '100%' }} value={form.source || ''} onChange={e => update('source', e.target.value)}><option value="">请选择</option><option value="主动开发">主动开发</option><option value="展会拓客">展会拓客</option><option value="老客户转介">老客户转介</option><option value="平台引流">平台引流</option><option value="线上咨询">线上咨询</option><option value="其他">其他</option></select></div>
-            <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>
+            {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>}
           </div>
           <div className="drawer-form-row">
             <div className="drawer-form-field" style={{ flex: 1 }}><label className="drawer-label">备注</label><input className="filter-input" style={{ width: '100%' }} value={form.remark || ''} onChange={e => update('remark', e.target.value)} /></div>
@@ -557,6 +565,8 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
           </div>
 
           {/* 结算账户 */}
+          {!isPersonal && (
+            <>
           <div className="drawer-section-title">结算账户（{bankAccounts.length}/5）</div>
           {bankAccounts.map((ba, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
@@ -593,6 +603,8 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
               <div><label className="drawer-label">税率</label><input className="filter-input" style={{ width: '100%' }} value={newInvoice.taxRate} onChange={e => setNewInvoice(prev => ({ ...prev, taxRate: e.target.value }))} placeholder="6%" /></div>
               <div style={{ gridColumn: '1 / -1' }}><Button size="sm" onClick={addInvoiceInfo} disabled={!newInvoice.invoiceEntity}>+ 添加发票主体</Button></div>
             </div>
+          )}
+            </>
           )}
 
           {customerType === 'direct' && (
@@ -770,4 +782,5 @@ function EmptyText({ children }: { children: React.ReactNode }) { return <div st
 function IconUsers() { return <svg viewBox="0 0 18 18" fill="none"><circle cx="7" cy="6.5" r="2.8" stroke="currentColor" strokeWidth="1.3" /><path d="M1 15c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /><circle cx="13" cy="7" r="2.2" stroke="currentColor" strokeWidth="1.2" /><path d="M13 11c2 0 4 1.5 4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg>; }
 function IconHome() { return <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg>; }
 function IconChannel() { return <svg viewBox="0 0 18 18" fill="none"><path d="M2 10l3 2 3-4 3 5 3-3 2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><circle cx="4" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.3" /></svg>; }
+function IconPersonal() { return <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" strokeWidth="1.3" /><path d="M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>; }
 function IconPlatform() { return <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" /><path d="M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5" stroke="currentColor" strokeWidth="1.3" /><path d="M9 8v2M8 9h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg>; }

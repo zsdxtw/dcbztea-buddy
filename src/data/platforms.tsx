@@ -74,10 +74,8 @@ export const platformItems: PlatformItem[] = [
 ];
 
 /**
- * 为平台生成统筹编号（接在客户编号之后，3 类客户统筹排序）
- * 客户共 15 条（c1-c15），平台从第 16 号开始
+ * 为平台生成编号（4位，平台类型从0001起）
  */
-const PLATFORM_SEQ_START = 16;
 platformItems.forEach((p, idx) => {
-  p.code = generateCustomerCode('platform', p.shortName, PLATFORM_SEQ_START + idx);
+  p.code = generateCustomerCode('platform', p.shortName, idx + 1);
 });

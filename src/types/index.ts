@@ -530,7 +530,7 @@ export interface BankAccount {
 }
 
 /** 客户类型 */
-export type CustomerType = 'direct' | 'channel' | 'platform';
+export type CustomerType = 'direct' | 'channel' | 'personal' | 'platform';
 
 /** 平台结算账户 */
 export interface PlatformBankAccount {
