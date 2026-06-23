@@ -9,6 +9,7 @@ import { customerItems as initialCustomers, CUSTOMER_TYPE_LABELS, CUSTOMER_TYPE_
 import { platformItems as globalPlatforms } from '../../data/platforms';
 import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 import { generateCustomerCode } from '../../utils/customerCode';
+import { useDrawerWidth } from '../../hooks/useDrawerWidth';
 
 const PRIMARY = '#0F64B5';
 const PRIMARY_LIGHT = '#EBF3FC';
@@ -32,6 +33,7 @@ export default function SalesCustomers() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [detailCustomer, setDetailCustomer] = useState<CustomerItem | null>(null);
   const [showAddDrawer, setShowAddDrawer] = useState(false);
+  const drawerWidth = useDrawerWidth();
 
   // 平台客户相关状态
   const [detailPlatform, setDetailPlatform] = useState<PlatformItem | null>(null);
@@ -374,7 +376,7 @@ export default function SalesCustomers() {
       {/* 平台客户详情/编辑抽屉 */}
       {showPlatformDetail && detailPlatform && (
         <div className="drawer-overlay" onClick={() => { setShowPlatformDetail(false); setEditingPlatform(false); setEditPlatformForm(null); }}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 680 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: drawerWidth }}>
             <div className="drawer-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>
                 <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', background: PRIMARY_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-base)', fontWeight: 'var(--font-bold)', color: PRIMARY, flexShrink: 0 }}>{detailPlatform.shortName.charAt(0)}</div>
@@ -473,6 +475,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
   onSave: (item: CustomerItem) => void;
   onQuickAddPlatform: (shortName: string) => string;
 }) {
+  const drawerWidth = useDrawerWidth();
   const [form, setForm] = useState<CustomerItem>({
     id: `c_${Date.now()}`, name: '', shortName: '', customerCode: '', type: customerType, region: '', province: '', city: '', district: '',
     contactPerson: '', contactPhone: '', contactEmail: '', contactAddress: '', level: 'B级', orders: 0, totalAmount: 0, platformIds: [],
@@ -524,7 +527,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
 
   return (
     <div className="drawer-overlay" onClick={onCancel}>
-      <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 680 }}>
+      <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: drawerWidth }}>
         <div className="drawer-header">
           <span className="drawer-title">新增{CUSTOMER_TYPE_LABELS[customerType]}</span>
           <button className="drawer-close" onClick={onCancel}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
@@ -652,6 +655,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
 
 /* ── 新增平台抽屉 ── */
 function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => void; onSave: (item: PlatformItem) => void; sequence: number }) {
+  const drawerWidth = useDrawerWidth();
   const [form, setForm] = useState<Partial<PlatformItem>>({
     name: '', shortName: '', contactPerson: '', contactPosition: '', contactPhone: '', contactAddress: '',
     province: '', city: '', district: '',
@@ -698,7 +702,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
 
   return (
     <div className="drawer-overlay" onClick={onCancel}>
-      <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 680 }}>
+      <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: drawerWidth }}>
         <div className="drawer-header">
           <span className="drawer-title">新增平台客户</span>
           <button className="drawer-close" onClick={onCancel}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
