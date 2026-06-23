@@ -378,7 +378,7 @@ body {
 }
 .page-title { font-family: var(--font-family-serif); font-size: var(--text-xl); font-weight: var(--font-semibold); color: var(--color-neutral-800); }
 .content-header-actions { display: flex; align-items: center; gap: var(--space-3); }
-.content-body { padding: var(--space-6); }
+.content-body { padding: var(--space-4) var(--space-6); }
 
 /* ═══ 组件样式 ═══ */
 
