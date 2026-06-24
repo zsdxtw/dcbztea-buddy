@@ -9,6 +9,7 @@ import {
   TEA_PROFESSIONAL_TYPE_LABELS,
   TEA_PROFESSIONAL_TYPE_COLORS,
 } from '../../data/teaProfessionals';
+import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 import type { TeaProfessional, TeaProfessionalType } from '../../types';
 import type { StatCardData } from '../../types';
 
@@ -23,6 +24,24 @@ const TYPE_INFO: Record<TeaProfessionalType, { label: string; desc: string; colo
 /* ── 性别标签 ── */
 const GENDER_LABELS: Record<string, string> = { male: '男', female: '女' };
 
+/* ── 新增表单初始值 ── */
+const emptyForm = {
+  name: '',
+  gender: '' as 'male' | 'female' | '',
+  birthDate: '',
+  province: '',
+  city: '',
+  district: '',
+  address: '',
+  height: 0,
+  weight: 0,
+  phone: '',
+  email: '',
+  idCard: '',
+  introduction: '',
+  type: [] as TeaProfessionalType[],
+};
+
 export default function PersonnelTeaProfessional() {
   const [activeType, setActiveType] = useState<TeaProfessionalType | 'all'>('all');
   const [keyword, setKeyword] = useState('');
@@ -32,12 +51,14 @@ export default function PersonnelTeaProfessional() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<TeaProfessional | null>(null);
   const [drawerMode, setDrawerMode] = useState<'view' | 'add'>('view');
+  const [form, setForm] = useState({ ...emptyForm });
 
   // 筛选
   const filtered = useMemo(() => {
     return teaProfessionals.filter(p => {
       if (activeType !== 'all' && !p.type.includes(activeType)) return false;
-      if (keyword && !p.name.includes(keyword) && !p.region.includes(keyword)) return false;
+      if (keyword && !p.name.includes(keyword) && !p.region.includes(keyword)
+        && !(p.province?.includes(keyword) || p.city?.includes(keyword) || p.district?.includes(keyword))) return false;
       return true;
     });
   }, [activeType, keyword]);
@@ -91,8 +112,16 @@ export default function PersonnelTeaProfessional() {
   // 新增
   const handleAdd = () => {
     setSelectedPerson(null);
+    setForm({ ...emptyForm });
     setDrawerMode('add');
     setShowDrawer(true);
+  };
+
+  // 保存（保存省市区，并根据城市生成 region，如"杭州市"→"杭州"）
+  const handleSave = () => {
+    const region = form.city ? form.city.replace(/市$/, '') : '';
+    void { ...form, region };
+    setShowDrawer(false);
   };
 
   // 计算年龄
@@ -206,7 +235,7 @@ export default function PersonnelTeaProfessional() {
               ))}
             </div>,
             GENDER_LABELS[person.gender],
-            person.region,
+            [person.province, person.city, person.district].filter(Boolean).join(' / ') || person.region,
             `${calcAge(person.birthDate)}岁`,
             <span key="cert" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{person.certificates.length}项</span>,
             <div key="spec" style={{ display: 'flex', gap: 4, flexWrap: 'wrap', maxWidth: 200 }}>
@@ -294,7 +323,7 @@ export default function PersonnelTeaProfessional() {
                 ['年龄', `${calcAge(selectedPerson.birthDate)}岁`],
                 ['身高', `${selectedPerson.height}cm`],
                 ['体重', `${selectedPerson.weight}kg`],
-                ['地区', selectedPerson.region],
+                ['地区', [selectedPerson.province, selectedPerson.city, selectedPerson.district].filter(Boolean).join(' / ') || selectedPerson.region],
                 ['手机', selectedPerson.phone],
                 ['邮箱', selectedPerson.email],
                 ['身份证', selectedPerson.idCard],
@@ -400,7 +429,6 @@ export default function PersonnelTeaProfessional() {
                 { label: '姓名', placeholder: '请输入姓名' },
                 { label: '性别', placeholder: '请选择', type: 'select', options: ['男', '女'] },
                 { label: '出生年月', placeholder: 'YYYY-MM-DD' },
-                { label: '地区', placeholder: '请输入地区' },
                 { label: '身高(cm)', placeholder: '请输入身高' },
                 { label: '体重(kg)', placeholder: '请输入体重' },
                 { label: '手机号', placeholder: '请输入手机号' },
@@ -420,8 +448,25 @@ export default function PersonnelTeaProfessional() {
                 </div>
               ))}
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>地址</label>
-                <input className="filter-input" placeholder="请输入详细地址" style={{ width: '100%' }} />
+                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>地区</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-2)' }}>
+                  <select className="filter-select" style={{ width: '100%' }} value={form.province} onChange={e => setForm({ ...form, province: e.target.value, city: '', district: '' })}>
+                    <option value="">请选择省份</option>
+                    {PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                  <select className="filter-select" style={{ width: '100%' }} value={form.city} onChange={e => setForm({ ...form, city: e.target.value, district: '' })} disabled={!form.province}>
+                    <option value="">请选择城市</option>
+                    {form.province && getCityNames(form.province).map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <select className="filter-select" style={{ width: '100%' }} value={form.district} onChange={e => setForm({ ...form, district: e.target.value })} disabled={!form.city}>
+                    <option value="">请选择区县</option>
+                    {form.province && form.city && getDistricts(form.province, form.city).map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>详细地址</label>
+                <input className="filter-input" placeholder="请输入详细地址" style={{ width: '100%' }} value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', marginBottom: 4, color: 'var(--color-text-secondary)' }}>茶人类型</label>
@@ -442,7 +487,7 @@ export default function PersonnelTeaProfessional() {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', marginTop: 'var(--space-4)' }}>
               <Button variant="ghost" onClick={() => setShowDrawer(false)}>取消</Button>
-              <Button onClick={() => setShowDrawer(false)}>保存</Button>
+              <Button onClick={handleSave}>保存</Button>
             </div>
           </div>
         </div>

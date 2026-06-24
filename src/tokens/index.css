@@ -50,17 +50,17 @@
   --color-module-sales-darkest: #093F7D;
   --color-module-sales-secondary: #CB405D; --color-module-sales-secondary-light: #FEF2F4;
 
-  /* ── 模块色（仓储）主色 #FD742D + 辅色 #01795D ── */
+  /* ── 模块色（仓储）主色 #eb5c20 + 辅色 #01795D ── */
   --color-module-inventory-lightest: #FFF3EB; --color-module-inventory-light: #FEDCC4;
-  --color-module-inventory-base: #FD742D; --color-module-inventory-dark: #E5621F;
-  --color-module-inventory-darkest: #C04F14;
+  --color-module-inventory-base: #eb5c20; --color-module-inventory-dark: #D34A12;
+  --color-module-inventory-darkest: #AE3707;
   --color-module-inventory-secondary: #01795D; --color-module-inventory-secondary-light: #EDFAF5;
 
-  /* ── 模块色（商品）主色 #01795D + 辅色 #FD742D ── */
+  /* ── 模块色（商品）主色 #01795D + 辅色 #eb5c20 ── */
   --color-module-product-lightest: #EDFAF5; --color-module-product-light: #D0F4E6;
   --color-module-product-base: #01795D; --color-module-product-dark: #01624B;
   --color-module-product-darkest: #01453A;
-  --color-module-product-secondary: #FD742D; --color-module-product-secondary-light: #FEF0E8;
+  --color-module-product-secondary: #eb5c20; --color-module-product-secondary-light: #FEF0E8;
 
   /* ── 模块色（财务）主色 #27254B + 辅色 #7BA6D1 ── */
   --color-module-finance-lightest: #F0F0F6; --color-module-finance-light: #DCDCE8;
@@ -378,7 +378,7 @@ body {
 }
 .page-title { font-family: var(--font-family-serif); font-size: var(--text-xl); font-weight: var(--font-semibold); color: var(--color-neutral-800); }
 .content-header-actions { display: flex; align-items: center; gap: var(--space-3); }
-.content-body { padding: var(--space-6); }
+.content-body { padding: var(--space-4) var(--space-6); }
 
 /* ═══ 组件样式 ═══ */
 

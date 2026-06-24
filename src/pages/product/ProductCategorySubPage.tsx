@@ -248,8 +248,8 @@ export default function ProductCategorySubPage({ categoryType, rootNode, hideHea
                   <div className="detail-row">
                     <div className="detail-label">分类层级</div>
                     <div className="detail-value">
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '2px 10px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: '#FFF3EB', color: '#FD742D' }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FD742D', flexShrink: 0 }}></span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '2px 10px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: '#FFF3EB', color: '#eb5c20' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#eb5c20', flexShrink: 0 }}></span>
                         {getLevelLabel(depth)}
                       </span>
                     </div>
@@ -266,8 +266,8 @@ export default function ProductCategorySubPage({ categoryType, rootNode, hideHea
                     <div className="detail-row">
                       <div className="detail-label">发酵种类</div>
                       <div className="detail-value">
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '2px 10px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: '#FFF3EB', color: '#FD742D' }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FD742D', flexShrink: 0 }}></span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '2px 10px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: '#FFF3EB', color: '#eb5c20' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#eb5c20', flexShrink: 0 }}></span>
                         {selectedNode.fermentation}
                       </span>
                       </div>
@@ -343,7 +343,7 @@ export default function ProductCategorySubPage({ categoryType, rootNode, hideHea
                       <>
                         <Button size="sm" onClick={handleStartEdit}>编辑</Button>
                         {selectedNode.productCount === 0 && (
-                          <Button size="sm" style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
+                          <Button size="sm" style={{ background: '#eb5c20', color: '#fff', borderColor: '#eb5c20' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
                         )}
                       </>
                     )}
@@ -380,17 +380,17 @@ export default function ProductCategorySubPage({ categoryType, rootNode, hideHea
               <div className="category-dialog-title">确认删除</div>
               <div style={{ marginBottom: 'var(--space-5)', fontSize: 'var(--text-base)', color: 'var(--color-neutral-600)', lineHeight: 'var(--leading-md)' }}>
                 {selectedNode.productCount > 0 ? (
-                  <span style={{ color: '#FD742D' }}>分类「<span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{selectedNode.name}</span>」下存在 {selectedNode.productCount} 件商品，不允许删除。请先移除或转移该分类下的所有商品。</span>
+                  <span style={{ color: '#eb5c20' }}>分类「<span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{selectedNode.name}</span>」下存在 {selectedNode.productCount} 件商品，不允许删除。请先移除或转移该分类下的所有商品。</span>
                 ) : (
                   <>
-                    确定要删除分类「<span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{selectedNode.name}</span>」吗？{selectedNode.children && selectedNode.children.length > 0 && <span style={{ color: '#FD742D', display: 'block', marginTop: 'var(--space-2)' }}>该分类下还有子分类，删除后将一并移除。</span>}
+                    确定要删除分类「<span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{selectedNode.name}</span>」吗？{selectedNode.children && selectedNode.children.length > 0 && <span style={{ color: '#eb5c20', display: 'block', marginTop: 'var(--space-2)' }}>该分类下还有子分类，删除后将一并移除。</span>}
                   </>
                 )}
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
                 <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>{selectedNode.productCount > 0 ? '关闭' : '取消'}</Button>
                 {selectedNode.productCount === 0 && (
-                  <Button style={{ background: '#FD742D', color: '#fff', borderColor: '#FD742D' }} onClick={() => { handleDelete(selectedNode.id); setShowDeleteConfirm(false); }}>确认删除</Button>
+                  <Button style={{ background: '#eb5c20', color: '#fff', borderColor: '#eb5c20' }} onClick={() => { handleDelete(selectedNode.id); setShowDeleteConfirm(false); }}>确认删除</Button>
                 )}
               </div>
             </div>

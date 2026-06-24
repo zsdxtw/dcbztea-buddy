@@ -8,6 +8,7 @@ import Tag from '../../components/common/Tag';
 import type { BrandItem } from '../../types';
 import { TeaCategory } from '../../types';
 import { brandItems } from '../../data/brands';
+import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 import { teaCategoryData, teawareCategoryData, teaPeripheralCategoryData, otherCategoryData } from '../../data/productCategories';
 
 /** 通过茶类中文名称获取 TeaCategory 枚举 */
@@ -39,7 +40,7 @@ const emptyForm = {
   name: '', owner: '', introduction: '', requirements: '', policy: '',
   mainCategories: [] as string[], series: [] as string[],
   jdStoreUrl: '', tmallStoreUrl: '', website: '',
-  contactPerson: '', contactPhone: '', address: '',
+  contactPerson: '', contactPhone: '', province: '', city: '', district: '', address: '',
 };
 
 export default function ProductBrand() {
@@ -166,7 +167,7 @@ export default function ProductBrand() {
           </Button>
           {deleteMode ? (
             <>
-              <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#FD742D', borderColor: '#FD742D' }}>
+              <Button onClick={() => setShowDeleteConfirm(true)} disabled={selectedForDelete.size === 0} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>
                 <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                   <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -175,7 +176,7 @@ export default function ProductBrand() {
               <Button variant="ghost" onClick={handleCancelDeleteMode} style={{ color: 'var(--color-neutral-500)' }}>取消</Button>
             </>
           ) : (
-            <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={handleEnterDeleteMode}>
+            <Button style={{ background: '#eb5c20', borderColor: '#eb5c20' }} onClick={handleEnterDeleteMode}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                 <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4m2 0v9.33a1.33 1.33 0 01-1.34 1.34H4.67a1.33 1.33 0 01-1.34-1.34V4h9.34z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -311,13 +312,13 @@ export default function ProductBrand() {
                   <input className="detail-input" value={nextCode} readOnly style={{ background: 'var(--color-neutral-100)', color: 'var(--color-neutral-500)' }} />
                 </div>
                 <div className="drawer-form-field">
-                  <label className="drawer-label">品牌名称 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">品牌名称 <span style={{ color: '#eb5c20' }}>*</span></label>
                   <input className="detail-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="请输入品牌名称" />
                 </div>
               </div>
               <div className="drawer-form-row">
                 <div className="drawer-form-field">
-                  <label className="drawer-label">品牌所属 <span style={{ color: '#FD742D' }}>*</span></label>
+                  <label className="drawer-label">品牌所属 <span style={{ color: '#eb5c20' }}>*</span></label>
                   <input className="detail-input" value={form.owner} onChange={(e) => setForm({ ...form, owner: e.target.value })} placeholder="请输入所属公司" />
                 </div>
                 <div className="drawer-form-field">
@@ -361,10 +362,33 @@ export default function ProductBrand() {
                   <input className="detail-input" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="请输入联系电话" />
                 </div>
               </div>
+              <div className="drawer-form-row">
+                <div className="drawer-form-field">
+                  <label className="drawer-label">省份</label>
+                  <select className="detail-select" value={form.province} onChange={(e) => setForm({ ...form, province: e.target.value, city: '', district: '' })}>
+                    <option value="">请选择省份</option>
+                    {PROVINCE_NAMES.map((p) => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">城市</label>
+                  <select className="detail-select" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value, district: '' })} disabled={!form.province}>
+                    <option value="">请选择城市</option>
+                    {form.province && getCityNames(form.province).map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="drawer-form-field">
+                  <label className="drawer-label">区县</label>
+                  <select className="detail-select" value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })} disabled={!form.city}>
+                    <option value="">请选择区县</option>
+                    {form.province && form.city && getDistricts(form.province, form.city).map((d) => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+              </div>
               <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
                 <div className="drawer-form-field" style={{ width: '100%' }}>
-                  <label className="drawer-label">地址</label>
-                  <input className="detail-input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="请输入地址" />
+                  <label className="drawer-label">详细地址</label>
+                  <input className="detail-input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="请输入详细地址" />
                 </div>
               </div>
 
@@ -452,7 +476,7 @@ export default function ProductBrand() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
+              <Button onClick={() => { handleConfirmDelete(); setShowDeleteConfirm(false); }} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>确认删除</Button>
             </div>
           </div>
         </div>

@@ -14,8 +14,9 @@ import {
   SHIPPING_SETTLEMENT_LABELS,
   QUALIFICATION_STATUS_LABELS,
 } from '../../data/suppliers';
-import type { SupplierItem, SupplierType, SupplierGrade } from '../../types';
+import type { SupplierItem, SupplierType, SupplierGrade, SupplierWarehouse } from '../../types';
 import type { StatCardData } from '../../types';
+import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 
 /* ── 供应商类型筛选配置 ── */
 const TYPE_FILTER: { key: SupplierType | 'all'; label: string; color: string; desc: string }[] = [
@@ -95,6 +96,20 @@ export default function PurchaseSuppliers() {
   // 保存编辑
   const handleSaveEdit = () => { if (editForm) { setSelectedSupplier(editForm); setEditing(false); setEditForm(null); } };
 
+  // 仓库编辑（合作仓库联动仓储 > 仓库设置）
+  const updateWarehouse = (idx: number, patch: Partial<SupplierWarehouse>) => {
+    setEditForm(prev => prev ? { ...prev, warehouses: prev.warehouses.map((w, i) => i === idx ? { ...w, ...patch } : w) } : prev);
+  };
+  const addWarehouse = () => {
+    setEditForm(prev => prev ? { ...prev, warehouses: [...prev.warehouses, { id: `w${Date.now()}`, name: '', address: '', contactPerson: '', contactPhone: '', isDefault: prev.warehouses.length === 0 }] } : prev);
+  };
+  const removeWarehouse = (idx: number) => {
+    setEditForm(prev => prev ? { ...prev, warehouses: prev.warehouses.filter((_, i) => i !== idx) } : prev);
+  };
+  const setDefaultWarehouse = (idx: number) => {
+    setEditForm(prev => prev ? { ...prev, warehouses: prev.warehouses.map((w, i) => ({ ...w, isDefault: i === idx })) } : prev);
+  };
+
   // OCR 模拟
   const handleOcr = () => {
     setOcrLoading(true);
@@ -102,21 +117,22 @@ export default function PurchaseSuppliers() {
   };
 
   return (
-    <div>
+    <>
       <ContentHeader title="供应商管理" breadcrumbs={['采购', '供应商管理']} />
 
+      <div className="content-body">
       {/* 统计卡片 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+      <div className="stat-cards">
         {stats.map((s, i) => <StatCard key={i} data={s} />)}
       </div>
 
       {/* 类型筛选卡片 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
         {TYPE_FILTER.map(tf => {
           const count = tf.key === 'all' ? supplierItems.length : supplierItems.filter(s => s.type === tf.key).length;
           const isActive = activeType === tf.key;
           return (
-            <div key={tf.key} style={{ cursor: 'pointer', border: isActive ? `2px solid ${tf.color}` : '1px solid var(--color-border-primary)', background: isActive ? `${tf.color}08` : 'var(--color-bg-primary)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', boxShadow: 'var(--shadow-sm)' }} onClick={() => setActiveType(isActive ? 'all' : tf.key)}>
+            <div key={tf.key} style={{ cursor: 'pointer', border: isActive ? `2px solid ${tf.color}` : '1px solid var(--color-border-primary)', background: isActive ? `${tf.color}08` : 'var(--color-bg-primary)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }} onClick={() => setActiveType(isActive ? 'all' : tf.key)}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span style={{ fontWeight: 'var(--font-semibold)', fontSize: 'var(--text-base)', color: 'var(--color-text-primary)' }}>{tf.label}</span>
                 <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: tf.color }}>{count}</span>
@@ -128,7 +144,7 @@ export default function PurchaseSuppliers() {
       </div>
 
       {/* 工具栏 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
         <input className="filter-input" placeholder="搜索名称、信用代码、联系人..." value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 260 }} />
         <select className="filter-select" value={filterGrade} onChange={e => setFilterGrade(e.target.value)}>
           <option value="">全部等级</option>
@@ -247,6 +263,48 @@ export default function PurchaseSuppliers() {
                     ['主营品类', 'mainCategories', 'text'],
                     ['资质状态', 'qualificationStatus', 'text'],
                   ] as [string, string, string][]).map(([label, field, type]) => {
+                    if (field === 'registeredAddress' || field === 'contactAddress') {
+                      const prefix = field === 'registeredAddress' ? 'registered' : 'contact';
+                      const provField = `${prefix}Province`;
+                      const cityField = `${prefix}City`;
+                      const distField = `${prefix}District`;
+                      const supAny = selectedSupplier as unknown as Record<string, string | undefined>;
+                      const formAny = editForm as unknown as Record<string, string | undefined> | null;
+                      const regionText = [supAny[provField], supAny[cityField], supAny[distField]].filter(Boolean).join(' / ');
+                      const detailAddr = supAny[field] ?? '';
+                      return (
+                        <div key={field} style={{ gridColumn: '1 / -1' }}>
+                          <label className="drawer-label">{label}</label>
+                          {editing && formAny ? (
+                            <>
+                              <div className="drawer-form-row" style={{ marginBottom: 'var(--space-2)' }}>
+                                <div className="drawer-form-field">
+                                  <select className="filter-select" style={{ width: '100%' }} value={formAny[provField] ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, [provField]: e.target.value, [cityField]: '', [distField]: '' } : prev)}>
+                                    <option value="">请选择省份</option>
+                                    {PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}
+                                  </select>
+                                </div>
+                                <div className="drawer-form-field">
+                                  <select className="filter-select" style={{ width: '100%' }} value={formAny[cityField] ?? ''} disabled={!formAny[provField]} onChange={e => setEditForm(prev => prev ? { ...prev, [cityField]: e.target.value, [distField]: '' } : prev)}>
+                                    <option value="">请选择城市</option>
+                                    {formAny[provField] && getCityNames(formAny[provField]).map(c => <option key={c} value={c}>{c}</option>)}
+                                  </select>
+                                </div>
+                                <div className="drawer-form-field">
+                                  <select className="filter-select" style={{ width: '100%' }} value={formAny[distField] ?? ''} disabled={!formAny[cityField]} onChange={e => setEditForm(prev => prev ? { ...prev, [distField]: e.target.value } : prev)}>
+                                    <option value="">请选择区县</option>
+                                    {formAny[provField] && formAny[cityField] && getDistricts(formAny[provField], formAny[cityField]).map(d => <option key={d} value={d}>{d}</option>)}
+                                  </select>
+                                </div>
+                              </div>
+                              <input className="filter-input" style={{ width: '100%' }} placeholder="请输入详细地址" value={formAny[field] ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, [field]: e.target.value } : prev)} />
+                            </>
+                          ) : (
+                            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{[regionText, detailAddr].filter(Boolean).join(' ') || '—'}</div>
+                          )}
+                        </div>
+                      );
+                    }
                     const value = (selectedSupplier as unknown as Record<string, unknown>)[field];
                     const displayValue = Array.isArray(value) ? value.join('、') : String(value ?? '—');
                     return (
@@ -311,25 +369,66 @@ export default function PurchaseSuppliers() {
               {/* 仓库信息 */}
               {detailTab === 'warehouse' && (
                 <div>
-                  {selectedSupplier.warehouses.length === 0 ? (
-                    <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: 'var(--space-6)' }}>暂无仓库信息</p>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                      {selectedSupplier.warehouses.map((wh, i) => (
-                        <div key={wh.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
-                          <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)', background: 'var(--color-module-current-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>
-                            {i + 1}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 2 }}>
-                              <span style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }}>{wh.name}</span>
-                              {wh.isDefault && <span style={{ padding: '0 6px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', background: '#E8F5E9', color: '#2E7D32' }}>默认</span>}
+                  {editing && editForm ? (
+                    <>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                        {editForm.warehouses.map((wh, i) => (
+                          <div key={wh.id} style={{ padding: 'var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                              <div style={{ width: 24, height: 24, borderRadius: 'var(--radius-sm)', background: 'var(--color-module-current-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)', flexShrink: 0 }}>{i + 1}</div>
+                              <input className="filter-input" placeholder="仓库名称" style={{ flex: 1, height: 30, fontSize: 'var(--text-sm)' }} value={wh.name} onChange={e => updateWarehouse(i, { name: e.target.value })} />
+                              <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', cursor: 'pointer', flexShrink: 0 }}>
+                                <input type="radio" name="default-wh" checked={wh.isDefault} onChange={() => setDefaultWarehouse(i)} /> 默认
+                              </label>
+                              <Button size="sm" variant="ghost" style={{ color: 'var(--color-semantic-error)', flexShrink: 0 }} onClick={() => removeWarehouse(i)}>删除</Button>
                             </div>
-                            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{wh.address} | {wh.contactPerson} {wh.contactPhone}</div>
+                            <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                              <select className="filter-select" style={{ flex: 1, height: 30, fontSize: 'var(--text-sm)' }} value={wh.province ?? ''} onChange={e => updateWarehouse(i, { province: e.target.value, city: '', district: '' })}>
+                                <option value="">省份</option>
+                                {PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}
+                              </select>
+                              <select className="filter-select" style={{ flex: 1, height: 30, fontSize: 'var(--text-sm)' }} value={wh.city ?? ''} disabled={!wh.province} onChange={e => updateWarehouse(i, { city: e.target.value, district: '' })}>
+                                <option value="">城市</option>
+                                {wh.province && getCityNames(wh.province).map(c => <option key={c} value={c}>{c}</option>)}
+                              </select>
+                              <select className="filter-select" style={{ flex: 1, height: 30, fontSize: 'var(--text-sm)' }} value={wh.district ?? ''} disabled={!wh.city} onChange={e => updateWarehouse(i, { district: e.target.value })}>
+                                <option value="">区县</option>
+                                {wh.province && wh.city && getDistricts(wh.province, wh.city).map(d => <option key={d} value={d}>{d}</option>)}
+                              </select>
+                            </div>
+                            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                              <input className="filter-input" placeholder="详细地址" style={{ flex: 2, height: 30, fontSize: 'var(--text-sm)' }} value={wh.address} onChange={e => updateWarehouse(i, { address: e.target.value })} />
+                              <input className="filter-input" placeholder="联系人" style={{ flex: 1, height: 30, fontSize: 'var(--text-sm)' }} value={wh.contactPerson} onChange={e => updateWarehouse(i, { contactPerson: e.target.value })} />
+                              <input className="filter-input" placeholder="电话" style={{ flex: 1, height: 30, fontSize: 'var(--text-sm)' }} value={wh.contactPhone} onChange={e => updateWarehouse(i, { contactPhone: e.target.value })} />
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      <Button size="sm" variant="ghost" style={{ marginTop: 'var(--space-2)' }} onClick={addWarehouse}>+ 添加仓库</Button>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 'var(--space-2)' }}>供应商仓库将同步至「仓储 &gt; 仓库设置」，作为合作仓库管理</div>
+                    </>
+                  ) : (
+                    selectedSupplier.warehouses.length === 0 ? (
+                      <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: 'var(--space-6)' }}>暂无仓库信息</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                        {selectedSupplier.warehouses.map((wh, i) => (
+                          <div key={wh.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
+                            <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)', background: 'var(--color-module-current-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>
+                              {i + 1}
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 2 }}>
+                                <span style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }}>{wh.name}</span>
+                                {wh.isDefault && <span style={{ padding: '0 6px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', background: '#E8F5E9', color: '#2E7D32' }}>默认</span>}
+                              </div>
+                              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{[wh.province, wh.city, wh.district].filter(Boolean).join(' / ')} {wh.address} | {wh.contactPerson} {wh.contactPhone}</div>
+                            </div>
+                          </div>
+                        ))}
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 4 }}>供应商仓库已同步至「仓储 &gt; 仓库设置」，作为合作仓库管理</div>
+                      </div>
+                    )
                   )}
                 </div>
               )}
@@ -609,6 +708,7 @@ export default function PurchaseSuppliers() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

@@ -53,6 +53,9 @@ const OutboundIcon = () => (
 const CustomersIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M2 16a5 5 0 0110 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="15" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.2"/></svg>
 );
+const StoreIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M3 8l1.5-4h11L17 8M3 8v9h14V8M3 8h14" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><path d="M8 17v-5h4v5" stroke="currentColor" strokeWidth="1.3"/></svg>
+);
 const PlatformIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M7 6V4a1.5 1.5 0 011.5-1.5h3A1.5 1.5 0 0113 4v2" stroke="currentColor" strokeWidth="1.2"/><path d="M10 9.5v2M9 10.5h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
 );
@@ -200,6 +203,12 @@ const PersonnelTabIcon = () => (
 const TeaProfessionalIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" strokeWidth="1.3"/><path d="M3 18a7 7 0 0114 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><path d="M14 4l2-2M16 4l-2-2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
 );
+const OrgChartIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><rect x="8" y="2" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="2" y="13" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="8" y="13" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="14" y="13" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><path d="M10 6v3M10 9H4v4M10 9h6v4" stroke="currentColor" strokeWidth="1.2"/></svg>
+);
+const EmployeeIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="6" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M1 17a6 6 0 0112 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="15" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.2"/><path d="M13 16a4 4 0 015 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
 
 /* ── 模块配置 ── */
 
@@ -221,11 +230,11 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     menus: [
       { key: 'purchase-overview', label: '采购概览', icon: <OverviewIcon /> },
       { key: 'purchase-orders', label: '采购订单', icon: <OrdersIcon /> },
+      { key: 'purchase-pricing', label: '采购报（调）价', icon: <PriceIcon /> },
       { key: 'purchase-inbound', label: '入库管理', icon: <InboundIcon /> },
-      { key: 'purchase-quality', label: '茶叶质检', icon: <QualityIcon /> },
       { key: 'purchase-suppliers', label: '供应商管理', icon: <SuppliersIcon /> },
+      { key: 'purchase-reconciliation', label: '供应商对账', icon: <ReconciliationIcon /> },
       { key: 'purchase-return', label: '采购退货', icon: <ReturnIcon /> },
-      { key: 'purchase-price-trend', label: '价格走势', icon: <PriceTrendIcon /> },
     ],
   },
   [ModuleKey.SALES]: {
@@ -234,12 +243,11 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     menus: [
       { key: 'sales-overview', label: '销售概览', icon: <OverviewIcon /> },
       { key: 'sales-orders', label: '销售订单', icon: <OrdersIcon /> },
-      { key: 'sales-quotations', label: '报价管理', icon: <QuotationIcon /> },
-      { key: 'sales-outbound', label: '出库管理', icon: <OutboundIcon /> },
+      { key: 'sales-pricing', label: '销售报（调）价', icon: <QuotationIcon /> },
       { key: 'sales-customers', label: '客户管理', icon: <CustomersIcon /> },
-      { key: 'sales-platforms', label: '平台方管理', icon: <PlatformIcon /> },
+      { key: 'sales-stores', label: '门店管理', icon: <StoreIcon /> },
+      { key: 'sales-reconciliation', label: '客户对账', icon: <ReconciliationIcon /> },
       { key: 'sales-return', label: '销售退货', icon: <ReturnIcon /> },
-      { key: 'sales-performance', label: '业绩统计', icon: <PerformanceIcon /> },
     ],
   },
   [ModuleKey.INVENTORY]: {
@@ -247,13 +255,15 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '仓储',
     menus: [
       { key: 'inventory-overview', label: '仓储概览', icon: <OverviewIcon /> },
-      { key: 'inventory-stock', label: '库存管理', icon: <StockIcon /> },
-      { key: 'inventory-traceability', label: '批次溯源', icon: <TraceabilityIcon /> },
-      { key: 'inventory-check', label: '盘点管理', icon: <CheckIcon /> },
-      { key: 'inventory-settings', label: '仓库设置', icon: <WarehouseSettingsIcon /> },
-      { key: 'inventory-location', label: '库位管理', icon: <LocationIcon /> },
-      { key: 'inventory-inbound-record', label: '入库记录', icon: <InboundRecordIcon /> },
-      { key: 'inventory-outbound-record', label: '出库记录', icon: <OutboundRecordIcon /> },
+      { key: 'inventory-stock', label: '库存管理', icon: <StockIcon />, children: [
+        { key: 'inventory-purchase-inbound', label: '采购入库', icon: <InboundIcon /> },
+        { key: 'inventory-sales-outbound', label: '销售出库', icon: <OutboundIcon /> },
+        { key: 'inventory-other-io', label: '其他出入库', icon: <InboundRecordIcon /> },
+        { key: 'inventory-transfer', label: '库存调拨', icon: <TraceabilityIcon /> },
+      ] },
+      { key: 'inventory-check', label: '库存盘点', icon: <CheckIcon /> },
+      { key: 'inventory-io-record', label: '出入库记录', icon: <InboundRecordIcon /> },
+      { key: 'inventory-warehouse-settings', label: '仓库设置', icon: <WarehouseSettingsIcon /> },
       { key: 'inventory-alert-settings', label: '预警设置', icon: <AlertSettingsIcon /> },
     ],
   },
@@ -282,14 +292,16 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '财务',
     menus: [
       { key: 'finance-overview', label: '财务概览', icon: <OverviewIcon /> },
-      { key: 'finance-receivable', label: '应收应付', icon: <ReceivableIcon /> },
-      { key: 'finance-records', label: '收支记录', icon: <RecordsIcon /> },
-      { key: 'finance-reconciliation', label: '对账管理', icon: <ReconciliationIcon /> },
-      { key: 'finance-collection', label: '收款管理', icon: <CollectionIcon /> },
-      { key: 'finance-payment', label: '付款管理', icon: <PaymentIcon /> },
-      { key: 'finance-expense', label: '费用报销', icon: <ExpenseIcon /> },
+      { key: 'finance-settlement', label: '结算管理', icon: <PaymentIcon />, children: [
+        { key: 'finance-purchase-payment', label: '采购付款', icon: <PaymentIcon /> },
+        { key: 'finance-sales-collection', label: '销售回款', icon: <CollectionIcon /> },
+        { key: 'finance-other-receivable', label: '其他应收', icon: <ReceivableIcon /> },
+        { key: 'finance-other-payable', label: '其他应付', icon: <ExpenseIcon /> },
+      ] },
       { key: 'finance-invoice', label: '发票管理', icon: <InvoiceIcon /> },
-      { key: 'finance-account', label: '账户管理', icon: <AccountIcon /> },
+      { key: 'finance-cost', label: '成本核算', icon: <FinanceReportIcon /> },
+      { key: 'finance-expense', label: '费用管理', icon: <ExpenseIcon /> },
+      { key: 'finance-balance', label: '余额管理', icon: <AccountIcon /> },
     ],
   },
   [ModuleKey.STATISTICS]: {
@@ -310,6 +322,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '系统',
     menus: [
       { key: 'settings-system', label: '系统设置', icon: <SystemSettingsIcon /> },
+      { key: 'settings-organization', label: '组织架构', icon: <OrgChartIcon /> },
       { key: 'settings-roles', label: '角色权限', icon: <RolesIcon /> },
       { key: 'settings-logs', label: '操作日志', icon: <LogsIcon /> },
       { key: 'settings-about', label: '关于', icon: <AboutIcon /> },
@@ -322,6 +335,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     key: ModuleKey.PERSONNEL,
     label: '人员',
     menus: [
+      { key: 'personnel-employee', label: '员工管理', icon: <EmployeeIcon /> },
       { key: 'personnel-tea-professional', label: '茶人管理', icon: <TeaProfessionalIcon /> },
     ],
   },

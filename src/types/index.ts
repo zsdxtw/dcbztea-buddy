@@ -340,6 +340,12 @@ export interface BrandItem {
   tmallStoreUrl: string;
   contactPerson: string;
   contactPhone: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   address: string;
   mainCategories: string[];
   productCount: number;
@@ -397,6 +403,8 @@ export interface TeaProduct {
   tmallUrl: string;
   jdPrice: number;
   jdUrl: string;
+  /** 销售价：当前系统内各商品标准的对外销售价 */
+  salesPrice: number;
   shelfStatus: 'on' | 'off';
   purchaseStatus: 'available' | 'stopped';
   productionStatus: 'producing' | 'stopped';
@@ -449,6 +457,12 @@ export interface TeaProfessional {
   gender: 'male' | 'female';
   photo: string;
   region: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   height: number;
   weight: number;
   birthDate: string;
@@ -483,10 +497,39 @@ export type ShippingSettlement = 'free' | 'not_free_fixed' | 'not_free_ratio' | 
 export interface SupplierWarehouse {
   id: string;
   name: string;
+  province?: string;
+  city?: string;
+  district?: string;
   address: string;
   contactPerson: string;
   contactPhone: string;
   isDefault: boolean;
+}
+
+/** 仓库归属类型：独立仓库（自有的纯仓库）/ 门店仓库（自有的在茶叶门店的仓库）/ 合作仓库（供应商的合作仓库） */
+export type WarehouseCategory = 'independent' | 'store' | 'partner';
+
+/** 仓库信息（仓库设置模块统一结构） */
+export interface Warehouse {
+  id: string;
+  name: string;
+  code: string;
+  address: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
+  manager: string;
+  phone: string;
+  category: WarehouseCategory;
+  enabled: boolean;
+  isDefault: boolean;
+  /** 合作仓库关联的供应商 ID（独立/门店仓库为空） */
+  supplierId?: string;
+  /** 合作仓库关联的供应商名称（独立/门店仓库为空） */
+  supplierName?: string;
 }
 
 /** 开票信息 */
@@ -510,7 +553,7 @@ export interface BankAccount {
 }
 
 /** 客户类型 */
-export type CustomerType = 'direct' | 'channel';
+export type CustomerType = 'direct' | 'channel' | 'personal' | 'platform';
 
 /** 平台结算账户 */
 export interface PlatformBankAccount {
@@ -527,18 +570,33 @@ export interface PlatformInvoiceInfo {
   taxRate: string;
 }
 
+/** 客户结算账户（与平台结算账户结构一致） */
+export type CustomerBankAccount = PlatformBankAccount;
+
+/** 客户发票信息（与平台发票信息结构一致） */
+export type CustomerInvoiceInfo = PlatformInvoiceInfo;
+
 /** 平台 */
 export interface PlatformItem {
   id: string;
   name: string;
   shortName: string;
+  /** 平台编号（原 code 字段，规则：VPT-简称首字母-XXXXX） */
   code: string;
   contactPerson: string;
   contactPosition: string;
   contactPhone: string;
   contactAddress: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   cooperationDate: string;
   commissionRate: string;
+  /** 对接人员工 ID（负责该平台客户的拓展与维护） */
+  liaisonEmpId?: string;
   bankAccounts: PlatformBankAccount[];
   invoiceInfos: PlatformInvoiceInfo[];
   status: 'active' | 'inactive';
@@ -549,8 +607,18 @@ export interface PlatformItem {
 export interface CustomerItem {
   id: string;
   name: string;
+  /** 客户简称 */
+  shortName?: string;
+  /** 客户编号（直营VZY/渠道VQD-简称首字母-XXXXX） */
+  customerCode?: string;
   type: CustomerType;
   region: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
   contactPerson: string;
   contactPhone: string;
   contactEmail?: string;
@@ -560,12 +628,49 @@ export interface CustomerItem {
   totalAmount: number;
   /** 直营客户关联的平台ID列表；渠道客户为空 */
   platformIds: string[];
+  /** 对接人员工 ID（负责该客户的拓展与维护） */
+  liaisonEmpId?: string;
   cooperationDate: string;
   status: 'active' | 'inactive';
   settlementMethod?: string;
   taxNo?: string;
   /** 客户来源 */
   source?: string;
+  /** 结算账户列表 */
+  bankAccounts?: CustomerBankAccount[];
+  /** 发票信息列表 */
+  invoiceInfos?: CustomerInvoiceInfo[];
+  remark?: string;
+}
+
+/** 门店（线下茶叶店） */
+export interface StoreItem {
+  id: string;
+  /** 门店编号（MD-XXXX） */
+  code: string;
+  /** 门店名称 */
+  name: string;
+  /** 省份 */
+  province: string;
+  /** 城市 */
+  city: string;
+  /** 区县 */
+  district: string;
+  /** 详细地址 */
+  address: string;
+  /** 店长/负责人 */
+  manager: string;
+  /** 联系电话 */
+  phone: string;
+  /** 营业时间 */
+  businessHours: string;
+  /** 开业日期 */
+  openingDate: string;
+  /** 门店面积（㎡） */
+  area: number;
+  /** 营业状态 */
+  status: 'active' | 'inactive';
+  /** 备注 */
   remark?: string;
 }
 
@@ -578,6 +683,12 @@ export interface SupplierItem {
   cooperationAgreements: string[];
   brandAuthAgreements: string[];
   businessLicense: string;
+  /** 注册地址-省份 */
+  registeredProvince?: string;
+  /** 注册地址-城市 */
+  registeredCity?: string;
+  /** 注册地址-区县 */
+  registeredDistrict?: string;
   registeredAddress: string;
   legalRepresentative: string;
   establishmentDate: string;
@@ -586,6 +697,12 @@ export interface SupplierItem {
   businessScope: string;
   contactPerson: string;
   contactPosition: string;
+  /** 联系地址-省份 */
+  contactProvince?: string;
+  /** 联系地址-城市 */
+  contactCity?: string;
+  /** 联系地址-区县 */
+  contactDistrict?: string;
   contactAddress: string;
   contactPhone: string;
   contactEmail: string;
@@ -610,4 +727,260 @@ export interface SupplierItem {
   qualityGuarantee: string;
   remark: string;
   status: 'active' | 'inactive';
+}
+
+/* ─────────────────────────── 价格体系类型 ─────────────────────────── */
+
+/** 采购价规则：按「商品 + 供应商」维度维护 */
+export interface PurchasePriceRule {
+  id: string;
+  /** 商品 ID */
+  productId: string;
+  productName: string;
+  brand: string;
+  category: string;
+  /** 供应商 ID */
+  supplierId: string;
+  supplierName: string;
+  /** 市场价（冗余，便于展示对比） */
+  marketPrice: number;
+  /** 采购价：与供应商商定的进货价格 */
+  purchasePrice: number;
+  /** 采购折扣率（百分比，如 55 表示 55%） */
+  discountRate: number;
+  /** 生效日期 */
+  validFrom: string;
+  /** 失效日期 */
+  validTo: string;
+  /** 状态 */
+  status: 'active' | 'inactive';
+  /** 最近调价记录 */
+  lastAdjustDate?: string;
+  lastAdjustNote?: string;
+}
+
+/** VIP 销售价规则：按「商品 + 客户」维度维护 */
+export interface VipPriceRule {
+  id: string;
+  /** 商品 ID */
+  productId: string;
+  productName: string;
+  brand: string;
+  category: string;
+  /** 客户 ID */
+  customerId: string;
+  customerName: string;
+  /** 客户类型 */
+  customerType: string;
+  /** 市场价（冗余） */
+  marketPrice: number;
+  /** 标准销售价（冗余） */
+  salesPrice: number;
+  /** VIP 销售价 */
+  vipPrice: number;
+  /** VIP 折扣率（百分比，如 85 表示 85%） */
+  discountRate: number;
+  /** 生效日期 */
+  validFrom: string;
+  /** 失效日期 */
+  validTo: string;
+  /** 状态 */
+  status: 'active' | 'inactive';
+  /** 备注 */
+  remark?: string;
+}
+
+/** 采购订单明细项（含采购实价） */
+export interface PurchaseOrderItem {
+  productId: string;
+  name: string;
+  spec: string;
+  quantity: string;
+  /** 市场价（参考） */
+  marketPrice: number;
+  /** 采购价（系统带出的默认价） */
+  purchasePrice: number;
+  /** 采购实价：本订单实际成交价格（可调整） */
+  actualPurchasePrice: number;
+  /** 金额 = 数量 × 采购实价 */
+  amount: string;
+}
+
+/** 销售订单明细项（含销售实价） */
+export interface SalesOrderItem {
+  productId: string;
+  name: string;
+  teaCategory: TeaCategory;
+  quantity: string;
+  /** 市场价（参考） */
+  marketPrice: number;
+  /** 默认销售价（VIP价或销售价，系统带出） */
+  defaultPrice: number;
+  /** 销售实价：本订单实际成交价格（可调整） */
+  actualSalesPrice: number;
+  /** 价格来源：vip / sales / market */
+  priceSource: 'vip' | 'sales' | 'market';
+  /** 金额 = 数量 × 销售实价 */
+  amount: string;
+}
+
+/* ════════════════════════════════════════
+ * 组织架构 & 员工管理
+ * ════════════════════════════════════════ */
+
+/** 组织节点类型：公司 / 部门 / 团队 */
+export type OrgNodeType = 'company' | 'department' | 'team';
+
+/** 组织架构节点 */
+export interface OrgNode {
+  id: string;
+  /** 节点类型 */
+  type: OrgNodeType;
+  /** 名称 */
+  name: string;
+  /** 父节点 ID（公司层为空） */
+  parentId: string | null;
+  /** 负责人姓名 */
+  leader?: string;
+  /** 排序号 */
+  sort: number;
+  /** 状态 */
+  status: 'active' | 'inactive';
+  /** 备注 */
+  remark?: string;
+}
+
+/** 员工状态 */
+export type EmployeeStatus = 'active' | 'inactive' | 'probation';
+
+/** 学习经历阶段 */
+export type EducationStage = 'high_school' | 'college' | 'university';
+
+/** 学习经历条目 */
+export interface EducationRecord {
+  /** 阶段：高中 / 大专 / 大学 */
+  stage: EducationStage;
+  /** 学校 */
+  school: string;
+  /** 学院 */
+  college: string;
+  /** 专业 */
+  major: string;
+}
+
+/** 员工结算信息 */
+export interface EmployeeSettlement {
+  /** 卡号 */
+  accountNo: string;
+  /** 户名 */
+  accountName: string;
+  /** 开户银行 */
+  bankName: string;
+  /** 开户行号 */
+  bankNo: string;
+}
+
+/** 合同文件 */
+export interface ContractFile {
+  /** 文件名 */
+  name: string;
+  /** 文件 URL（ObjectURL 或外链） */
+  url: string;
+  /** 上传时间 */
+  uploadedAt: string;
+}
+
+/** 员工 */
+export interface Employee {
+  id: string;
+  /** 工号 */
+  empNo: string;
+  /** 姓名 */
+  name: string;
+  /** 性别 */
+  gender: 'male' | 'female';
+  /** 手机号 */
+  phone: string;
+  /** 邮箱 */
+  email?: string;
+  /** 部门 ID */
+  departmentId: string;
+  /** 团队 ID（可选） */
+  teamId?: string;
+  /** 职位 */
+  position: string;
+  /** 入职日期 */
+  joinDate: string;
+  /** 状态 */
+  status: EmployeeStatus;
+  /** 备注 */
+  remark?: string;
+
+  /* ── 身份证信息 ── */
+  /** 身份证号 */
+  idCardNo?: string;
+  /** 身份证图片（正面/反面，ObjectURL 或外链） */
+  idCardImages?: string[];
+  /** 身份证住址 */
+  idCardAddress?: string;
+  /** 民族 */
+  ethnicity?: string;
+  /** 籍贯 */
+  nativePlace?: string;
+  /** 出生日期 */
+  birthDate?: string;
+
+  /* ── 个人信息 ── */
+  /** 兴趣爱好 */
+  hobbies?: string;
+  /** 身高（cm） */
+  height?: number;
+  /** 体重（kg） */
+  weight?: number;
+  /** 本地住址 */
+  localAddress?: string;
+
+  /* ── 学历信息 ── */
+  /** 学历 */
+  education?: string;
+  /** 学位 */
+  degree?: string;
+  /** 学习经历（高中/大专/大学可多选） */
+  educationRecords?: EducationRecord[];
+
+  /* ── 结算信息 ── */
+  /** 结算信息 */
+  settlement?: EmployeeSettlement;
+
+  /* ── 合同文件 ── */
+  /** 合同文件列表（PDF，最多5个） */
+  contracts?: ContractFile[];
+
+  /* ── 紧急联系人 ── */
+  /** 紧急联系人姓名 */
+  emergencyContactName?: string;
+  /** 紧急联系人电话 */
+  emergencyContactPhone?: string;
+}
+
+/** 员工绩效统计（绩效金额 + 绩效利润） */
+export interface EmployeePerformance {
+  employeeId: string;
+  employeeName: string;
+  departmentName: string;
+  position: string;
+  /** 绩效金额 - 作为跟单人的销售金额（订单金额 × 40%） */
+  followerAmount: number;
+  /** 绩效金额 - 作为对接人的销售金额（跟单人缺失时 × 40% + 所有订单 × 50%） */
+  liaisonAmount: number;
+  /** 绩效金额总额 */
+  totalAmount: number;
+  /** 绩效利润 - 作为跟单人的利润金额（订单利润 × 40%） */
+  followerProfit: number;
+  /** 绩效利润 - 作为对接人的利润金额（订单利润 × 40%/50%） */
+  liaisonProfit: number;
+  /** 绩效利润总额 */
+  totalProfit: number;
+  /** 关联订单数 */
+  orderCount: number;
 }

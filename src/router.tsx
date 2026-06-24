@@ -10,30 +10,29 @@ import DashboardOperationLog from './pages/dashboard/DashboardOperationLog';
 
 import PurchaseOverview from './pages/purchase/PurchaseOverview';
 import PurchaseOrders from './pages/purchase/PurchaseOrders';
+import PurchasePricing from './pages/purchase/PurchasePricing';
 import PurchaseInbound from './pages/purchase/PurchaseInbound';
-import PurchaseQuality from './pages/purchase/PurchaseQuality';
 import PurchaseSuppliers from './pages/purchase/PurchaseSuppliers';
+import PurchaseReconciliation from './pages/purchase/PurchaseReconciliation';
 import PurchaseReturn from './pages/purchase/PurchaseReturn';
-import PurchasePriceTrend from './pages/purchase/PurchasePriceTrend';
 
 import SalesOverview from './pages/sales/SalesOverview';
 import SalesOrders from './pages/sales/SalesOrders';
-import SalesQuotations from './pages/sales/SalesQuotations';
-import SalesOutbound from './pages/sales/SalesOutbound';
+import SalesPricing from './pages/sales/SalesPricing';
+import SalesReconciliation from './pages/sales/SalesReconciliation';
 import SalesCustomers from './pages/sales/SalesCustomers';
-import SalesPlatforms from './pages/sales/SalesPlatforms';
+import SalesStores from './pages/sales/SalesStores';
 import SalesReturn from './pages/sales/SalesReturn';
-import SalesPerformance from './pages/sales/SalesPerformance';
 
 import InventoryOverview from './pages/inventory/InventoryOverview';
-import InventoryStock from './pages/inventory/InventoryStock';
-import InventoryTraceability from './pages/inventory/InventoryTraceability';
+import InventoryPurchaseInbound from './pages/inventory/InventoryPurchaseInbound';
+import InventorySalesOutbound from './pages/inventory/InventorySalesOutbound';
+import InventoryOtherIO from './pages/inventory/InventoryOtherIO';
+import InventoryTransfer from './pages/inventory/InventoryTransfer';
 import InventoryCheck from './pages/inventory/InventoryCheck';
-import InventorySettings from './pages/inventory/InventorySettings';
-import InventoryLocation from './pages/inventory/InventoryLocation';
-import InventoryInboundRecord from './pages/inventory/InventoryInboundRecord';
-import InventoryOutboundRecord from './pages/inventory/InventoryOutboundRecord';
+import InventoryIORecord from './pages/inventory/InventoryIORecord';
 import InventoryAlertSettings from './pages/inventory/InventoryAlertSettings';
+import InventorySettings from './pages/inventory/InventorySettings';
 
 import ProductOverview from './pages/product/ProductOverview';
 import ProductTeaCategory from './pages/product/ProductTeaCategory';
@@ -49,14 +48,14 @@ import ProductBrandDetail from './pages/product/ProductBrandDetail';
 import ProductPrice from './pages/product/ProductPrice';
 
 import FinanceOverview from './pages/finance/FinanceOverview';
-import FinanceReceivable from './pages/finance/FinanceReceivable';
-import FinanceRecords from './pages/finance/FinanceRecords';
-import FinanceReconciliation from './pages/finance/FinanceReconciliation';
-import FinanceCollection from './pages/finance/FinanceCollection';
-import FinancePayment from './pages/finance/FinancePayment';
-import FinanceExpense from './pages/finance/FinanceExpense';
+import FinancePurchasePayment from './pages/finance/FinancePurchasePayment';
+import FinanceSalesCollection from './pages/finance/FinanceSalesCollection';
+import FinanceOtherReceivable from './pages/finance/FinanceOtherReceivable';
+import FinanceOtherPayable from './pages/finance/FinanceOtherPayable';
 import FinanceInvoice from './pages/finance/FinanceInvoice';
-import FinanceAccount from './pages/finance/FinanceAccount';
+import FinanceCost from './pages/finance/FinanceCost';
+import FinanceExpense from './pages/finance/FinanceExpense';
+import FinanceBalance from './pages/finance/FinanceBalance';
 
 import StatisticsSales from './pages/statistics/StatisticsSales';
 import StatisticsBrandAnalysis from './pages/statistics/StatisticsBrandAnalysis';
@@ -73,8 +72,10 @@ import SettingsAbout from './pages/settings/SettingsAbout';
 import SettingsUserManagement from './pages/settings/SettingsUserManagement';
 import SettingsDataBackup from './pages/settings/SettingsDataBackup';
 import SettingsUnit from './pages/settings/SettingsUnit';
+import SettingsOrganization from './pages/settings/SettingsOrganization';
 
 import PersonnelTeaProfessional from './pages/personnel/PersonnelTeaProfessional';
+import PersonnelEmployee from './pages/personnel/PersonnelEmployee';
 
 export const router = createBrowserRouter([
   {
@@ -93,31 +94,31 @@ export const router = createBrowserRouter([
       { path: 'purchase', element: <PurchaseOverview /> },
       { path: 'purchase/purchase-overview', element: <PurchaseOverview /> },
       { path: 'purchase/purchase-orders', element: <PurchaseOrders /> },
+      { path: 'purchase/purchase-pricing', element: <PurchasePricing /> },
       { path: 'purchase/purchase-inbound', element: <PurchaseInbound /> },
-      { path: 'purchase/purchase-quality', element: <PurchaseQuality /> },
       { path: 'purchase/purchase-suppliers', element: <PurchaseSuppliers /> },
+      { path: 'purchase/purchase-reconciliation', element: <PurchaseReconciliation /> },
       { path: 'purchase/purchase-return', element: <PurchaseReturn /> },
-      { path: 'purchase/purchase-price-trend', element: <PurchasePriceTrend /> },
       /* ── 销售 ── */
       { path: 'sales', element: <SalesOverview /> },
       { path: 'sales/sales-overview', element: <SalesOverview /> },
       { path: 'sales/sales-orders', element: <SalesOrders /> },
-      { path: 'sales/sales-quotations', element: <SalesQuotations /> },
-      { path: 'sales/sales-outbound', element: <SalesOutbound /> },
+      { path: 'sales/sales-pricing', element: <SalesPricing /> },
       { path: 'sales/sales-customers', element: <SalesCustomers /> },
-      { path: 'sales/sales-platforms', element: <SalesPlatforms /> },
+      { path: 'sales/sales-platforms', element: <Navigate to="/sales/sales-customers" replace /> },
+      { path: 'sales/sales-stores', element: <SalesStores /> },
+      { path: 'sales/sales-reconciliation', element: <SalesReconciliation /> },
       { path: 'sales/sales-return', element: <SalesReturn /> },
-      { path: 'sales/sales-performance', element: <SalesPerformance /> },
       /* ── 仓储 ── */
       { path: 'inventory', element: <InventoryOverview /> },
       { path: 'inventory/inventory-overview', element: <InventoryOverview /> },
-      { path: 'inventory/inventory-stock', element: <InventoryStock /> },
-      { path: 'inventory/inventory-traceability', element: <InventoryTraceability /> },
+      { path: 'inventory/inventory-purchase-inbound', element: <InventoryPurchaseInbound /> },
+      { path: 'inventory/inventory-sales-outbound', element: <InventorySalesOutbound /> },
+      { path: 'inventory/inventory-other-io', element: <InventoryOtherIO /> },
+      { path: 'inventory/inventory-transfer', element: <InventoryTransfer /> },
       { path: 'inventory/inventory-check', element: <InventoryCheck /> },
-      { path: 'inventory/inventory-settings', element: <InventorySettings /> },
-      { path: 'inventory/inventory-location', element: <InventoryLocation /> },
-      { path: 'inventory/inventory-inbound-record', element: <InventoryInboundRecord /> },
-      { path: 'inventory/inventory-outbound-record', element: <InventoryOutboundRecord /> },
+      { path: 'inventory/inventory-io-record', element: <InventoryIORecord /> },
+      { path: 'inventory/inventory-warehouse-settings', element: <InventorySettings /> },
       { path: 'inventory/inventory-alert-settings', element: <InventoryAlertSettings /> },
       /* ── 商品 ── */
       { path: 'product', element: <ProductOverview /> },
@@ -138,14 +139,14 @@ export const router = createBrowserRouter([
       /* ── 财务 ── */
       { path: 'finance', element: <FinanceOverview /> },
       { path: 'finance/finance-overview', element: <FinanceOverview /> },
-      { path: 'finance/finance-receivable', element: <FinanceReceivable /> },
-      { path: 'finance/finance-records', element: <FinanceRecords /> },
-      { path: 'finance/finance-reconciliation', element: <FinanceReconciliation /> },
-      { path: 'finance/finance-collection', element: <FinanceCollection /> },
-      { path: 'finance/finance-payment', element: <FinancePayment /> },
-      { path: 'finance/finance-expense', element: <FinanceExpense /> },
+      { path: 'finance/finance-purchase-payment', element: <FinancePurchasePayment /> },
+      { path: 'finance/finance-sales-collection', element: <FinanceSalesCollection /> },
+      { path: 'finance/finance-other-receivable', element: <FinanceOtherReceivable /> },
+      { path: 'finance/finance-other-payable', element: <FinanceOtherPayable /> },
       { path: 'finance/finance-invoice', element: <FinanceInvoice /> },
-      { path: 'finance/finance-account', element: <FinanceAccount /> },
+      { path: 'finance/finance-cost', element: <FinanceCost /> },
+      { path: 'finance/finance-expense', element: <FinanceExpense /> },
+      { path: 'finance/finance-balance', element: <FinanceBalance /> },
       /* ── 统计 ── */
       { path: 'statistics', element: <StatisticsSales /> },
       { path: 'statistics/statistics-sales', element: <StatisticsSales /> },
@@ -158,6 +159,7 @@ export const router = createBrowserRouter([
       /* ── 系统 ── */
       { path: 'settings', element: <SettingsSystem /> },
       { path: 'settings/settings-system', element: <SettingsSystem /> },
+      { path: 'settings/settings-organization', element: <SettingsOrganization /> },
       { path: 'settings/settings-roles', element: <SettingsRoles /> },
       { path: 'settings/settings-logs', element: <SettingsLogs /> },
       { path: 'settings/settings-about', element: <SettingsAbout /> },
@@ -165,7 +167,8 @@ export const router = createBrowserRouter([
       { path: 'settings/settings-data-backup', element: <SettingsDataBackup /> },
       { path: 'settings/settings-unit', element: <SettingsUnit /> },
       /* ── 人员 ── */
-      { path: 'personnel', element: <PersonnelTeaProfessional /> },
+      { path: 'personnel', element: <PersonnelEmployee /> },
+      { path: 'personnel/personnel-employee', element: <PersonnelEmployee /> },
       { path: 'personnel/personnel-tea-professional', element: <PersonnelTeaProfessional /> },
     ],
   },

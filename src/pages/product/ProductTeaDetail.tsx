@@ -363,7 +363,7 @@ export default function ProductTeaDetail() {
             <>
               <Button variant="ghost" onClick={() => navigate(-1)}>返回</Button>
               <Button onClick={handleEnterEdit}>编辑</Button>
-              <Button style={{ background: '#FD742D', borderColor: '#FD742D' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
+              <Button style={{ background: '#eb5c20', borderColor: '#eb5c20' }} onClick={() => setShowDeleteConfirm(true)}>删除</Button>
             </>
           )
         }
@@ -1130,7 +1130,7 @@ export default function ProductTeaDetail() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>取消</Button>
-              <Button onClick={() => { setShowDeleteConfirm(false); navigate('/product/product-manage-tea'); }} style={{ background: '#FD742D', borderColor: '#FD742D' }}>确认删除</Button>
+              <Button onClick={() => { setShowDeleteConfirm(false); navigate('/product/product-manage-tea'); }} style={{ background: '#eb5c20', borderColor: '#eb5c20' }}>确认删除</Button>
             </div>
           </div>
         </div>
