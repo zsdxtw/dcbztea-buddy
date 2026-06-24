@@ -480,6 +480,13 @@ export default function ProductManageTea() {
       syncSeriesToBrand(form.brand, finalSeries);
     }
 
+    // 根据茶类计算销售价（市场价 × 茶类系数）
+    const teaTypeDiscount: Record<string, number> = {
+      '绿茶': 0.78, '红茶': 0.80, '青茶': 0.76, '白茶': 0.82,
+      '黄茶': 0.79, '黑茶': 0.75, '花草茶': 0.77,
+    };
+    const salesPrice = Math.round(form.marketPrice * (teaTypeDiscount[category.split('-')[0]] ?? 0.78));
+
     const newProduct: TeaProduct = {
       id: String(Date.now()),
       code,
@@ -507,6 +514,7 @@ export default function ProductManageTea() {
       tmallUrl: form.tmallUrl,
       jdPrice: form.jdPrice,
       jdUrl: form.jdUrl,
+      salesPrice,
       shelfStatus: form.shelfStatus,
       purchaseStatus: form.purchaseStatus,
       productionStatus: form.productionStatus,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
 import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
@@ -8,7 +8,32 @@ import Button from '../../components/common/Button';
 import StatusTag, { orderStatusToVariant, orderStatusLabel } from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
 import { TeaCategory, OrderStatus } from '../../types';
-import type { StatCardData } from '../../types';
+import type { StatCardData, SalesOrderItem } from '../../types';
+import { PRICE_CUSTOMERS, getSalesDefaultPrice } from '../../data/prices';
+import { teaProducts } from '../../data/teaProducts';
+
+/* ── 工具函数 ── */
+function categoryToTeaCategory(category: string): TeaCategory {
+  const prefix = category.split('-')[0];
+  const map: Record<string, TeaCategory> = {
+    '绿茶': TeaCategory.GREEN, '红茶': TeaCategory.RED, '青茶': TeaCategory.OOLONG,
+    '白茶': TeaCategory.WHITE, '黄茶': TeaCategory.YELLOW, '黑茶': TeaCategory.DARK,
+    '花草茶': TeaCategory.FLOWER,
+  };
+  return map[prefix] ?? TeaCategory.GREEN;
+}
+
+function formatMoney(n: number): string {
+  return `¥${n.toLocaleString('en-US')}`;
+}
+
+/* 价格来源标签 */
+const SOURCE_LABELS: Record<'vip' | 'sales' | 'market', string> = {
+  vip: 'VIP', sales: '销售', market: '市场',
+};
+const SOURCE_COLORS: Record<'vip' | 'sales' | 'market', string> = {
+  vip: '#CB405D', sales: 'var(--color-module-current-base)', market: 'var(--color-text-tertiary)',
+};
 
 /* ── 统计卡片 ── */
 const stats: StatCardData[] = [
@@ -43,6 +68,11 @@ const CUSTOMER_TYPE_LABELS: Record<CustomerType, string> = {
   platform: '平台客户',
 };
 
+/* PRICE_CUSTOMERS.type → 本地 CustomerType 映射 */
+const PRICE_CUSTOMER_TYPE_MAP: Record<string, CustomerType> = {
+  '直营': 'direct', '间营': 'platform', '渠道': 'channel', '带货': 'platform',
+};
+
 /* ── Mock 订单数据 ── */
 interface SalesOrderRecord {
   id: string;
@@ -60,7 +90,7 @@ interface SalesOrderRecord {
   contactPhone: string;
   deliveryAddress: string;
   remark: string;
-  products: { name: string; teaCategory: TeaCategory; quantity: string; unitPrice: string; amount: string }[];
+  products: SalesOrderItem[];
   timeline: { time: string; event: string; operator: string }[];
 }
 
@@ -72,8 +102,8 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '王经理', contactPhone: '0571-87651234', deliveryAddress: '杭州市西湖区龙井路88号',
     remark: '需冷藏运输，指定顺丰',
     products: [
-      { name: '明前龙井 — 特级', teaCategory: TeaCategory.GREEN, quantity: '20 kg', unitPrice: '¥ 580/50g', amount: '¥ 23,200' },
-      { name: '碧螺春 — 一级', teaCategory: TeaCategory.GREEN, quantity: '10 kg', unitPrice: '¥ 580/50g', amount: '¥ 11,600' },
+      { productId: '1', name: '明前龙井 — 特级', teaCategory: TeaCategory.GREEN, quantity: '20 kg', marketPrice: 580, defaultPrice: 452, actualSalesPrice: 452, priceSource: 'sales', amount: '¥ 23,200' },
+      { productId: '2', name: '碧螺春 — 一级', teaCategory: TeaCategory.GREEN, quantity: '10 kg', marketPrice: 420, defaultPrice: 328, actualSalesPrice: 328, priceSource: 'sales', amount: '¥ 11,600' },
     ],
     timeline: [
       { time: '2025-07-12 09:30', event: '客户下单', operator: '系统' },
@@ -87,7 +117,7 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '赵总', contactPhone: '0599-51234567', deliveryAddress: '武夷山市度假区茶博园6号',
     remark: '长期合作客户，月结',
     products: [
-      { name: '金骏眉 — 特级', teaCategory: TeaCategory.RED, quantity: '15 kg', unitPrice: '¥ 1,200/50g', amount: '¥ 36,000' },
+      { productId: '7', name: '金骏眉 — 特级', teaCategory: TeaCategory.RED, quantity: '15 kg', marketPrice: 1280, defaultPrice: 1024, actualSalesPrice: 1024, priceSource: 'sales', amount: '¥ 36,000' },
     ],
     timeline: [
       { time: '2025-07-11 14:00', event: '客户下单', operator: '系统' },
@@ -102,8 +132,8 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '林老板', contactPhone: '0768-2345678', deliveryAddress: '潮州市湘桥区太平路168号',
     remark: '分两批发货',
     products: [
-      { name: '凤凰单丛 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '25 kg', unitPrice: '¥ 560/50g', amount: '¥ 28,000' },
-      { name: '大红袍 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '15 kg', unitPrice: '¥ 560/50g', amount: '¥ 16,800' },
+      { productId: '12', name: '凤凰单丛 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '25 kg', marketPrice: 560, defaultPrice: 426, actualSalesPrice: 426, priceSource: 'sales', amount: '¥ 28,000' },
+      { productId: '10', name: '大红袍 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '15 kg', marketPrice: 720, defaultPrice: 547, actualSalesPrice: 547, priceSource: 'sales', amount: '¥ 16,800' },
     ],
     timeline: [
       { time: '2025-07-10 10:00', event: '客户下单', operator: '系统' },
@@ -119,7 +149,7 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '张女士', contactPhone: '0593-5678901', deliveryAddress: '福鼎市太姥山镇茶都路22号',
     remark: '已签收，客户满意',
     products: [
-      { name: '白毫银针 — 特级', teaCategory: TeaCategory.WHITE, quantity: '20 kg', unitPrice: '¥ 960/50g', amount: '¥ 38,400' },
+      { productId: '13', name: '白毫银针 — 特级', teaCategory: TeaCategory.WHITE, quantity: '20 kg', marketPrice: 960, defaultPrice: 787, actualSalesPrice: 787, priceSource: 'sales', amount: '¥ 38,400' },
     ],
     timeline: [
       { time: '2025-07-09 08:30', event: '客户下单', operator: '系统' },
@@ -136,8 +166,8 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '周经理', contactPhone: '0774-7234567', deliveryAddress: '梧州市万秀区西江路56号',
     remark: '季度采购，常规订单',
     products: [
-      { name: '六堡茶 — 二级', teaCategory: TeaCategory.DARK, quantity: '30 kg', unitPrice: '¥ 180/50g', amount: '¥ 10,800' },
-      { name: '熟普洱 — 三级', teaCategory: TeaCategory.DARK, quantity: '20 kg', unitPrice: '¥ 180/50g', amount: '¥ 7,200' },
+      { productId: '33', name: '六堡茶 — 二级', teaCategory: TeaCategory.DARK, quantity: '30 kg', marketPrice: 280, defaultPrice: 210, actualSalesPrice: 210, priceSource: 'sales', amount: '¥ 10,800' },
+      { productId: '18', name: '熟普洱 — 三级', teaCategory: TeaCategory.DARK, quantity: '20 kg', marketPrice: 260, defaultPrice: 195, actualSalesPrice: 195, priceSource: 'sales', amount: '¥ 7,200' },
     ],
     timeline: [
       { time: '2025-07-08 09:00', event: '客户下单', operator: '系统' },
@@ -154,7 +184,7 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '何老板', contactPhone: '0730-8234567', deliveryAddress: '岳阳市君山区洞庭大道99号',
     remark: '新客户首单，需提供样品检测报告',
     products: [
-      { name: '君山银针 — 特级', teaCategory: TeaCategory.YELLOW, quantity: '10 kg', unitPrice: '¥ 880/50g', amount: '¥ 17,600' },
+      { productId: '16', name: '君山银针 — 特级', teaCategory: TeaCategory.YELLOW, quantity: '10 kg', marketPrice: 880, defaultPrice: 695, actualSalesPrice: 695, priceSource: 'sales', amount: '¥ 17,600' },
     ],
     timeline: [
       { time: '2025-07-07 11:00', event: '客户下单', operator: '系统' },
@@ -167,7 +197,7 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '江总', contactPhone: '0599-5234567', deliveryAddress: '武夷山市星村镇茶场路12号',
     remark: '有机认证产品，需附证书',
     products: [
-      { name: '正山小种 — 特级', teaCategory: TeaCategory.RED, quantity: '25 kg', unitPrice: '¥ 480/50g', amount: '¥ 24,000' },
+      { productId: '6', name: '正山小种 — 特级', teaCategory: TeaCategory.RED, quantity: '25 kg', marketPrice: 480, defaultPrice: 384, actualSalesPrice: 384, priceSource: 'sales', amount: '¥ 24,000' },
     ],
     timeline: [
       { time: '2025-07-06 09:30', event: '客户下单', operator: '系统' },
@@ -182,8 +212,8 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '吴经理', contactPhone: '0595-2345678', deliveryAddress: '安溪县凤城镇茶都路188号',
     remark: '清香型，真空包装',
     products: [
-      { name: '铁观音 — 一级', teaCategory: TeaCategory.OOLONG, quantity: '40 kg', unitPrice: '¥ 320/50g', amount: '¥ 25,600' },
-      { name: '铁观音 — 二级', teaCategory: TeaCategory.OOLONG, quantity: '20 kg', unitPrice: '¥ 320/50g', amount: '¥ 12,800' },
+      { productId: '11', name: '铁观音 — 一级', teaCategory: TeaCategory.OOLONG, quantity: '40 kg', marketPrice: 320, defaultPrice: 243, actualSalesPrice: 243, priceSource: 'sales', amount: '¥ 25,600' },
+      { productId: '11', name: '铁观音 — 二级', teaCategory: TeaCategory.OOLONG, quantity: '20 kg', marketPrice: 320, defaultPrice: 243, actualSalesPrice: 243, priceSource: 'sales', amount: '¥ 12,800' },
     ],
     timeline: [
       { time: '2025-07-05 08:00', event: '客户下单', operator: '系统' },
@@ -199,7 +229,7 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '王经理', contactPhone: '0571-87651234', deliveryAddress: '杭州市西湖区龙井路88号',
     remark: '月度补货订单',
     products: [
-      { name: '祁门红茶 — 特级', teaCategory: TeaCategory.RED, quantity: '35 kg', unitPrice: '¥ 520/50g', amount: '¥ 36,400' },
+      { productId: '9', name: '祁门红茶 — 特级', teaCategory: TeaCategory.RED, quantity: '35 kg', marketPrice: 520, defaultPrice: 416, actualSalesPrice: 416, priceSource: 'sales', amount: '¥ 36,400' },
     ],
     timeline: [
       { time: '2025-07-04 09:00', event: '客户下单', operator: '系统' },
@@ -216,7 +246,7 @@ const orderData: SalesOrderRecord[] = [
     contactPerson: '赵总', contactPhone: '0599-51234567', deliveryAddress: '武夷山市度假区茶博园6号',
     remark: '客户取消，改订茉莉花茶',
     products: [
-      { name: '玫瑰花茶 — 一级', teaCategory: TeaCategory.FLOWER, quantity: '20 kg', unitPrice: '¥ 128/50g', amount: '¥ 5,120' },
+      { productId: '24', name: '玫瑰花茶 — 一级', teaCategory: TeaCategory.FLOWER, quantity: '20 kg', marketPrice: 158, defaultPrice: 122, actualSalesPrice: 122, priceSource: 'sales', amount: '¥ 5,120' },
     ],
     timeline: [
       { time: '2025-07-03 10:00', event: '客户下单', operator: '系统' },
@@ -226,8 +256,11 @@ const orderData: SalesOrderRecord[] = [
 ];
 
 export default function SalesOrders() {
+  const [orders, setOrders] = useState<SalesOrderRecord[]>(orderData);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrderRecord | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [codeSeq, setCodeSeq] = useState(243);
 
   const handleView = (order: SalesOrderRecord) => {
     setSelectedOrder(order);
@@ -239,12 +272,18 @@ export default function SalesOrders() {
     setSelectedOrder(null);
   };
 
+  const handleCreate = (order: SalesOrderRecord) => {
+    setOrders(prev => [order, ...prev]);
+    setCodeSeq(s => s + 1);
+    setShowCreate(false);
+  };
+
   return (
     <>
       <ContentHeader
         title="销售订单"
         breadcrumbs={['销售', '销售订单']}
-        actions={<Button><PlusIcon />新建销售单</Button>}
+        actions={<Button onClick={() => setShowCreate(true)}><PlusIcon />新建销售单</Button>}
       />
       <div className="content-body">
         <div className="stat-cards">
@@ -262,7 +301,7 @@ export default function SalesOrders() {
         <Card>
           <Table
             headers={['订单编号', '客户', '客户类型', '商品', '茶类', '数量', '单价', '金额', '下单日期', '状态', '操作']}
-            rows={orderData.map((o) => [
+            rows={orders.map((o) => [
               <span className="mono">{o.code}</span>,
               o.customer,
               <span style={{
@@ -283,6 +322,15 @@ export default function SalesOrders() {
           />
         </Card>
       </div>
+
+      {/* 新建销售单抽屉 */}
+      {showCreate && (
+        <CreateSalesDrawer
+          nextNumber={codeSeq}
+          onCancel={() => setShowCreate(false)}
+          onSave={handleCreate}
+        />
+      )}
 
       {/* 订单详情抽屉 */}
       {showDetail && selectedOrder && (
@@ -350,7 +398,9 @@ export default function SalesOrders() {
                         <th>商品</th>
                         <th>茶类</th>
                         <th>数量</th>
-                        <th>单价</th>
+                        <th>市场价</th>
+                        <th>默认价</th>
+                        <th>销售实价</th>
                         <th>金额</th>
                       </tr>
                     </thead>
@@ -360,12 +410,22 @@ export default function SalesOrders() {
                           <td style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</td>
                           <td><Tag category={p.teaCategory} /></td>
                           <td className="mono">{p.quantity}</td>
-                          <td className="mono">{p.unitPrice}</td>
+                          <td className="mono" style={{ color: 'var(--color-text-tertiary)' }}>{formatMoney(p.marketPrice)}</td>
+                          <td className="mono">
+                            {formatMoney(p.defaultPrice)}
+                            <span style={{
+                              marginLeft: 6, padding: '0 6px', borderRadius: 'var(--radius-sm)',
+                              fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
+                              background: 'var(--color-bg-tertiary)', color: SOURCE_COLORS[p.priceSource],
+                              border: `1px solid ${SOURCE_COLORS[p.priceSource]}30`,
+                            }}>{SOURCE_LABELS[p.priceSource]}</span>
+                          </td>
+                          <td className="mono" style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{formatMoney(p.actualSalesPrice)}</td>
                           <td className="mono">{p.amount}</td>
                         </tr>
                       ))}
                       <tr style={{ fontWeight: 'var(--font-semibold)' }}>
-                        <td colSpan={4} style={{ textAlign: 'right', color: 'var(--color-text-secondary)' }}>合计</td>
+                        <td colSpan={6} style={{ textAlign: 'right', color: 'var(--color-text-secondary)' }}>合计</td>
                         <td className="mono" style={{ color: 'var(--color-module-current-base)' }}>{selectedOrder.amount}</td>
                       </tr>
                     </tbody>
@@ -418,6 +478,228 @@ export default function SalesOrders() {
         </div>
       )}
     </>
+  );
+}
+
+/* ── 新建销售单抽屉 ── */
+function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
+  nextNumber: number;
+  onCancel: () => void;
+  onSave: (order: SalesOrderRecord) => void;
+}) {
+  const [customerId, setCustomerId] = useState('');
+  const [productId, setProductId] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [actualSalesPrice, setActualSalesPrice] = useState('');
+  const [orderDate, setOrderDate] = useState(new Date().toISOString().slice(0, 10));
+  const [contactPerson, setContactPerson] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [remark, setRemark] = useState('');
+
+  const selectedProduct = teaProducts.find(p => p.id === productId);
+  const selectedCustomer = PRICE_CUSTOMERS.find(c => c.id === customerId);
+  const marketPrice = selectedProduct?.marketPrice ?? 0;
+  const defaultResult = (productId && customerId) ? getSalesDefaultPrice(productId, customerId) : null;
+  const defaultPrice = defaultResult?.price ?? 0;
+  const priceSource = defaultResult?.source ?? 'market';
+
+  // 商品或客户变化时，销售实价自动带出默认价（VIP价 > 销售价 > 市场价）
+  useEffect(() => {
+    if (productId && customerId) {
+      const { price } = getSalesDefaultPrice(productId, customerId);
+      setActualSalesPrice(String(price));
+    } else {
+      setActualSalesPrice('');
+    }
+  }, [productId, customerId]);
+
+  const qtyNum = Number(quantity) || 0;
+  const actualNum = Number(actualSalesPrice) || 0;
+  const amountNum = qtyNum * actualNum;
+
+  const canSave = !!customerId && !!productId && qtyNum > 0 && actualNum > 0 && !!orderDate;
+
+  const handleSave = () => {
+    if (!canSave || !selectedProduct || !selectedCustomer) return;
+    const now = new Date();
+    const timeStr = `${orderDate} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const order: SalesOrderRecord = {
+      id: `so_${Date.now()}`,
+      code: `SO-2025-${String(nextNumber).padStart(4, '0')}`,
+      customer: selectedCustomer.name,
+      customerType: PRICE_CUSTOMER_TYPE_MAP[selectedCustomer.type] ?? 'platform',
+      product: selectedProduct.name,
+      teaCategory: categoryToTeaCategory(selectedProduct.category),
+      quantity: `${qtyNum} ${selectedProduct.packageUnit}`,
+      unitPrice: `¥${actualNum}/${selectedProduct.packageUnit}`,
+      amount: formatMoney(amountNum),
+      date: orderDate,
+      status: OrderStatus.PENDING,
+      contactPerson: contactPerson || '—',
+      contactPhone: contactPhone || '—',
+      deliveryAddress: deliveryAddress || '—',
+      remark,
+      products: [{
+        productId: selectedProduct.id,
+        name: `${selectedProduct.name} — ${selectedProduct.grade}`,
+        teaCategory: categoryToTeaCategory(selectedProduct.category),
+        quantity: `${qtyNum} ${selectedProduct.packageUnit}`,
+        marketPrice,
+        defaultPrice,
+        actualSalesPrice: actualNum,
+        priceSource,
+        amount: formatMoney(amountNum),
+      }],
+      timeline: [{ time: timeStr, event: '客户下单', operator: '系统' }],
+    };
+    onSave(order);
+  };
+
+  // 只读价格展示框样式
+  const readOnlyPriceStyle: React.CSSProperties = {
+    height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)',
+    border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)',
+    background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)',
+  };
+
+  return (
+    <div className="drawer-overlay" onClick={onCancel}>
+      <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 680 }}>
+        <div className="drawer-header">
+          <span className="drawer-title">新建销售单</span>
+          <button className="drawer-close" onClick={onCancel}>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+          </button>
+        </div>
+
+        <div className="drawer-body">
+          {/* 客户与商品 */}
+          <div className="drawer-section-title">客户与商品</div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">客户 *</label>
+              <select className="filter-select" style={{ width: '100%' }} value={customerId} onChange={(e) => setCustomerId(e.target.value)}>
+                <option value="">请选择客户</option>
+                {PRICE_CUSTOMERS.map((c) => <option key={c.id} value={c.id}>{c.name}（{c.type}）</option>)}
+              </select>
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">商品 *</label>
+              <select className="filter-select" style={{ width: '100%' }} value={productId} onChange={(e) => setProductId(e.target.value)}>
+                <option value="">请选择商品</option>
+                {teaProducts.map((p) => <option key={p.id} value={p.id}>{p.name}（{p.brand}）</option>)}
+              </select>
+            </div>
+          </div>
+          {selectedProduct && (
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginBottom: 'var(--space-3)' }}>
+              规格：{selectedProduct.spec} · 品牌：{selectedProduct.brand} · 包装单位：{selectedProduct.packageUnit}
+            </div>
+          )}
+
+          {/* 价格信息 */}
+          <div className="drawer-section-title">价格信息</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+            <div>
+              <label className="drawer-label">市场价</label>
+              <div style={readOnlyPriceStyle} className="mono">{marketPrice ? formatMoney(marketPrice) : '—'}</div>
+            </div>
+            <div>
+              <label className="drawer-label">默认价（带来源）</label>
+              <div style={{ ...readOnlyPriceStyle, gap: 'var(--space-2)' }}>
+                <span className="mono">{defaultPrice ? formatMoney(defaultPrice) : '—'}</span>
+                {defaultPrice > 0 && (
+                  <span style={{
+                    padding: '0 6px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
+                    background: 'var(--color-neutral-0)', color: SOURCE_COLORS[priceSource], border: `1px solid ${SOURCE_COLORS[priceSource]}30`,
+                  }}>{SOURCE_LABELS[priceSource]}</span>
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="drawer-label">销售实价（可调整）*</label>
+              <input
+                type="number"
+                className="filter-input"
+                style={{
+                  width: '100%', height: 34,
+                  borderColor: 'var(--color-module-current-base)',
+                  background: 'var(--color-module-current-lightest)',
+                  fontWeight: 'var(--font-semibold)',
+                  color: 'var(--color-module-current-base)',
+                }}
+                value={actualSalesPrice}
+                onChange={(e) => setActualSalesPrice(e.target.value)}
+                placeholder="0"
+                disabled={!productId || !customerId}
+              />
+            </div>
+          </div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">数量 *</label>
+              <input
+                type="number"
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                placeholder="请输入数量"
+              />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">金额（自动计算）</label>
+              <div
+                className="mono"
+                style={{
+                  height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)',
+                  border: '1px solid var(--color-module-current-base)', borderRadius: 'var(--radius-md)',
+                  background: 'var(--color-module-current-lightest)', fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-bold)', color: 'var(--color-module-current-base)',
+                }}
+              >
+                {amountNum > 0 ? formatMoney(amountNum) : '—'}
+              </div>
+            </div>
+          </div>
+
+          {/* 订单信息 */}
+          <div className="drawer-section-title">订单信息</div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">下单日期 *</label>
+              <input type="date" className="filter-input" style={{ width: '100%' }} value={orderDate} onChange={(e) => setOrderDate(e.target.value)} />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">联系人</label>
+              <input className="filter-input" style={{ width: '100%' }} value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} placeholder="请输入联系人" />
+            </div>
+          </div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">联系电话</label>
+              <input className="filter-input" style={{ width: '100%' }} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} placeholder="请输入联系电话" />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">收货地址</label>
+              <input className="filter-input" style={{ width: '100%' }} value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} placeholder="请输入收货地址" />
+            </div>
+          </div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field" style={{ flex: 1 }}>
+              <label className="drawer-label">备注</label>
+              <input className="filter-input" style={{ width: '100%' }} value={remark} onChange={(e) => setRemark(e.target.value)} placeholder="选填" />
+            </div>
+          </div>
+        </div>
+
+        <div className="drawer-footer">
+          <Button variant="ghost" onClick={onCancel}>取消</Button>
+          <Button onClick={handleSave} disabled={!canSave}>确认下单</Button>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -5,8 +5,9 @@ import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import { TeaCategory } from '../../types';
+import type { TeaProduct, PurchasePriceRule, VipPriceRule } from '../../types';
 import { teaProducts } from '../../data/teaProducts';
-import { brandItems } from '../../data/brands';
+import { purchasePriceRules, vipPriceRules, PRICE_SUPPLIERS, PRICE_CUSTOMERS } from '../../data/prices';
 
 /* ── 工具函数 ── */
 function nameToTeaCategory(name: string): TeaCategory | undefined {
@@ -18,108 +19,33 @@ function nameToTeaCategory(name: string): TeaCategory | undefined {
   return map[name];
 }
 
-/* ── 供应商列表（模拟） ── */
-const suppliers = [
-  { id: 's1', name: '西湖龙井合作社' },
-  { id: 's2', name: '武夷山茶业' },
-  { id: 's3', name: '安溪铁观音集团' },
-  { id: 's4', name: '福鼎白茶厂' },
-  { id: 's5', name: '云南普洱茶业' },
-  { id: 's6', name: '正山堂茶业' },
-  { id: 's7', name: '八马茶业供应链' },
-  { id: 's8', name: '大益集团' },
-];
-
-/* ── 客户列表（模拟，对应客户分类） ── */
-const customers = [
-  { id: 'c1', name: '华茗堂茶庄', type: '直营' },
-  { id: 'c2', name: '清心茶坊', type: '直营' },
-  { id: 'c3', name: '浦发银行', type: '间营' },
-  { id: 'c4', name: '交通银行', type: '间营' },
-  { id: 'c5', name: '天福茗茶（渠道）', type: '渠道' },
-  { id: 'c6', name: '八马茶业（渠道）', type: '渠道' },
-  { id: 'c7', name: '茶道达人小李', type: '带货' },
-  { id: 'c8', name: '茗香阁直播', type: '带货' },
-];
-
-/* ── 模拟采购价数据 ── */
-interface PurchasePrice {
-  productId: string;
-  productName: string;
-  brand: string;
-  category: string;
-  marketPrice: number;
-  supplierId: string;
-  supplierName: string;
-  purchasePrice: number;
-  discountRate: number; // 采购折扣率
-}
-
-/* ── 模拟销售价数据 ── */
-interface SalesPrice {
-  productId: string;
-  productName: string;
-  brand: string;
-  category: string;
-  marketPrice: number;
-  customerId: string;
-  customerName: string;
-  customerType: string;
-  salesPrice: number;
-  discountRate: number; // 销售折扣率
-}
-
-// 生成采购价模拟数据
-const purchasePriceData: PurchasePrice[] = [];
-teaProducts.forEach(p => {
-  // 每个商品有2-3个供应商
-  const brandData = brandItems.find(b => b.name === p.brand);
-  const supplierCount = 2 + Math.floor(Math.random() * 2);
-  const usedSuppliers = suppliers.slice(0, supplierCount);
-  usedSuppliers.forEach(s => {
-    const discount = 0.45 + Math.random() * 0.2; // 采购折扣 45%-65%
-    purchasePriceData.push({
-      productId: p.id,
-      productName: p.name,
-      brand: p.brand,
-      category: p.category.split('-')[0],
-      marketPrice: p.marketPrice,
-      supplierId: s.id,
-      supplierName: s.name,
-      purchasePrice: Math.round(p.marketPrice * discount),
-      discountRate: Math.round(discount * 100),
-    });
-  });
-});
-
-// 生成销售价模拟数据
-const salesPriceData: SalesPrice[] = [];
-teaProducts.slice(0, 15).forEach(p => {
-  // 每个商品面向3-4个客户
-  const customerCount = 3 + Math.floor(Math.random() * 2);
-  const usedCustomers = customers.slice(0, customerCount);
-  usedCustomers.forEach(c => {
-    const discount = c.type === '直营' ? 0.75 + Math.random() * 0.1 :
-                     c.type === '间营' ? 0.7 + Math.random() * 0.1 :
-                     c.type === '渠道' ? 0.6 + Math.random() * 0.1 :
-                     0.65 + Math.random() * 0.1;
-    salesPriceData.push({
-      productId: p.id,
-      productName: p.name,
-      brand: p.brand,
-      category: p.category.split('-')[0],
-      marketPrice: p.marketPrice,
-      customerId: c.id,
-      customerName: c.name,
-      customerType: c.type,
-      salesPrice: Math.round(p.marketPrice * discount),
-      discountRate: Math.round(discount * 100),
-    });
-  });
-});
+/* ── 价格色 ── */
+const COLOR_PURCHASE = '#0DAFC6';
+const COLOR_SALES = '#F18F4D';
+const COLOR_VIP = '#9D73BD';
 
 /* ── Tab 类型 ── */
-type PriceTab = 'market' | 'purchase' | 'sales';
+type PriceTab = 'market' | 'purchase' | 'sales' | 'vip';
+
+/* ── 调价弹窗表单 ── */
+interface EditForm {
+  marketPrice: string;
+  tmallPrice: string;
+  jdPrice: string;
+  salesPrice: string;
+  purchasePrice: string;
+  vipPrice: string;
+}
+interface EditState {
+  tab: PriceTab;
+  key: string; // market/sales: productId；purchase/vip: ruleId
+  productName: string;
+  subInfo: string; // 供应商 / 客户名称
+  marketPrice: number;
+  salesPrice: number; // 标准销售价（vip 用）
+  validFrom?: string;
+  validTo?: string;
+}
 
 export default function ProductPrice() {
   const [activeTab, setActiveTab] = useState<PriceTab>('market');
@@ -129,12 +55,29 @@ export default function ProductPrice() {
 
   // 采购价筛选
   const [purchaseSupplier, setPurchaseSupplier] = useState('');
-  // 销售价筛选
-  const [salesCustomer, setSalesCustomer] = useState('');
+  // VIP价筛选
+  const [vipCustomer, setVipCustomer] = useState('');
 
-  // 批量修改状态
+  // 可编辑的本地价格数据（基准数据来自数据源，调价后覆盖）
+  const [marketOverrides, setMarketOverrides] = useState<Record<string, { marketPrice: number; tmallPrice: number; jdPrice: number; salesPrice: number }>>({});
+  const [purchaseRules, setPurchaseRules] = useState<PurchasePriceRule[]>(purchasePriceRules);
+  const [salesOverrides, setSalesOverrides] = useState<Record<string, number>>({});
+  const [vipRules, setVipRules] = useState<VipPriceRule[]>(vipPriceRules);
+
+  // 单条调价弹窗
+  const [editState, setEditState] = useState<EditState | null>(null);
+  const [editForm, setEditForm] = useState<EditForm | null>(null);
+
+  // 新增 VIP 价弹窗
+  const [showAddVip, setShowAddVip] = useState(false);
+  const [addVipProduct, setAddVipProduct] = useState('');
+  const [addVipCustomer, setAddVipCustomer] = useState('');
+  const [addVipPrice, setAddVipPrice] = useState('');
+
+  // 批量调价
   const [batchMode, setBatchMode] = useState(false);
-  const [batchTarget, setBatchTarget] = useState(''); // 品牌ID 或 客户ID
+  const [batchTab, setBatchTab] = useState<'purchase' | 'vip'>('purchase');
+  const [batchTarget, setBatchTarget] = useState('');
   const [batchAdjustType, setBatchAdjustType] = useState<'percent' | 'fixed'>('percent');
   const [batchAdjustValue, setBatchAdjustValue] = useState('');
   const [showBatchConfirm, setShowBatchConfirm] = useState(false);
@@ -153,7 +96,14 @@ export default function ProductPrice() {
     return Array.from(cats).sort();
   }, []);
 
-  // ── 市场价列表 ──
+  // 取商品的市场价/销售价（含覆盖值）
+  const getMarketData = (p: TeaProduct) => {
+    const ov = marketOverrides[p.id];
+    return ov ?? { marketPrice: p.marketPrice, tmallPrice: p.tmallPrice, jdPrice: p.jdPrice, salesPrice: p.salesPrice };
+  };
+  const getSalesPrice = (p: TeaProduct) => salesOverrides[p.id] ?? p.salesPrice;
+
+  /* ── 列表筛选 ── */
   const marketList = useMemo(() => {
     return teaProducts.filter(p => {
       if (keyword && !p.name.includes(keyword) && !p.brand.includes(keyword) && !p.code.includes(keyword)) return false;
@@ -163,29 +113,160 @@ export default function ProductPrice() {
     });
   }, [keyword, filterBrand, filterCategory]);
 
-  // ── 采购价列表 ──
   const purchaseList = useMemo(() => {
-    return purchasePriceData.filter(item => {
+    return purchaseRules.filter(item => {
       if (keyword && !item.productName.includes(keyword) && !item.brand.includes(keyword)) return false;
       if (filterBrand && item.brand !== filterBrand) return false;
       if (filterCategory && item.category !== filterCategory) return false;
       if (purchaseSupplier && item.supplierId !== purchaseSupplier) return false;
       return true;
     });
-  }, [keyword, filterBrand, filterCategory, purchaseSupplier]);
+  }, [keyword, filterBrand, filterCategory, purchaseSupplier, purchaseRules]);
 
-  // ── 销售价列表 ──
   const salesList = useMemo(() => {
-    return salesPriceData.filter(item => {
+    return teaProducts.filter(p => {
+      if (keyword && !p.name.includes(keyword) && !p.brand.includes(keyword) && !p.code.includes(keyword)) return false;
+      if (filterBrand && p.brand !== filterBrand) return false;
+      if (filterCategory && !p.category.startsWith(filterCategory)) return false;
+      return true;
+    });
+  }, [keyword, filterBrand, filterCategory]);
+
+  const vipList = useMemo(() => {
+    return vipRules.filter(item => {
       if (keyword && !item.productName.includes(keyword) && !item.brand.includes(keyword)) return false;
       if (filterBrand && item.brand !== filterBrand) return false;
       if (filterCategory && item.category !== filterCategory) return false;
-      if (salesCustomer && item.customerId !== salesCustomer) return false;
+      if (vipCustomer && item.customerId !== vipCustomer) return false;
       return true;
     });
-  }, [keyword, filterBrand, filterCategory, salesCustomer]);
+  }, [keyword, filterBrand, filterCategory, vipCustomer, vipRules]);
 
-  // Tab 样式
+  /* ── 打开单条调价弹窗 ── */
+  const openEdit = (tab: PriceTab, key: string) => {
+    let st: EditState;
+    let form: EditForm = { marketPrice: '', tmallPrice: '', jdPrice: '', salesPrice: '', purchasePrice: '', vipPrice: '' };
+    if (tab === 'market') {
+      const p = teaProducts.find(x => x.id === key)!;
+      const d = getMarketData(p);
+      st = { tab, key, productName: p.name, subInfo: p.brand, marketPrice: d.marketPrice, salesPrice: d.salesPrice };
+      form = { ...form, marketPrice: String(d.marketPrice), tmallPrice: String(d.tmallPrice), jdPrice: String(d.jdPrice), salesPrice: String(d.salesPrice) };
+    } else if (tab === 'purchase') {
+      const r = purchaseRules.find(x => x.id === key)!;
+      st = { tab, key, productName: r.productName, subInfo: r.supplierName, marketPrice: r.marketPrice, salesPrice: 0, validFrom: r.validFrom, validTo: r.validTo };
+      form = { ...form, marketPrice: String(r.marketPrice), purchasePrice: String(r.purchasePrice) };
+    } else if (tab === 'sales') {
+      const p = teaProducts.find(x => x.id === key)!;
+      const sp = getSalesPrice(p);
+      st = { tab, key, productName: p.name, subInfo: p.brand, marketPrice: p.marketPrice, salesPrice: sp };
+      form = { ...form, marketPrice: String(p.marketPrice), salesPrice: String(sp) };
+    } else {
+      const r = vipRules.find(x => x.id === key)!;
+      st = { tab, key, productName: r.productName, subInfo: r.customerName, marketPrice: r.marketPrice, salesPrice: r.salesPrice, validFrom: r.validFrom, validTo: r.validTo };
+      form = { ...form, marketPrice: String(r.marketPrice), salesPrice: String(r.salesPrice), vipPrice: String(r.vipPrice) };
+    }
+    setEditState(st);
+    setEditForm(form);
+  };
+
+  const saveEdit = () => {
+    if (!editState || !editForm) return;
+    const { tab, key } = editState;
+    if (tab === 'market') {
+      setMarketOverrides(prev => ({ ...prev, [key]: {
+        marketPrice: Number(editForm.marketPrice) || 0,
+        tmallPrice: Number(editForm.tmallPrice) || 0,
+        jdPrice: Number(editForm.jdPrice) || 0,
+        salesPrice: Number(editForm.salesPrice) || 0,
+      }}));
+    } else if (tab === 'purchase') {
+      const pp = Number(editForm.purchasePrice) || 0;
+      setPurchaseRules(prev => prev.map(r => r.id === key ? {
+        ...r, purchasePrice: pp,
+        discountRate: r.marketPrice > 0 ? Math.round(pp / r.marketPrice * 100) : 0,
+        lastAdjustDate: new Date().toISOString().slice(0, 10),
+      } : r));
+    } else if (tab === 'sales') {
+      setSalesOverrides(prev => ({ ...prev, [key]: Number(editForm.salesPrice) || 0 }));
+    } else if (tab === 'vip') {
+      const vp = Number(editForm.vipPrice) || 0;
+      setVipRules(prev => prev.map(r => r.id === key ? {
+        ...r, vipPrice: vp,
+        discountRate: r.marketPrice > 0 ? Math.round(vp / r.marketPrice * 100) : 0,
+      } : r));
+    }
+    setEditState(null);
+    setEditForm(null);
+  };
+
+  /* ── 新增 VIP 价 ── */
+  const saveAddVip = () => {
+    const p = teaProducts.find(x => x.id === addVipProduct);
+    const c = PRICE_CUSTOMERS.find(x => x.id === addVipCustomer);
+    if (!p || !c) return;
+    const vp = Number(addVipPrice) || 0;
+    const newRule: VipPriceRule = {
+      id: `vip_new_${Date.now()}`,
+      productId: p.id,
+      productName: p.name,
+      brand: p.brand,
+      category: p.category.split('-')[0],
+      customerId: c.id,
+      customerName: c.name,
+      customerType: c.type,
+      marketPrice: p.marketPrice,
+      salesPrice: p.salesPrice,
+      vipPrice: vp,
+      discountRate: p.marketPrice > 0 ? Math.round(vp / p.marketPrice * 100) : 0,
+      validFrom: '2026-01-01',
+      validTo: '2026-12-31',
+      status: 'active',
+      remark: `${c.type}客户专属价`,
+    };
+    setVipRules(prev => [newRule, ...prev]);
+    setShowAddVip(false);
+    setAddVipProduct('');
+    setAddVipCustomer('');
+    setAddVipPrice('');
+  };
+
+  /* ── 批量调价 ── */
+  const openBatch = (tab: 'purchase' | 'vip') => {
+    setBatchTab(tab);
+    setBatchMode(true);
+    setBatchTarget('');
+    setBatchAdjustValue('');
+    setBatchAdjustType('percent');
+  };
+
+  const batchCount = useMemo(() => {
+    if (!batchTarget) return 0;
+    return batchTab === 'purchase'
+      ? purchaseRules.filter(r => r.brand === batchTarget).length
+      : vipRules.filter(r => r.customerId === batchTarget).length;
+  }, [batchTab, batchTarget, purchaseRules, vipRules]);
+
+  const confirmBatch = () => {
+    const val = Number(batchAdjustValue) || 0;
+    const apply = (origin: number) => Math.max(0, batchAdjustType === 'percent'
+      ? Math.round(origin * (1 + val / 100))
+      : origin + val);
+    if (batchTab === 'purchase') {
+      setPurchaseRules(prev => prev.map(r => r.brand !== batchTarget ? r : {
+        ...r, purchasePrice: apply(r.purchasePrice),
+        discountRate: r.marketPrice > 0 ? Math.round(apply(r.purchasePrice) / r.marketPrice * 100) : 0,
+      }));
+    } else {
+      setVipRules(prev => prev.map(r => r.customerId !== batchTarget ? r : {
+        ...r, vipPrice: apply(r.vipPrice),
+        discountRate: r.marketPrice > 0 ? Math.round(apply(r.vipPrice) / r.marketPrice * 100) : 0,
+      }));
+    }
+    setShowBatchConfirm(false);
+    setBatchMode(false);
+  };
+
+  /* ── 样式 ── */
   const tabStyle = (active: boolean): React.CSSProperties => ({
     padding: '8px 20px',
     borderRadius: 'var(--radius-md)',
@@ -199,16 +280,20 @@ export default function ProductPrice() {
     whiteSpace: 'nowrap',
   });
 
-  // 客户类型标签
   const customerTypeStyle = (type: string): React.CSSProperties => {
     const colors: Record<string, { bg: string; color: string }> = {
       '直营': { bg: 'var(--color-module-current-lightest)', color: 'var(--color-module-current-base)' },
-      '间营': { bg: 'rgba(13,175,198,0.1)', color: '#0DAFC6' },
-      '渠道': { bg: 'rgba(241,143,77,0.1)', color: '#F18F4D' },
-      '带货': { bg: 'rgba(203,64,93,0.1)', color: '#CB405D' },
+      '间营': { bg: 'rgba(13,175,198,0.1)', color: COLOR_PURCHASE },
+      '渠道': { bg: 'rgba(241,143,77,0.1)', color: COLOR_SALES },
+      '带货': { bg: 'rgba(157,115,189,0.1)', color: COLOR_VIP },
     };
     const c = colors[type] || colors['直营'];
     return { padding: '2px 8px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: c.bg, color: c.color };
+  };
+
+  const fieldLabel: React.CSSProperties = {
+    display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)',
+    color: 'var(--color-neutral-700)', marginBottom: 'var(--space-2)',
   };
 
   return (
@@ -220,6 +305,7 @@ export default function ProductPrice() {
           <button style={tabStyle(activeTab === 'market')} onClick={() => setActiveTab('market')}>市场价管理</button>
           <button style={tabStyle(activeTab === 'purchase')} onClick={() => setActiveTab('purchase')}>采购价管理</button>
           <button style={tabStyle(activeTab === 'sales')} onClick={() => setActiveTab('sales')}>销售价管理</button>
+          <button style={tabStyle(activeTab === 'vip')} onClick={() => setActiveTab('vip')}>VIP销售价</button>
         </div>
 
         {/* ── 市场价管理 ── */}
@@ -239,18 +325,20 @@ export default function ProductPrice() {
             </div>
             <Card>
               <Table
-                headers={['商品名称', '品牌', '分类', '规格', '市场价', '天猫价', '京东价', '操作']}
+                headers={['商品名称', '品牌', '分类', '规格', '市场价', '天猫价', '京东价', '销售价', '操作']}
                 rows={marketList.map(p => {
                   const teaCat = nameToTeaCategory(p.category.split('-')[0]);
+                  const d = getMarketData(p);
                   return [
                     <span style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>,
                     <span>{p.brand}</span>,
                     teaCat ? <Tag category={teaCat} /> : <span>{p.category.split('-')[0]}</span>,
                     <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{p.spec}</span>,
-                    <span className="mono" style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>¥{p.marketPrice}</span>,
-                    <span className="mono" style={{ color: 'var(--color-neutral-600)' }}>¥{p.tmallPrice || '-'}</span>,
-                    <span className="mono" style={{ color: 'var(--color-neutral-600)' }}>¥{p.jdPrice || '-'}</span>,
-                    <Button variant="ghost" size="sm" style={{ color: 'var(--color-module-current-base)' }}>调价</Button>,
+                    <span className="mono" style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>¥{d.marketPrice}</span>,
+                    <span className="mono" style={{ color: 'var(--color-neutral-600)' }}>¥{d.tmallPrice || '-'}</span>,
+                    <span className="mono" style={{ color: 'var(--color-neutral-600)' }}>¥{d.jdPrice || '-'}</span>,
+                    <span className="mono" style={{ fontWeight: 'var(--font-semibold)', color: COLOR_SALES }}>¥{d.salesPrice || '-'}</span>,
+                    <Button variant="ghost" size="sm" style={{ color: 'var(--color-module-current-base)' }} onClick={() => openEdit('market', p.id)}>调价</Button>,
                   ];
                 })}
               />
@@ -273,9 +361,9 @@ export default function ProductPrice() {
               </select>
               <select className="filter-select" value={purchaseSupplier} onChange={(e) => setPurchaseSupplier(e.target.value)}>
                 <option value="">全部供应商</option>
-                {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                {PRICE_SUPPLIERS.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
-              <Button style={{ background: '#0DAFC6', borderColor: '#0DAFC6', color: '#fff' }} onClick={() => { setBatchMode(true); setBatchTarget(''); setBatchAdjustValue(''); }}>
+              <Button style={{ background: COLOR_PURCHASE, borderColor: COLOR_PURCHASE, color: '#fff' }} onClick={() => openBatch('purchase')}>
                 <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                   <path d="M2 8h12M8 2v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
@@ -285,24 +373,25 @@ export default function ProductPrice() {
             </div>
             <Card>
               <Table
-                headers={['商品名称', '品牌', '分类', '市场价', '供应商', '采购价', '采购折扣', '利润空间', '操作']}
+                headers={['商品名称', '品牌', '分类', '市场价', '供应商', '采购价', '采购折扣', '利润空间', '有效期', '操作']}
                 rows={purchaseList.map(item => {
                   const teaCat = nameToTeaCategory(item.category);
                   const profit = item.marketPrice - item.purchasePrice;
-                  const profitRate = Math.round((profit / item.marketPrice) * 100);
+                  const profitRate = item.marketPrice > 0 ? Math.round((profit / item.marketPrice) * 100) : 0;
                   return [
                     <span style={{ fontWeight: 'var(--font-medium)' }}>{item.productName}</span>,
                     <span>{item.brand}</span>,
                     teaCat ? <Tag category={teaCat} /> : <span>{item.category}</span>,
                     <span className="mono">¥{item.marketPrice}</span>,
                     <span style={{ fontSize: 'var(--text-sm)' }}>{item.supplierName}</span>,
-                    <span className="mono" style={{ fontWeight: 'var(--font-semibold)', color: '#0DAFC6' }}>¥{item.purchasePrice}</span>,
+                    <span className="mono" style={{ fontWeight: 'var(--font-semibold)', color: COLOR_PURCHASE }}>¥{item.purchasePrice}</span>,
                     <span className="mono" style={{ color: 'var(--color-neutral-500)' }}>{item.discountRate}%</span>,
                     <span style={{ fontSize: 'var(--text-sm)' }}>
                       <span className="mono" style={{ color: profitRate > 40 ? 'var(--color-success-500)' : profitRate > 25 ? 'var(--color-warning-500)' : 'var(--color-error-500)' }}>{profitRate}%</span>
                       <span style={{ color: 'var(--color-neutral-400)', marginLeft: 4 }}>(¥{profit})</span>
                     </span>,
-                    <Button variant="ghost" size="sm" style={{ color: '#0DAFC6' }}>调价</Button>,
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{item.validFrom} ~ {item.validTo}</span>,
+                    <Button variant="ghost" size="sm" style={{ color: COLOR_PURCHASE }} onClick={() => openEdit('purchase', item.id)}>调价</Button>,
                   ];
                 })}
               />
@@ -314,6 +403,43 @@ export default function ProductPrice() {
         {activeTab === 'sales' && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+              <input className="filter-input" placeholder="搜索商品名称、品牌、编号..." value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+              <select className="filter-select" value={filterBrand} onChange={(e) => setFilterBrand(e.target.value)}>
+                <option value="">全部品牌</option>
+                {allBrands.map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+              <select className="filter-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                <option value="">全部茶类</option>
+                {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>共 {salesList.length} 件商品</span>
+            </div>
+            <Card>
+              <Table
+                headers={['商品名称', '品牌', '分类', '市场价', '销售价', '销售折扣', '操作']}
+                rows={salesList.map(p => {
+                  const teaCat = nameToTeaCategory(p.category.split('-')[0]);
+                  const sp = getSalesPrice(p);
+                  const discount = p.marketPrice > 0 ? Math.round((sp / p.marketPrice) * 100) : 0;
+                  return [
+                    <span style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>,
+                    <span>{p.brand}</span>,
+                    teaCat ? <Tag category={teaCat} /> : <span>{p.category.split('-')[0]}</span>,
+                    <span className="mono">¥{p.marketPrice}</span>,
+                    <span className="mono" style={{ fontWeight: 'var(--font-semibold)', color: COLOR_SALES }}>¥{sp}</span>,
+                    <span className="mono" style={{ color: 'var(--color-neutral-500)' }}>{discount}%</span>,
+                    <Button variant="ghost" size="sm" style={{ color: COLOR_SALES }} onClick={() => openEdit('sales', p.id)}>调价</Button>,
+                  ];
+                })}
+              />
+            </Card>
+          </>
+        )}
+
+        {/* ── VIP销售价管理 ── */}
+        {activeTab === 'vip' && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
               <input className="filter-input" placeholder="搜索商品名称、品牌..." value={keyword} onChange={(e) => setKeyword(e.target.value)} />
               <select className="filter-select" value={filterBrand} onChange={(e) => setFilterBrand(e.target.value)}>
                 <option value="">全部品牌</option>
@@ -323,33 +449,41 @@ export default function ProductPrice() {
                 <option value="">全部茶类</option>
                 {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
-              <select className="filter-select" value={salesCustomer} onChange={(e) => setSalesCustomer(e.target.value)}>
+              <select className="filter-select" value={vipCustomer} onChange={(e) => setVipCustomer(e.target.value)}>
                 <option value="">全部客户</option>
-                {customers.map(c => <option key={c.id} value={c.id}>{c.name}（{c.type}）</option>)}
+                {PRICE_CUSTOMERS.map(c => <option key={c.id} value={c.id}>{c.name}（{c.type}）</option>)}
               </select>
-              <Button style={{ background: '#F18F4D', borderColor: '#F18F4D', color: '#fff' }} onClick={() => { setBatchMode(true); setBatchTarget(''); setBatchAdjustValue(''); }}>
+              <Button style={{ background: COLOR_VIP, borderColor: COLOR_VIP, color: '#fff' }} onClick={() => { setShowAddVip(true); setAddVipProduct(''); setAddVipCustomer(''); setAddVipPrice(''); }}>
+                <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
+                  <path d="M2 8h12M8 2v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+                新增VIP价
+              </Button>
+              <Button variant="secondary" onClick={() => openBatch('vip')}>
                 <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}>
                   <path d="M2 8h12M8 2v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
                 批量调价
               </Button>
-              <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>共 {salesList.length} 条记录</span>
+              <span style={{ marginLeft: 'auto', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>共 {vipList.length} 条记录</span>
             </div>
             <Card>
               <Table
-                headers={['商品名称', '品牌', '分类', '市场价', '客户', '客户类型', '销售价', '销售折扣', '操作']}
-                rows={salesList.map(item => {
+                headers={['商品名称', '品牌', '分类', '市场价', '标准销售价', '客户', '客户类型', 'VIP价', 'VIP折扣', '有效期', '操作']}
+                rows={vipList.map(item => {
                   const teaCat = nameToTeaCategory(item.category);
                   return [
                     <span style={{ fontWeight: 'var(--font-medium)' }}>{item.productName}</span>,
                     <span>{item.brand}</span>,
                     teaCat ? <Tag category={teaCat} /> : <span>{item.category}</span>,
                     <span className="mono">¥{item.marketPrice}</span>,
+                    <span className="mono" style={{ color: 'var(--color-neutral-600)' }}>¥{item.salesPrice}</span>,
                     <span style={{ fontSize: 'var(--text-sm)' }}>{item.customerName}</span>,
                     <span style={customerTypeStyle(item.customerType)}>{item.customerType}</span>,
-                    <span className="mono" style={{ fontWeight: 'var(--font-semibold)', color: '#F18F4D' }}>¥{item.salesPrice}</span>,
+                    <span className="mono" style={{ fontWeight: 'var(--font-semibold)', color: COLOR_VIP }}>¥{item.vipPrice}</span>,
                     <span className="mono" style={{ color: 'var(--color-neutral-500)' }}>{item.discountRate}%</span>,
-                    <Button variant="ghost" size="sm" style={{ color: '#F18F4D' }}>调价</Button>,
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{item.validFrom} ~ {item.validTo}</span>,
+                    <Button variant="ghost" size="sm" style={{ color: COLOR_VIP }} onClick={() => openEdit('vip', item.id)}>调价</Button>,
                   ];
                 })}
               />
@@ -358,20 +492,164 @@ export default function ProductPrice() {
         )}
       </div>
 
+      {/* ── 单条调价弹窗 ── */}
+      {editState && editForm && (
+        <div className="category-dialog-overlay" onClick={() => { setEditState(null); setEditForm(null); }}>
+          <div className="category-dialog" onClick={(e) => e.stopPropagation()} style={{ width: 480 }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-2)' }}>
+              {editState.tab === 'market' ? '市场价调价' : editState.tab === 'purchase' ? '采购价调价' : editState.tab === 'sales' ? '销售价调价' : 'VIP价调价'}
+            </div>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)', marginBottom: 'var(--space-4)' }}>
+              商品：{editState.productName}{editState.subInfo ? `（${editState.subInfo}）` : ''}
+            </div>
+
+            {/* 市场价 Tab：可改 4 个价 */}
+            {editState.tab === 'market' && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                <div>
+                  <label style={fieldLabel}>市场价</label>
+                  <input className="detail-input" type="number" value={editForm.marketPrice} onChange={(e) => setEditForm({ ...editForm, marketPrice: e.target.value })} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={fieldLabel}>天猫价</label>
+                  <input className="detail-input" type="number" value={editForm.tmallPrice} onChange={(e) => setEditForm({ ...editForm, tmallPrice: e.target.value })} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={fieldLabel}>京东价</label>
+                  <input className="detail-input" type="number" value={editForm.jdPrice} onChange={(e) => setEditForm({ ...editForm, jdPrice: e.target.value })} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={fieldLabel}>销售价</label>
+                  <input className="detail-input" type="number" value={editForm.salesPrice} onChange={(e) => setEditForm({ ...editForm, salesPrice: e.target.value })} style={{ width: '100%' }} />
+                </div>
+              </div>
+            )}
+
+            {/* 采购价 Tab */}
+            {editState.tab === 'purchase' && (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                  <div>
+                    <label style={fieldLabel}>市场价（参考）</label>
+                    <div className="mono" style={{ padding: '8px 12px', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', color: 'var(--color-neutral-600)' }}>¥{editState.marketPrice}</div>
+                  </div>
+                  <div>
+                    <label style={fieldLabel}>采购价</label>
+                    <input className="detail-input" type="number" value={editForm.purchasePrice} onChange={(e) => setEditForm({ ...editForm, purchasePrice: e.target.value })} style={{ width: '100%' }} />
+                  </div>
+                </div>
+                <div style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>
+                  采购折扣率：{editState.marketPrice > 0 ? Math.round((Number(editForm.purchasePrice) || 0) / editState.marketPrice * 100) : 0}%
+                  <span style={{ marginLeft: 12, color: 'var(--color-neutral-400)' }}>有效期：{editState.validFrom} ~ {editState.validTo}</span>
+                </div>
+              </>
+            )}
+
+            {/* 销售价 Tab */}
+            {editState.tab === 'sales' && (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                  <div>
+                    <label style={fieldLabel}>市场价（参考）</label>
+                    <div className="mono" style={{ padding: '8px 12px', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', color: 'var(--color-neutral-600)' }}>¥{editState.marketPrice}</div>
+                  </div>
+                  <div>
+                    <label style={fieldLabel}>销售价</label>
+                    <input className="detail-input" type="number" value={editForm.salesPrice} onChange={(e) => setEditForm({ ...editForm, salesPrice: e.target.value })} style={{ width: '100%' }} />
+                  </div>
+                </div>
+                <div style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>
+                  销售折扣率：{editState.marketPrice > 0 ? Math.round((Number(editForm.salesPrice) || 0) / editState.marketPrice * 100) : 0}%
+                </div>
+              </>
+            )}
+
+            {/* VIP价 Tab */}
+            {editState.tab === 'vip' && (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                  <div>
+                    <label style={fieldLabel}>市场价（参考）</label>
+                    <div className="mono" style={{ padding: '8px 12px', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', color: 'var(--color-neutral-600)' }}>¥{editState.marketPrice}</div>
+                  </div>
+                  <div>
+                    <label style={fieldLabel}>标准销售价（参考）</label>
+                    <div className="mono" style={{ padding: '8px 12px', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', color: 'var(--color-neutral-600)' }}>¥{editState.salesPrice}</div>
+                  </div>
+                </div>
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <label style={fieldLabel}>VIP价</label>
+                  <input className="detail-input" type="number" value={editForm.vipPrice} onChange={(e) => setEditForm({ ...editForm, vipPrice: e.target.value })} style={{ width: '100%' }} />
+                </div>
+                <div style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>
+                  VIP折扣率：{editState.marketPrice > 0 ? Math.round((Number(editForm.vipPrice) || 0) / editState.marketPrice * 100) : 0}%
+                  <span style={{ marginLeft: 12, color: 'var(--color-neutral-400)' }}>有效期：{editState.validFrom} ~ {editState.validTo}</span>
+                </div>
+              </>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+              <Button variant="ghost" onClick={() => { setEditState(null); setEditForm(null); }}>取消</Button>
+              <Button onClick={saveEdit}>确认调价</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 新增 VIP 价弹窗 ── */}
+      {showAddVip && (
+        <div className="category-dialog-overlay" onClick={() => setShowAddVip(false)}>
+          <div className="category-dialog" onClick={(e) => e.stopPropagation()} style={{ width: 480 }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-4)' }}>新增VIP价</div>
+
+            <div style={{ marginBottom: 'var(--space-4)' }}>
+              <label style={fieldLabel}>商品</label>
+              <select className="filter-select" style={{ width: '100%' }} value={addVipProduct} onChange={(e) => setAddVipProduct(e.target.value)}>
+                <option value="">请选择商品</option>
+                {teaProducts.map(p => <option key={p.id} value={p.id}>{p.name}（{p.brand}）</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: 'var(--space-4)' }}>
+              <label style={fieldLabel}>客户</label>
+              <select className="filter-select" style={{ width: '100%' }} value={addVipCustomer} onChange={(e) => setAddVipCustomer(e.target.value)}>
+                <option value="">请选择客户</option>
+                {PRICE_CUSTOMERS.map(c => <option key={c.id} value={c.id}>{c.name}（{c.type}）</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: 'var(--space-4)' }}>
+              <label style={fieldLabel}>VIP价</label>
+              <input className="detail-input" type="number" value={addVipPrice} onChange={(e) => setAddVipPrice(e.target.value)} placeholder="输入VIP价" style={{ width: '100%' }} />
+            </div>
+            {addVipProduct && addVipPrice && (() => {
+              const p = teaProducts.find(x => x.id === addVipProduct);
+              const vp = Number(addVipPrice) || 0;
+              const rate = p && p.marketPrice > 0 ? Math.round(vp / p.marketPrice * 100) : 0;
+              return (
+                <div style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>
+                  VIP折扣率：{rate}%　|　市场价：¥{p?.marketPrice ?? '-'}　|　标准销售价：¥{p?.salesPrice ?? '-'}
+                </div>
+              );
+            })()}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+              <Button variant="ghost" onClick={() => setShowAddVip(false)}>取消</Button>
+              <Button onClick={saveAddVip} disabled={!addVipProduct || !addVipCustomer || !addVipPrice}>确认新增</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── 批量调价弹窗 ── */}
       {batchMode && (
         <div className="category-dialog-overlay" onClick={() => setBatchMode(false)}>
           <div className="category-dialog" onClick={(e) => e.stopPropagation()} style={{ width: 520 }}>
             <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-4)' }}>
-              批量调整{activeTab === 'purchase' ? '采购价' : '销售价'}
+              批量调整{batchTab === 'purchase' ? '采购价' : 'VIP价'}
             </div>
 
-            {/* 选择调价对象 */}
             <div style={{ marginBottom: 'var(--space-4)' }}>
-              <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--color-neutral-700)', marginBottom: 'var(--space-2)' }}>
-                调价范围 — 按{activeTab === 'purchase' ? '品牌' : '客户'}
-              </label>
-              {activeTab === 'purchase' ? (
+              <label style={fieldLabel}>调价范围 — 按{batchTab === 'purchase' ? '品牌' : '客户'}</label>
+              {batchTab === 'purchase' ? (
                 <select className="filter-select" style={{ width: '100%' }} value={batchTarget} onChange={(e) => setBatchTarget(e.target.value)}>
                   <option value="">请选择品牌</option>
                   {allBrands.map(b => <option key={b} value={b}>{b}</option>)}
@@ -379,14 +657,13 @@ export default function ProductPrice() {
               ) : (
                 <select className="filter-select" style={{ width: '100%' }} value={batchTarget} onChange={(e) => setBatchTarget(e.target.value)}>
                   <option value="">请选择客户</option>
-                  {customers.map(c => <option key={c.id} value={c.id}>{c.name}（{c.type}）</option>)}
+                  {PRICE_CUSTOMERS.map(c => <option key={c.id} value={c.id}>{c.name}（{c.type}）</option>)}
                 </select>
               )}
             </div>
 
-            {/* 调价方式 */}
             <div style={{ marginBottom: 'var(--space-4)' }}>
-              <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--color-neutral-700)', marginBottom: 'var(--space-2)' }}>调价方式</label>
+              <label style={fieldLabel}>调价方式</label>
               <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
                 <button style={{
                   padding: '6px 16px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)', cursor: 'pointer',
@@ -416,7 +693,6 @@ export default function ProductPrice() {
               </div>
             </div>
 
-            {/* 影响预览 */}
             {batchTarget && batchAdjustValue && (
               <div style={{
                 padding: 'var(--space-3)',
@@ -428,25 +704,18 @@ export default function ProductPrice() {
               }}>
                 <div style={{ fontWeight: 'var(--font-medium)', marginBottom: 'var(--space-1)' }}>调整预览</div>
                 <div>
-                  {activeTab === 'purchase'
+                  {batchTab === 'purchase'
                     ? `品牌「${batchTarget}」下所有商品的采购价将${Number(batchAdjustValue) >= 0 ? '上调' : '下调'}${batchAdjustType === 'percent' ? `${Math.abs(Number(batchAdjustValue))}%` : `¥${Math.abs(Number(batchAdjustValue))}`}`
-                    : `客户「${customers.find(c => c.id === batchTarget)?.name}」下所有商品的销售价将${Number(batchAdjustValue) >= 0 ? '上调' : '下调'}${batchAdjustType === 'percent' ? `${Math.abs(Number(batchAdjustValue))}%` : `¥${Math.abs(Number(batchAdjustValue))}`}`
+                    : `客户「${PRICE_CUSTOMERS.find(c => c.id === batchTarget)?.name}」下所有商品的VIP价将${Number(batchAdjustValue) >= 0 ? '上调' : '下调'}${batchAdjustType === 'percent' ? `${Math.abs(Number(batchAdjustValue))}%` : `¥${Math.abs(Number(batchAdjustValue))}`}`
                   }
                 </div>
-                <div style={{ marginTop: 'var(--space-1)', color: 'var(--color-neutral-400)' }}>
-                  影响 {activeTab === 'purchase'
-                    ? purchasePriceData.filter(i => i.brand === batchTarget).length
-                    : salesPriceData.filter(i => i.customerId === batchTarget).length
-                  } 条价格记录
-                </div>
+                <div style={{ marginTop: 'var(--space-1)', color: 'var(--color-neutral-400)' }}>影响 {batchCount} 条价格记录</div>
               </div>
             )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
               <Button variant="ghost" onClick={() => setBatchMode(false)}>取消</Button>
-              <Button onClick={() => { setShowBatchConfirm(true); }} disabled={!batchTarget || !batchAdjustValue}>
-                确认调价
-              </Button>
+              <Button onClick={() => setShowBatchConfirm(true)} disabled={!batchTarget || !batchAdjustValue}>确认调价</Button>
             </div>
           </div>
         </div>
@@ -458,11 +727,11 @@ export default function ProductPrice() {
           <div className="category-dialog" onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
             <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)', marginBottom: 'var(--space-3)' }}>确认调价</div>
             <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)', marginBottom: 'var(--space-5)' }}>
-              确认对{activeTab === 'purchase' ? `品牌「${batchTarget}」` : `客户「${customers.find(c => c.id === batchTarget)?.name}」`}的所有商品{activeTab === 'purchase' ? '采购价' : '销售价'}进行批量调整？此操作不可撤销。
+              确认对{batchTab === 'purchase' ? `品牌「${batchTarget}」` : `客户「${PRICE_CUSTOMERS.find(c => c.id === batchTarget)?.name}」`}的所有商品{batchTab === 'purchase' ? '采购价' : 'VIP价'}进行批量调整？此操作不可撤销。
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
               <Button variant="ghost" onClick={() => setShowBatchConfirm(false)}>取消</Button>
-              <Button onClick={() => { setShowBatchConfirm(false); setBatchMode(false); }} style={{ background: 'var(--color-module-current-base)', borderColor: 'var(--color-module-current-base)' }}>确认调价</Button>
+              <Button onClick={confirmBatch} style={{ background: 'var(--color-module-current-base)', borderColor: 'var(--color-module-current-base)' }}>确认调价</Button>
             </div>
           </div>
         </div>

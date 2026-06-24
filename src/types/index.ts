@@ -403,6 +403,8 @@ export interface TeaProduct {
   tmallUrl: string;
   jdPrice: number;
   jdUrl: string;
+  /** 销售价：当前系统内各商品标准的对外销售价 */
+  salesPrice: number;
   shelfStatus: 'on' | 'off';
   purchaseStatus: 'available' | 'stopped';
   productionStatus: 'producing' | 'stopped';
@@ -721,4 +723,99 @@ export interface SupplierItem {
   qualityGuarantee: string;
   remark: string;
   status: 'active' | 'inactive';
+}
+
+/* ─────────────────────────── 价格体系类型 ─────────────────────────── */
+
+/** 采购价规则：按「商品 + 供应商」维度维护 */
+export interface PurchasePriceRule {
+  id: string;
+  /** 商品 ID */
+  productId: string;
+  productName: string;
+  brand: string;
+  category: string;
+  /** 供应商 ID */
+  supplierId: string;
+  supplierName: string;
+  /** 市场价（冗余，便于展示对比） */
+  marketPrice: number;
+  /** 采购价：与供应商商定的进货价格 */
+  purchasePrice: number;
+  /** 采购折扣率（百分比，如 55 表示 55%） */
+  discountRate: number;
+  /** 生效日期 */
+  validFrom: string;
+  /** 失效日期 */
+  validTo: string;
+  /** 状态 */
+  status: 'active' | 'inactive';
+  /** 最近调价记录 */
+  lastAdjustDate?: string;
+  lastAdjustNote?: string;
+}
+
+/** VIP 销售价规则：按「商品 + 客户」维度维护 */
+export interface VipPriceRule {
+  id: string;
+  /** 商品 ID */
+  productId: string;
+  productName: string;
+  brand: string;
+  category: string;
+  /** 客户 ID */
+  customerId: string;
+  customerName: string;
+  /** 客户类型 */
+  customerType: string;
+  /** 市场价（冗余） */
+  marketPrice: number;
+  /** 标准销售价（冗余） */
+  salesPrice: number;
+  /** VIP 销售价 */
+  vipPrice: number;
+  /** VIP 折扣率（百分比，如 85 表示 85%） */
+  discountRate: number;
+  /** 生效日期 */
+  validFrom: string;
+  /** 失效日期 */
+  validTo: string;
+  /** 状态 */
+  status: 'active' | 'inactive';
+  /** 备注 */
+  remark?: string;
+}
+
+/** 采购订单明细项（含采购实价） */
+export interface PurchaseOrderItem {
+  productId: string;
+  name: string;
+  spec: string;
+  quantity: string;
+  /** 市场价（参考） */
+  marketPrice: number;
+  /** 采购价（系统带出的默认价） */
+  purchasePrice: number;
+  /** 采购实价：本订单实际成交价格（可调整） */
+  actualPurchasePrice: number;
+  /** 金额 = 数量 × 采购实价 */
+  amount: string;
+}
+
+/** 销售订单明细项（含销售实价） */
+export interface SalesOrderItem {
+  productId: string;
+  name: string;
+  teaCategory: TeaCategory;
+  quantity: string;
+  /** 市场价（参考） */
+  marketPrice: number;
+  /** 默认销售价（VIP价或销售价，系统带出） */
+  defaultPrice: number;
+  /** 销售实价：本订单实际成交价格（可调整） */
+  actualSalesPrice: number;
+  /** 价格来源：vip / sales / market */
+  priceSource: 'vip' | 'sales' | 'market';
+  /** 金额 = 数量 × 销售实价 */
+  amount: string;
 }
