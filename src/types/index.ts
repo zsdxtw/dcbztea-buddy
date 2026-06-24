@@ -476,6 +476,10 @@ export interface TeaProfessional {
   serviceQuotes: TeaServiceQuote[];
   introduction: string;
   status: 'active' | 'inactive';
+  /** 结算信息（户名、卡号、开户银行、开户行号） */
+  settlement?: EmployeeSettlement;
+  /** 是否带货 */
+  isStreamer?: boolean;
 }
 
 /** 供应商类型 */
@@ -553,7 +557,7 @@ export interface BankAccount {
 }
 
 /** 客户类型 */
-export type CustomerType = 'direct' | 'channel' | 'personal' | 'platform';
+export type CustomerType = 'direct' | 'channel' | 'personal' | 'platform' | 'guest';
 
 /** 平台结算账户 */
 export interface PlatformBankAccount {
@@ -595,8 +599,10 @@ export interface PlatformItem {
   district?: string;
   cooperationDate: string;
   commissionRate: string;
-  /** 对接人员工 ID（负责该平台客户的拓展与维护） */
-  liaisonEmpId?: string;
+  /** 主办人 ID（负责该平台客户的拓展与维护，可为员工或带货人） */
+  hostId?: string;
+  /** 主办人类型 */
+  hostType?: 'employee' | 'streamer';
   bankAccounts: PlatformBankAccount[];
   invoiceInfos: PlatformInvoiceInfo[];
   status: 'active' | 'inactive';
@@ -628,8 +634,10 @@ export interface CustomerItem {
   totalAmount: number;
   /** 直营客户关联的平台ID列表；渠道客户为空 */
   platformIds: string[];
-  /** 对接人员工 ID（负责该客户的拓展与维护） */
-  liaisonEmpId?: string;
+  /** 主办人 ID（负责该客户的拓展与维护，可为员工或带货人） */
+  hostId?: string;
+  /** 主办人类型 */
+  hostType?: 'employee' | 'streamer';
   cooperationDate: string;
   status: 'active' | 'inactive';
   settlementMethod?: string;
@@ -963,22 +971,40 @@ export interface Employee {
   emergencyContactPhone?: string;
 }
 
+/** 带货人 */
+export interface Streamer {
+  id: string;
+  /** 姓名 */
+  name: string;
+  /** 手机号码 */
+  phone: string;
+  /** 结算信息（户名、卡号、开户银行、开户行号） */
+  settlement: EmployeeSettlement;
+  /** 备注 */
+  remark?: string;
+  /** 关联的茶人 ID（若由茶人联动创建） */
+  linkedTeaProfessionalId?: string;
+}
+
+/** 订单销售场景（6种情况） */
+export type SalesScenario = 1 | 2 | 3 | 4 | 5 | 6;
+
 /** 员工绩效统计（绩效金额 + 绩效利润） */
 export interface EmployeePerformance {
   employeeId: string;
   employeeName: string;
   departmentName: string;
   position: string;
-  /** 绩效金额 - 作为跟单人的销售金额（订单金额 × 40%） */
+  /** 绩效金额 - 作为跟单人的销售金额 */
   followerAmount: number;
-  /** 绩效金额 - 作为对接人的销售金额（跟单人缺失时 × 40% + 所有订单 × 50%） */
-  liaisonAmount: number;
+  /** 绩效金额 - 作为主办人的销售金额 */
+  hostAmount: number;
   /** 绩效金额总额 */
   totalAmount: number;
-  /** 绩效利润 - 作为跟单人的利润金额（订单利润 × 40%） */
+  /** 绩效利润 - 作为跟单人的利润金额 */
   followerProfit: number;
-  /** 绩效利润 - 作为对接人的利润金额（订单利润 × 40%/50%） */
-  liaisonProfit: number;
+  /** 绩效利润 - 作为主办人的利润金额 */
+  hostProfit: number;
   /** 绩效利润总额 */
   totalProfit: number;
   /** 关联订单数 */

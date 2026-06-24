@@ -76,6 +76,7 @@ import SettingsOrganization from './pages/settings/SettingsOrganization';
 
 import PersonnelTeaProfessional from './pages/personnel/PersonnelTeaProfessional';
 import PersonnelEmployee from './pages/personnel/PersonnelEmployee';
+import PersonnelStreamer from './pages/personnel/PersonnelStreamer';
 
 export const router = createBrowserRouter([
   {
@@ -170,6 +171,7 @@ export const router = createBrowserRouter([
       { path: 'personnel', element: <PersonnelEmployee /> },
       { path: 'personnel/personnel-employee', element: <PersonnelEmployee /> },
       { path: 'personnel/personnel-tea-professional', element: <PersonnelTeaProfessional /> },
+      { path: 'personnel/personnel-streamer', element: <PersonnelStreamer /> },
     ],
   },
 ]);

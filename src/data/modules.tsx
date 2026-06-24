@@ -209,6 +209,9 @@ const OrgChartIcon = () => (
 const EmployeeIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="6" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M1 17a6 6 0 0112 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="15" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.2"/><path d="M13 16a4 4 0 015 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
 );
+const StreamerIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><path d="M3 10l2 2 4-6 4 8 2-4h2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/></svg>
+);
 
 /* ── 模块配置 ── */
 
@@ -337,6 +340,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     menus: [
       { key: 'personnel-employee', label: '员工管理', icon: <EmployeeIcon /> },
       { key: 'personnel-tea-professional', label: '茶人管理', icon: <TeaProfessionalIcon /> },
+      { key: 'personnel-streamer', label: '带货人管理', icon: <StreamerIcon /> },
     ],
   },
 };

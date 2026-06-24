@@ -6,6 +6,7 @@
  * - 渠道客户：VQD-简称首字母-0001
  * - 个人客户：VGR-名称首字母-0001
  * - 平台客户：VPT-简称首字母-0001
+ * - 游客客户：VYK-名称首字母-0001（未知客户具体情况的自来客户）
  */
 
 import { getPinyinInitial } from './pinyin';
@@ -17,6 +18,7 @@ const TYPE_PREFIX: Record<CustomerType, string> = {
   channel: 'VQD',
   personal: 'VGR',
   platform: 'VPT',
+  guest: 'VYK',
 };
 
 /** 获取简称/名称的首字母组合（大写） */

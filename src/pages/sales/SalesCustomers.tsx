@@ -18,6 +18,15 @@ const PRIMARY_LIGHT = '#EBF3FC';
 const SECONDARY = '#CB405D';
 const SECONDARY_LIGHT = '#FEF2F4';
 
+/* 客户类型标签颜色映射 */
+const customerTypeColors: Record<CustomerType, { bg: string; color: string; border: string }> = {
+  direct: { bg: '#E3F2FD', color: '#1565C0', border: '#90CAF9' },
+  channel: { bg: '#FFF3E0', color: '#E65100', border: '#FFCC80' },
+  personal: { bg: '#F3E5F5', color: '#7B1FA2', border: '#CE93D8' },
+  platform: { bg: '#E8F5E9', color: '#2E7D32', border: '#A5D6A7' },
+  guest: { bg: '#ECEFF1', color: '#455A64', border: '#B0BEC5' },
+};
+
 const TABS: { key: CustomerType; label: string; desc: string; icon: React.ReactNode }[] = [
   { key: 'direct', label: '直营客户', desc: CUSTOMER_TYPE_DESC.direct, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg> },
   { key: 'channel', label: '渠道客户', desc: CUSTOMER_TYPE_DESC.channel, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M2 10l3 2 3-4 3 5 3-3 2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><circle cx="4" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.3" /></svg> },
@@ -190,13 +199,13 @@ export default function SalesCustomers() {
 
           <Card style={{ padding: 0 }}>
             <Table
-              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '平台编号', '客户名称', '对接人', '联系人', '联系人职务', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
+              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '平台编号', '客户名称', '主办人', '联系人', '联系人职务', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
               rows={filteredPlatforms.map((p, idx) => [
                 deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(p.id)} onChange={() => togglePlatformSelect(p.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
                 <span key="sn" style={{ fontWeight: 'var(--font-medium)' }}>{p.shortName}</span>,
                 <span key="code" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.code}</span>,
                 <span key="name">{p.name}</span>,
-                <span key="liaison">{p.liaisonEmpId ? getEmployeeName(p.liaisonEmpId) : '—'}</span>,
+                <span key="liaison">{p.hostId ? getEmployeeName(p.hostId) : '—'}</span>,
                 <span key="cp">{p.contactPerson}</span>,
                 <span key="cpo" style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-xs)' }}>{p.contactPosition || '—'}</span>,
                 <span key="cph" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.contactPhone}</span>,
@@ -237,14 +246,14 @@ export default function SalesCustomers() {
 
           <Card style={{ padding: 0 }}>
             <Table
-              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '客户编号', '客户名称', '对接人', ...(activeTab === 'direct' ? ['平台方'] : []), '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
+              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '客户编号', '客户名称', '主办人', ...(activeTab === 'direct' ? ['平台方'] : []), '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
               rows={filtered.map((c, idx) => {
                 const cells: React.ReactNode[] = [
                   deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(c.id)} onChange={() => toggleSelect(c.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
                   <span key="sn" style={{ fontWeight: 'var(--font-medium)' }}>{c.shortName || c.name}</span>,
                   <span key="cc" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{c.customerCode || '—'}</span>,
                   <span key="name">{c.name}</span>,
-                  <span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.liaisonEmpId ? getEmployeeName(c.liaisonEmpId) : '—'}</span>,
+                  <span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? getEmployeeName(c.hostId) : '—'}</span>,
                 ];
                 if (activeTab === 'direct') cells.push(<span key="pf">{platformTags(c.platformIds)}</span>);
                 cells.push(
@@ -288,7 +297,7 @@ export default function SalesCustomers() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 4 }}>
                   <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)' }}>{detailCustomer.name}</span>
-                  <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${PRIMARY}15`, color: PRIMARY, border: `1px solid ${PRIMARY}30` }}>{CUSTOMER_TYPE_LABELS[detailCustomer.type]}</span>
+                  <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: customerTypeColors[detailCustomer.type].bg, color: customerTypeColors[detailCustomer.type].color, border: `1px solid ${customerTypeColors[detailCustomer.type].border}` }}>{CUSTOMER_TYPE_LABELS[detailCustomer.type]}</span>
                   {levelTag(detailCustomer.level)}{statusTag(detailCustomer.status)}
                 </div>
                 <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>{detailCustomer.region} · {detailCustomer.contactPerson} · {detailCustomer.contactPhone}</div>
@@ -300,7 +309,7 @@ export default function SalesCustomers() {
                 ['客户简称', detailCustomer.shortName || '—'],
                 ['客户编号', detailCustomer.customerCode || '—'],
                 ['所在地区', [detailCustomer.province, detailCustomer.city, detailCustomer.district].filter(Boolean).join(' / ') || detailCustomer.region || '—'],
-                ['对接人', detailCustomer.liaisonEmpId ? getEmployeeName(detailCustomer.liaisonEmpId) : '—'],
+                ['主办人', detailCustomer.hostId ? getEmployeeName(detailCustomer.hostId) : '—'],
                 ['联系邮箱', detailCustomer.contactEmail || '—'],
                 ['联系地址', detailCustomer.contactAddress || '—'],
                 ...(detailCustomer.type !== 'personal' ? [['结算方式', detailCustomer.settlementMethod || '—']] as [string, string][] : []),
@@ -403,7 +412,7 @@ export default function SalesCustomers() {
                 <Field label="平台编号"><Text className="mono">{detailPlatform.code}</Text></Field>
                 <Field label="联系人">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPerson ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPerson}</Text>}</Field>
                 <Field label="联系人职务">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPosition ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPosition: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPosition || '—'}</Text>}</Field>
-                <Field label="对接人" full>{editingPlatform ? <DeptEmployeeSelect value={editPlatformForm?.liaisonEmpId ?? ''} onChange={(empId) => setEditPlatformForm(prev => prev ? { ...prev, liaisonEmpId: empId || undefined } : prev)} /> : <Text>{detailPlatform.liaisonEmpId ? getEmployeeName(detailPlatform.liaisonEmpId) : '—'}</Text>}</Field>
+                <Field label="主办人" full>{editingPlatform ? <DeptEmployeeSelect value={editPlatformForm?.hostId ?? ''} onChange={(empId) => setEditPlatformForm(prev => prev ? { ...prev, hostId: empId || undefined } : prev)} /> : <Text>{detailPlatform.hostId ? getEmployeeName(detailPlatform.hostId) : '—'}</Text>}</Field>
                 <Field label="联系电话">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPhone ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPhone}</Text>}</Field>
                 <Field label="省份">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.province ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, province: e.target.value, city: '', district: '' } : prev)}><option value="">请选择</option>{PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}</select> : <Text>{detailPlatform.province || '—'}</Text>}</Field>
                 <Field label="城市">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.city ?? ''} disabled={!editPlatformForm?.province} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, city: e.target.value, district: '' } : prev)}><option value="">请选择</option>{(editPlatformForm?.province ? getCityNames(editPlatformForm.province) : []).map(c => <option key={c} value={c}>{c}</option>)}</select> : <Text>{detailPlatform.city || '—'}</Text>}</Field>
@@ -566,7 +575,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
             {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }} value={form.settlementMethod || ''} onChange={e => update('settlementMethod', e.target.value)}><option value="月结">月结</option><option value="预付">预付</option><option value="季度">季度结算</option><option value="现款">现款</option></select></div>}
             <div className="drawer-form-field"><label className="drawer-label">客户来源</label><select className="filter-select" style={{ width: '100%' }} value={form.source || ''} onChange={e => update('source', e.target.value)}><option value="">请选择</option><option value="主动开发">主动开发</option><option value="展会拓客">展会拓客</option><option value="老客户转介">老客户转介</option><option value="平台引流">平台引流</option><option value="线上咨询">线上咨询</option><option value="其他">其他</option></select></div>
             {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>}
-            <div className="drawer-form-field" style={{ flex: 2 }}><label className="drawer-label">对接人</label><DeptEmployeeSelect value={form.liaisonEmpId ?? ''} onChange={(empId) => update('liaisonEmpId', empId || undefined)} style={{ width: '100%' }} /></div>
+            <div className="drawer-form-field" style={{ flex: 2 }}><label className="drawer-label">主办人</label><DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => update('hostId', empId || undefined)} style={{ width: '100%' }} /></div>
           </div>
           <div className="drawer-form-row">
             <div className="drawer-form-field" style={{ flex: 1 }}><label className="drawer-label">备注</label><input className="filter-input" style={{ width: '100%' }} value={form.remark || ''} onChange={e => update('remark', e.target.value)} /></div>
@@ -702,7 +711,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
       contactPerson: form.contactPerson ?? '', contactPosition: form.contactPosition ?? '', contactPhone: form.contactPhone ?? '', contactAddress: form.contactAddress ?? '',
       province: form.province ?? '', city: form.city ?? '', district: form.district ?? '',
       cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10), commissionRate: form.commissionRate ?? '',
-      bankAccounts, invoiceInfos, status: 'active', remark: form.remark, liaisonEmpId: form.liaisonEmpId,
+      bankAccounts, invoiceInfos, status: 'active', remark: form.remark, hostId: form.hostId,
     } as PlatformItem);
   };
 
@@ -721,7 +730,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
             <Field label="平台编号（自动生成）" full><input className="filter-input" style={{ width: '100%' }} value={previewCode} readOnly placeholder="输入平台简称后自动生成" /></Field>
             <Field label="联系人"><input className="filter-input" style={{ width: '100%' }} value={form.contactPerson ?? ''} onChange={e => update('contactPerson', e.target.value)} /></Field>
             <Field label="联系人职务"><input className="filter-input" style={{ width: '100%' }} value={form.contactPosition ?? ''} onChange={e => update('contactPosition', e.target.value)} placeholder="如：采购总监" /></Field>
-            <Field label="对接人" full><DeptEmployeeSelect value={form.liaisonEmpId ?? ''} onChange={(empId) => update('liaisonEmpId', empId || undefined)} /></Field>
+            <Field label="主办人" full><DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => update('hostId', empId || undefined)} /></Field>
             <Field label="联系电话"><input className="filter-input" style={{ width: '100%' }} value={form.contactPhone ?? ''} onChange={e => update('contactPhone', e.target.value)} /></Field>
           </div>
 
