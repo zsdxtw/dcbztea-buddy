@@ -8,7 +8,7 @@ import Button from '../../components/common/Button';
 import StatusTag, { orderStatusToVariant, orderStatusLabel } from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
 import { TeaCategory, OrderStatus } from '../../types';
-import type { StatCardData, SalesOrderItem } from '../../types';
+import type { StatCardData, SalesOrderItem, CustomerItem } from '../../types';
 import { getSalesDefaultPrice } from '../../data/prices';
 import { teaProducts } from '../../data/teaProducts';
 import { employees, getEmployeeName } from '../../data/organization';
@@ -16,6 +16,7 @@ import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
 import { customerItems, CUSTOMER_TYPE_LABELS as GLOBAL_CUSTOMER_LABELS, CUSTOMER_TYPE_DESC } from '../../data/customers';
 import { platformItems } from '../../data/platforms';
 import { streamers } from '../../data/streamers';
+import { generateCustomerCode } from '../../utils/customerCode';
 
 /* ── 工具函数 ── */
 function categoryToTeaCategory(category: string): TeaCategory {
@@ -74,6 +75,15 @@ const CUSTOMER_TYPE_LABELS: Record<CustomerType, string> = {
   platform: '平台客户',
   guest: '游客客户',
 };
+
+/* 新客户下拉选项（直营/渠道加"企业"后缀） */
+const CUSTOMER_TYPE_DROPDOWN_OPTIONS: { value: CustomerType; label: string }[] = [
+  { value: 'direct', label: '直营客户（企业）' },
+  { value: 'channel', label: '渠道客户（企业）' },
+  { value: 'personal', label: '个人客户' },
+  { value: 'platform', label: '平台客户' },
+  { value: 'guest', label: '游客客户' },
+];
 
 /* 客户类型标签颜色映射 */
 const customerTypeColors: Record<CustomerType, { bg: string; color: string; border: string }> = {
@@ -331,7 +341,7 @@ export default function SalesOrders() {
           <FilterInput placeholder="搜索订单编号、客户..." />
           <FilterSelect options={['全部状态', '待审核', '待确认', '运输中', '已完成', '已取消']} />
           <FilterSelect options={['全部茶类', '绿茶', '白茶', '黄茶', '青茶', '红茶', '黑茶', '花草茶']} />
-          <FilterSelect options={['全部客户类型', '直营客户', '渠道客户', '平台客户']} />
+          <FilterSelect options={['全部客户类型', '直营客户', '渠道客户', '个人客户', '平台客户', '游客客户']} />
           <FilterSelect options={['全部时间', '今日', '本周', '本月', '近3月']} />
         </FilterBar>
 
@@ -548,10 +558,7 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   const [isNewCustomer, setIsNewCustomer] = useState(false);
   const [customerType, setCustomerType] = useState<CustomerType | ''>('');
-
-  // 主办人
-  const [hostId, setHostId] = useState('');
-  const [hostType, setHostType] = useState<'employee' | 'streamer' | ''>('');
+  const [newCustomerShortName, setNewCustomerShortName] = useState('');
 
   // 跟单人
   const [followerId, setFollowerId] = useState('');
@@ -574,6 +581,7 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
       setIsNewCustomer(true);
       setCustomerId('');
       setCustomerType('');
+      setNewCustomerShortName('');
     } else {
       setIsNewCustomer(false);
       setCustomerId(selectedId);
@@ -586,27 +594,64 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
     setCustomerSearch('');
   };
 
+  // 清除客户选择
+  const handleClearCustomer = () => {
+    setCustomerId('');
+    setIsNewCustomer(false);
+    setCustomerType('');
+    setNewCustomerShortName('');
+    setCustomerSearch('');
+    setShowCustomerDropdown(false);
+  };
+
+  // 获取选中客户的详细信息（主办人、联系人、电话、等级）
+  const selectedCustomerInfo = useMemo(() => {
+    if (!customerId || isNewCustomer) return null;
+    const customer = customerItems.find(c => c.id === customerId);
+    if (customer) {
+      const hostName = customer.hostId
+        ? (customer.hostType === 'streamer' ? streamers.find(s => s.id === customer.hostId)?.name : getEmployeeName(customer.hostId))
+        : undefined;
+      return { hostName: hostName ?? '—', contactPerson: customer.contactPerson || '—', contactPhone: customer.contactPhone || '—', level: customer.level || '—' };
+    }
+    const platform = platformItems.find(p => p.id === customerId);
+    if (platform) {
+      const hostName = platform.hostId
+        ? (platform.hostType === 'streamer' ? streamers.find(s => s.id === platform.hostId)?.name : getEmployeeName(platform.hostId))
+        : undefined;
+      return { hostName: hostName ?? '—', contactPerson: platform.contactPerson || '—', contactPhone: platform.contactPhone || '—', level: '—' };
+    }
+    return null;
+  }, [customerId, isNewCustomer]);
+
   const selectedProduct = teaProducts.find(p => p.id === productId);
   const marketPrice = selectedProduct?.marketPrice ?? 0;
-  const defaultResult = (productId && customerId) ? getSalesDefaultPrice(productId, customerId) : null;
+  const hasCustomer = !!(customerId || isNewCustomer);
+  const defaultResult = productId && hasCustomer
+    ? (customerId ? getSalesDefaultPrice(productId, customerId) : { price: selectedProduct?.salesPrice || marketPrice, source: 'sales' as const })
+    : null;
   const defaultPrice = defaultResult?.price ?? 0;
   const priceSource = defaultResult?.source ?? 'market';
 
   // 商品或客户变化时，销售实价自动带出默认价（VIP价 > 销售价 > 市场价）
   useEffect(() => {
-    if (productId && customerId) {
-      const { price } = getSalesDefaultPrice(productId, customerId);
-      setActualSalesPrice(String(price));
+    if (productId && hasCustomer) {
+      if (customerId) {
+        const { price } = getSalesDefaultPrice(productId, customerId);
+        setActualSalesPrice(String(price));
+      } else {
+        setActualSalesPrice(String(selectedProduct?.salesPrice || marketPrice));
+      }
     } else {
       setActualSalesPrice('');
     }
-  }, [productId, customerId]);
+  }, [productId, customerId, isNewCustomer]);
 
   const qtyNum = Number(quantity) || 0;
   const actualNum = Number(actualSalesPrice) || 0;
   const amountNum = qtyNum * actualNum;
 
-  const canSave = (isNewCustomer || !!customerId) && !!customerType && !!productId && qtyNum > 0 && actualNum > 0 && !!orderDate;
+  const canSave = (isNewCustomer ? (!!customerType && !!newCustomerShortName.trim()) : !!customerId) && !!productId && qtyNum > 0 && actualNum > 0 && !!orderDate;
 
   // 根据人员类型获取姓名
   const getPersonName = (id: string, type: 'employee' | 'streamer'): string | undefined => {
@@ -621,14 +666,56 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
   };
 
   const handleSave = () => {
-    if (!canSave || !selectedProduct || !customerType) return;
+    if (!canSave || !selectedProduct) return;
+    if (isNewCustomer && !customerType) return;
     const now = new Date();
     const timeStr = `${orderDate} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const customerName = isNewCustomer
-      ? (customerSearch || '新客户')
+      ? newCustomerShortName.trim()
       : (allCustomerOptions.find(c => c.id === customerId)?.name ?? '新客户');
-    const hostName = hostId && hostType ? getPersonName(hostId, hostType) : undefined;
     const followerName = followerId && followerType ? getPersonName(followerId, followerType) : undefined;
+
+    // 新客户联动添加到客户管理列表
+    let orderHostId: string | undefined;
+    let orderHostType: 'employee' | 'streamer' | undefined;
+    let orderHostName: string | undefined;
+    if (isNewCustomer) {
+      const newCustId = `c_${Date.now()}`;
+      const newCustomer: CustomerItem = {
+        id: newCustId,
+        name: newCustomerShortName.trim(),
+        shortName: newCustomerShortName.trim(),
+        customerCode: generateCustomerCode(customerType as CustomerType, newCustomerShortName.trim(), customerItems.length + 1),
+        type: customerType as CustomerType,
+        region: '', province: '', city: '', district: '',
+        contactPerson: contactPerson || '', contactPhone: contactPhone || '', contactEmail: '', contactAddress: deliveryAddress || '',
+        level: 'B级', orders: 1, totalAmount: amountNum, platformIds: [],
+        cooperationDate: orderDate, status: 'active',
+        settlementMethod: '月结', taxNo: '', source: '线上咨询', remark: '由销售订单新增',
+        bankAccounts: [], invoiceInfos: [],
+      };
+      customerItems.push(newCustomer);
+    } else {
+      // 已有客户：从客户档案获取主办人信息
+      const customer = customerItems.find(c => c.id === customerId);
+      if (customer) {
+        orderHostId = customer.hostId;
+        orderHostType = customer.hostType;
+        orderHostName = customer.hostId
+          ? (customer.hostType === 'streamer' ? streamers.find(s => s.id === customer.hostId)?.name : getEmployeeName(customer.hostId))
+          : undefined;
+      } else {
+        const platform = platformItems.find(p => p.id === customerId);
+        if (platform) {
+          orderHostId = platform.hostId;
+          orderHostType = platform.hostType;
+          orderHostName = platform.hostId
+            ? (platform.hostType === 'streamer' ? streamers.find(s => s.id === platform.hostId)?.name : getEmployeeName(platform.hostId))
+            : undefined;
+        }
+      }
+    }
+
     const order: SalesOrderRecord = {
       id: `so_${Date.now()}`,
       code: `SO-2025-${String(nextNumber).padStart(4, '0')}`,
@@ -648,9 +735,9 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
       followerId: followerId || undefined,
       followerType: (followerType || undefined) as 'employee' | 'streamer' | undefined,
       followerName,
-      hostId: hostId || undefined,
-      hostType: (hostType || undefined) as 'employee' | 'streamer' | undefined,
-      hostName,
+      hostId: orderHostId,
+      hostType: orderHostType,
+      hostName: orderHostName,
       scenario: getScenarioByType(customerType as CustomerType),
       products: [{
         productId: selectedProduct.id,
@@ -701,12 +788,15 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
               <div style={{ position: 'relative' }}>
                 <input
                   className="filter-input"
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', paddingRight: 28 }}
                   value={isNewCustomer ? '新客户' : (allCustomerOptions.find(c => c.id === customerId)?.name || customerSearch)}
                   onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); if (e.target.value === '') { setCustomerId(''); setIsNewCustomer(false); } }}
                   onFocus={() => setShowCustomerDropdown(true)}
                   placeholder="搜索或选择客户"
                 />
+                {(customerId || isNewCustomer || customerSearch) && (
+                  <button type="button" onClick={handleClearCustomer} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-neutral-400)', fontSize: 16, lineHeight: 1, padding: 0 }}>×</button>
+                )}
                 {showCustomerDropdown && (
                   <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, maxHeight: 240, overflowY: 'auto', background: '#fff', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                     <div style={{ padding: '8px 12px', cursor: 'pointer', fontWeight: 500, color: '#0F64B5', borderBottom: '1px solid var(--color-border-secondary)' }} onClick={() => handleSelectCustomer('new')}>+ 新客户</div>
@@ -720,20 +810,32 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
                 )}
               </div>
             </div>
-            <div className="drawer-form-field">
-              <label className="drawer-label">客户类型</label>
-              {isNewCustomer || !customerType ? (
+            {isNewCustomer && (
+              <div className="drawer-form-field">
+                <label className="drawer-label">客户类型 *</label>
                 <select className="filter-select" style={{ width: '100%' }} value={customerType} onChange={(e) => setCustomerType(e.target.value as CustomerType)}>
                   <option value="">请选择客户类型</option>
-                  {Object.entries(CUSTOMER_TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  {CUSTOMER_TYPE_DROPDOWN_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                 </select>
-              ) : (
-                <div style={readOnlyFieldStyle}>
-                  {CUSTOMER_TYPE_LABELS[customerType]}
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
+          {isNewCustomer && (
+            <div className="drawer-form-row">
+              <div className="drawer-form-field">
+                <label className="drawer-label">客户简称 *</label>
+                <input className="filter-input" style={{ width: '100%' }} value={newCustomerShortName} onChange={(e) => setNewCustomerShortName(e.target.value)} placeholder="请输入客户简称（将同步至客户管理）" />
+              </div>
+            </div>
+          )}
+          {selectedCustomerInfo && (
+            <div style={{ display: 'flex', gap: 'var(--space-4)', padding: 'var(--space-3) var(--space-4)', background: 'var(--color-module-current-lightest)', border: '1px solid var(--color-module-current-light)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
+              <div><span style={{ color: 'var(--color-text-tertiary)' }}>主办人：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{selectedCustomerInfo.hostName}</span></div>
+              <div><span style={{ color: 'var(--color-text-tertiary)' }}>联系人：</span>{selectedCustomerInfo.contactPerson}</div>
+              <div><span style={{ color: 'var(--color-text-tertiary)' }}>联系电话：</span>{selectedCustomerInfo.contactPhone}</div>
+              <div><span style={{ color: 'var(--color-text-tertiary)' }}>等级：</span>{selectedCustomerInfo.level}</div>
+            </div>
+          )}
           <div className="drawer-form-row">
             <div className="drawer-form-field">
               <label className="drawer-label">商品 *</label>
@@ -783,7 +885,7 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
                 value={actualSalesPrice}
                 onChange={(e) => setActualSalesPrice(e.target.value)}
                 placeholder="0"
-                disabled={!productId || !customerId}
+                disabled={!productId || !hasCustomer}
               />
             </div>
           </div>
@@ -827,48 +929,29 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
               <input className="filter-input" style={{ width: '100%' }} value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} placeholder="请输入联系人" />
             </div>
           </div>
-          {/* 主办人 */}
-          <div className="drawer-form-row">
-            <div className="drawer-form-field">
-              <label className="drawer-label">主办人</label>
-              <select className="filter-select" style={{ width: '100%' }} value={hostType} onChange={(e) => { setHostType(e.target.value as 'employee' | 'streamer' | ''); setHostId(''); }}>
-                <option value="">请选择</option>
-                <option value="employee">员工</option>
-                <option value="streamer">带货人</option>
-              </select>
-            </div>
-            <div className="drawer-form-field" style={{ flex: 2 }}>
-              {hostType === 'employee' ? (
-                <DeptEmployeeSelect value={hostId} onChange={setHostId} placeholder="选择员工" />
-              ) : hostType === 'streamer' ? (
-                <select className="filter-select" style={{ width: '100%' }} value={hostId} onChange={(e) => setHostId(e.target.value)}>
-                  <option value="">选择带货人</option>
-                  {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
-              ) : (
-                <div style={readOnlyFieldStyle}>请先选择主办人类型</div>
-              )}
-            </div>
-          </div>
           {/* 跟单人 */}
           <div className="drawer-form-row">
-            <div className="drawer-form-field">
-              <label className="drawer-label">跟单人</label>
-              <select className="filter-select" style={{ width: '100%' }} value={followerType} onChange={(e) => { setFollowerType(e.target.value as 'employee' | 'streamer' | ''); setFollowerId(''); }}>
-                <option value="">请选择</option>
-                <option value="employee">员工</option>
-                <option value="streamer">带货人</option>
-              </select>
-            </div>
-            <div className="drawer-form-field" style={{ flex: 2 }}>
-              {followerType === 'employee' ? (
-                <DeptEmployeeSelect value={followerId} onChange={setFollowerId} placeholder="选择员工" />
-              ) : followerType === 'streamer' ? (
-                <select className="filter-select" style={{ width: '100%' }} value={followerId} onChange={(e) => setFollowerId(e.target.value)}>
-                  <option value="">选择带货人</option>
-                  {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            <div className="drawer-form-field" style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-end' }}>
+              <div style={{ width: 100 }}>
+                <label className="drawer-label">跟单人</label>
+                <select className="filter-select" style={{ width: '100%' }} value={followerType} onChange={(e) => { setFollowerType(e.target.value as 'employee' | 'streamer' | ''); setFollowerId(''); }}>
+                  <option value="">请选择</option>
+                  <option value="employee">员工</option>
+                  <option value="streamer">带货人</option>
                 </select>
-              ) : null}
+              </div>
+              <div style={{ flex: 1 }}>
+                {followerType === 'employee' ? (
+                  <DeptEmployeeSelect value={followerId} onChange={setFollowerId} placeholder="选择员工" style={{ width: '100%' }} />
+                ) : followerType === 'streamer' ? (
+                  <select className="filter-select" style={{ width: '100%' }} value={followerId} onChange={(e) => setFollowerId(e.target.value)}>
+                    <option value="">选择带货人</option>
+                    {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                ) : (
+                  <div style={{ height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
+                )}
+              </div>
             </div>
           </div>
           <div className="drawer-form-row">

@@ -11,6 +11,7 @@ import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 import { generateCustomerCode } from '../../utils/customerCode';
 import { useDrawerWidth } from '../../hooks/useDrawerWidth';
 import { employees, getEmployeeName } from '../../data/organization';
+import { streamers } from '../../data/streamers';
 import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
 
 const PRIMARY = '#0F64B5';
@@ -44,6 +45,7 @@ export default function SalesCustomers() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [detailCustomer, setDetailCustomer] = useState<CustomerItem | null>(null);
   const [showAddDrawer, setShowAddDrawer] = useState(false);
+  const [showPendingMaintain, setShowPendingMaintain] = useState(false);
   const drawerWidth = useDrawerWidth();
 
   // 平台客户相关状态
@@ -55,11 +57,27 @@ export default function SalesCustomers() {
 
   const tabCustomers = useMemo(() => data.filter(c => c.type === activeTab), [data, activeTab]);
   const filtered = useMemo(() => {
-    if (!keyword) return tabCustomers;
-    return tabCustomers.filter(c => c.name.includes(keyword) || c.contactPerson.includes(keyword) || c.region.includes(keyword) || c.contactPhone.includes(keyword) || (c.shortName ?? '').includes(keyword) || (c.customerCode ?? '').includes(keyword));
-  }, [tabCustomers, keyword]);
+    let result = tabCustomers;
+    if (showPendingMaintain) {
+      // 待维护：缺少联系人、联系电话、地址、结算账户等关键信息的客户
+      result = result.filter(c =>
+        !c.contactPerson || !c.contactPhone || !c.contactAddress ||
+        (c.type !== 'personal' && (c.bankAccounts ?? []).length === 0) ||
+        !c.province || !c.city
+      );
+    }
+    if (!keyword) return result;
+    return result.filter(c => c.name.includes(keyword) || c.contactPerson.includes(keyword) || c.region.includes(keyword) || c.contactPhone.includes(keyword) || (c.shortName ?? '').includes(keyword) || (c.customerCode ?? '').includes(keyword));
+  }, [tabCustomers, keyword, showPendingMaintain]);
 
   const getPlatformName = (id: string) => platforms.find(p => p.id === id)?.shortName ?? id;
+
+  /** 主办人名称：支持员工或带货人 */
+  const getHostName = (hostId?: string, hostType?: 'employee' | 'streamer') => {
+    if (!hostId) return '—';
+    if (hostType === 'streamer') return streamers.find(s => s.id === hostId)?.name ?? '—';
+    return getEmployeeName(hostId);
+  };
 
   const stats: StatCardData[] = useMemo(() => {
     const direct = data.filter(c => c.type === 'direct');
@@ -205,7 +223,7 @@ export default function SalesCustomers() {
                 <span key="sn" style={{ fontWeight: 'var(--font-medium)' }}>{p.shortName}</span>,
                 <span key="code" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.code}</span>,
                 <span key="name">{p.name}</span>,
-                <span key="liaison">{p.hostId ? getEmployeeName(p.hostId) : '—'}</span>,
+                <span key="liaison">{p.hostId ? getHostName(p.hostId, p.hostType) : '—'}</span>,
                 <span key="cp">{p.contactPerson}</span>,
                 <span key="cpo" style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-xs)' }}>{p.contactPosition || '—'}</span>,
                 <span key="cph" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.contactPhone}</span>,
@@ -223,6 +241,10 @@ export default function SalesCustomers() {
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
             <input className="filter-input" placeholder={`搜索${CUSTOMER_TYPE_LABELS[activeTab]}名称、简称、编号、联系人、地区...`} value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
+            <Button variant={showPendingMaintain ? 'primary' : 'ghost'} onClick={() => setShowPendingMaintain(!showPendingMaintain)}>
+              <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 2v6M8 14v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.2"/></svg>
+              待维护
+            </Button>
             <Button onClick={() => setShowAddDrawer(true)}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
               新增
@@ -253,7 +275,7 @@ export default function SalesCustomers() {
                   <span key="sn" style={{ fontWeight: 'var(--font-medium)' }}>{c.shortName || c.name}</span>,
                   <span key="cc" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{c.customerCode || '—'}</span>,
                   <span key="name">{c.name}</span>,
-                  <span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? getEmployeeName(c.hostId) : '—'}</span>,
+                  <span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>,
                 ];
                 if (activeTab === 'direct') cells.push(<span key="pf">{platformTags(c.platformIds)}</span>);
                 cells.push(
@@ -309,7 +331,7 @@ export default function SalesCustomers() {
                 ['客户简称', detailCustomer.shortName || '—'],
                 ['客户编号', detailCustomer.customerCode || '—'],
                 ['所在地区', [detailCustomer.province, detailCustomer.city, detailCustomer.district].filter(Boolean).join(' / ') || detailCustomer.region || '—'],
-                ['主办人', detailCustomer.hostId ? getEmployeeName(detailCustomer.hostId) : '—'],
+                ['主办人', detailCustomer.hostId ? getHostName(detailCustomer.hostId, detailCustomer.hostType) : '—'],
                 ['联系邮箱', detailCustomer.contactEmail || '—'],
                 ['联系地址', detailCustomer.contactAddress || '—'],
                 ...(detailCustomer.type !== 'personal' ? [['结算方式', detailCustomer.settlementMethod || '—']] as [string, string][] : []),
@@ -412,7 +434,25 @@ export default function SalesCustomers() {
                 <Field label="平台编号"><Text className="mono">{detailPlatform.code}</Text></Field>
                 <Field label="联系人">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPerson ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPerson}</Text>}</Field>
                 <Field label="联系人职务">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPosition ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPosition: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPosition || '—'}</Text>}</Field>
-                <Field label="主办人" full>{editingPlatform ? <DeptEmployeeSelect value={editPlatformForm?.hostId ?? ''} onChange={(empId) => setEditPlatformForm(prev => prev ? { ...prev, hostId: empId || undefined } : prev)} /> : <Text>{detailPlatform.hostId ? getEmployeeName(detailPlatform.hostId) : '—'}</Text>}</Field>
+                <Field label="主办人" full>{editingPlatform ? (
+                  <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                    <select className="filter-select" style={{ width: 100 }} value={editPlatformForm?.hostType ?? ''} onChange={(e) => { setEditPlatformForm(prev => prev ? { ...prev, hostType: (e.target.value || undefined) as 'employee' | 'streamer' | undefined, hostId: undefined } : prev); }}>
+                      <option value="">请选择</option>
+                      <option value="employee">员工</option>
+                      <option value="streamer">带货人</option>
+                    </select>
+                    {editPlatformForm?.hostType === 'employee' ? (
+                      <DeptEmployeeSelect value={editPlatformForm?.hostId ?? ''} onChange={(empId) => setEditPlatformForm(prev => prev ? { ...prev, hostId: empId || undefined } : prev)} style={{ flex: 1 }} />
+                    ) : editPlatformForm?.hostType === 'streamer' ? (
+                      <select className="filter-select" style={{ flex: 1 }} value={editPlatformForm?.hostId ?? ''} onChange={(e) => setEditPlatformForm(prev => prev ? { ...prev, hostId: e.target.value || undefined } : prev)}>
+                        <option value="">选择带货人</option>
+                        {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                      </select>
+                    ) : (
+                      <div style={{ flex: 1, height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
+                    )}
+                  </div>
+                ) : <Text>{getHostName(detailPlatform.hostId, detailPlatform.hostType)}</Text>}</Field>
                 <Field label="联系电话">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPhone ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPhone}</Text>}</Field>
                 <Field label="省份">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.province ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, province: e.target.value, city: '', district: '' } : prev)}><option value="">请选择</option>{PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}</select> : <Text>{detailPlatform.province || '—'}</Text>}</Field>
                 <Field label="城市">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.city ?? ''} disabled={!editPlatformForm?.province} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, city: e.target.value, district: '' } : prev)}><option value="">请选择</option>{(editPlatformForm?.province ? getCityNames(editPlatformForm.province) : []).map(c => <option key={c} value={c}>{c}</option>)}</select> : <Text>{detailPlatform.city || '—'}</Text>}</Field>
@@ -575,7 +615,26 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
             {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }} value={form.settlementMethod || ''} onChange={e => update('settlementMethod', e.target.value)}><option value="月结">月结</option><option value="预付">预付</option><option value="季度">季度结算</option><option value="现款">现款</option></select></div>}
             <div className="drawer-form-field"><label className="drawer-label">客户来源</label><select className="filter-select" style={{ width: '100%' }} value={form.source || ''} onChange={e => update('source', e.target.value)}><option value="">请选择</option><option value="主动开发">主动开发</option><option value="展会拓客">展会拓客</option><option value="老客户转介">老客户转介</option><option value="平台引流">平台引流</option><option value="线上咨询">线上咨询</option><option value="其他">其他</option></select></div>
             {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>}
-            <div className="drawer-form-field" style={{ flex: 2 }}><label className="drawer-label">主办人</label><DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => update('hostId', empId || undefined)} style={{ width: '100%' }} /></div>
+            <div className="drawer-form-field" style={{ flex: 2 }}>
+              <label className="drawer-label">主办人</label>
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                <select className="filter-select" style={{ width: 100 }} value={form.hostType ?? ''} onChange={(e) => { update('hostType', (e.target.value || undefined) as 'employee' | 'streamer' | undefined); update('hostId', undefined); }}>
+                  <option value="">请选择</option>
+                  <option value="employee">员工</option>
+                  <option value="streamer">带货人</option>
+                </select>
+                {form.hostType === 'employee' ? (
+                  <DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => update('hostId', empId || undefined)} style={{ flex: 1 }} />
+                ) : form.hostType === 'streamer' ? (
+                  <select className="filter-select" style={{ flex: 1 }} value={form.hostId ?? ''} onChange={(e) => update('hostId', e.target.value || undefined)}>
+                    <option value="">选择带货人</option>
+                    {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                ) : (
+                  <div style={{ flex: 1, height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
+                )}
+              </div>
+            </div>
           </div>
           <div className="drawer-form-row">
             <div className="drawer-form-field" style={{ flex: 1 }}><label className="drawer-label">备注</label><input className="filter-input" style={{ width: '100%' }} value={form.remark || ''} onChange={e => update('remark', e.target.value)} /></div>
@@ -711,7 +770,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
       contactPerson: form.contactPerson ?? '', contactPosition: form.contactPosition ?? '', contactPhone: form.contactPhone ?? '', contactAddress: form.contactAddress ?? '',
       province: form.province ?? '', city: form.city ?? '', district: form.district ?? '',
       cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10), commissionRate: form.commissionRate ?? '',
-      bankAccounts, invoiceInfos, status: 'active', remark: form.remark, hostId: form.hostId,
+      bankAccounts, invoiceInfos, status: 'active', remark: form.remark, hostId: form.hostId, hostType: form.hostType,
     } as PlatformItem);
   };
 
@@ -730,7 +789,25 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
             <Field label="平台编号（自动生成）" full><input className="filter-input" style={{ width: '100%' }} value={previewCode} readOnly placeholder="输入平台简称后自动生成" /></Field>
             <Field label="联系人"><input className="filter-input" style={{ width: '100%' }} value={form.contactPerson ?? ''} onChange={e => update('contactPerson', e.target.value)} /></Field>
             <Field label="联系人职务"><input className="filter-input" style={{ width: '100%' }} value={form.contactPosition ?? ''} onChange={e => update('contactPosition', e.target.value)} placeholder="如：采购总监" /></Field>
-            <Field label="主办人" full><DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => update('hostId', empId || undefined)} /></Field>
+            <Field label="主办人" full>
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                <select className="filter-select" style={{ width: 100 }} value={form.hostType ?? ''} onChange={(e) => { update('hostType', (e.target.value || undefined) as 'employee' | 'streamer' | undefined); update('hostId', undefined); }}>
+                  <option value="">请选择</option>
+                  <option value="employee">员工</option>
+                  <option value="streamer">带货人</option>
+                </select>
+                {form.hostType === 'employee' ? (
+                  <DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => update('hostId', empId || undefined)} style={{ flex: 1 }} />
+                ) : form.hostType === 'streamer' ? (
+                  <select className="filter-select" style={{ flex: 1 }} value={form.hostId ?? ''} onChange={(e) => update('hostId', e.target.value || undefined)}>
+                    <option value="">选择带货人</option>
+                    {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                ) : (
+                  <div style={{ flex: 1, height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
+                )}
+              </div>
+            </Field>
             <Field label="联系电话"><input className="filter-input" style={{ width: '100%' }} value={form.contactPhone ?? ''} onChange={e => update('contactPhone', e.target.value)} /></Field>
           </div>
 
