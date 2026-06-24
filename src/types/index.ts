@@ -888,12 +888,18 @@ export interface EmployeePerformance {
   departmentName: string;
   position: string;
   role: EmployeeRole;
-  /** 作为跟单员的销售金额（订单金额 × 40%） */
+  /** 销售绩效 - 作为跟单员的销售金额（订单金额 × 40%） */
   followerAmount: number;
-  /** 作为客户经理的销售金额（跟单员缺失时 × 40% + 所有订单 × 50%） */
+  /** 销售绩效 - 作为客户经理的销售金额（跟单员缺失时 × 40% + 所有订单 × 50%） */
   managerAmount: number;
-  /** 总销售绩效金额 */
+  /** 销售绩效总额 */
   totalAmount: number;
+  /** 绩效利润 - 作为跟单员的利润金额（订单利润 × 40%） */
+  followerProfit: number;
+  /** 绩效利润 - 作为客户经理的利润金额（订单利润 × 40%/50%） */
+  managerProfit: number;
+  /** 绩效利润总额 */
+  totalProfit: number;
   /** 关联订单数 */
   orderCount: number;
 }

@@ -77,8 +77,12 @@ export interface CompletedOrderForPerformance {
   orderCode: string;
   customerId: string;
   customerName: string;
-  /** 订单金额（元） */
+  /** 订单金额（元）= 销售实价合计 */
   amount: number;
+  /** 销售实价合计（元） */
+  actualSalesPrice: number;
+  /** 采购实价合计（元） */
+  actualPurchasePrice: number;
   /** 跟单员员工 ID（可能为空） */
   followerEmpId?: string;
   /** 跟单员姓名（可能为空） */
@@ -87,38 +91,48 @@ export interface CompletedOrderForPerformance {
   paymentDate: string;
 }
 
+/** 计算单笔订单利润 =（销售实价 - 采购实价）× 90% */
+export function getOrderProfit(order: CompletedOrderForPerformance): number {
+  return (order.actualSalesPrice - order.actualPurchasePrice) * 0.9;
+}
+
 export const completedOrders: CompletedOrderForPerformance[] = [
-  { orderId: 'SO-2025-0242', orderCode: 'SO-2025-0242', customerId: 'c1', customerName: '华茗堂茶庄', amount: 34800, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-15' },
-  { orderId: 'SO-2025-0241', orderCode: 'SO-2025-0241', customerId: 'c2', customerName: '清心茶坊', amount: 36000, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-14' },
-  { orderId: 'SO-2025-0240', orderCode: 'SO-2025-0240', customerId: 'c3', customerName: '品茗轩', amount: 44800, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-13' },
-  { orderId: 'SO-2025-0239', orderCode: 'SO-2025-0239', customerId: 'c4', customerName: '翠竹茶行', amount: 18000, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-12' },
-  { orderId: 'SO-2025-0238', orderCode: 'SO-2025-0238', customerId: 'c5', customerName: '云顶茶舍', amount: 17600, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-11' },
-  { orderId: 'SO-2025-0237', orderCode: 'SO-2025-0237', customerId: 'c6', customerName: '浦发银行', amount: 42500, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-10' },
-  { orderId: 'SO-2025-0236', orderCode: 'SO-2025-0236', customerId: 'c7', customerName: '交通银行', amount: 36800, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-09' },
-  { orderId: 'SO-2025-0235', orderCode: 'SO-2025-0235', customerId: 'c8', customerName: '中信证券', amount: 53600, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-08' },
-  { orderId: 'SO-2025-0234', orderCode: 'SO-2025-0234', customerId: 'c9', customerName: '中国平安', amount: 28500, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-07' },
-  { orderId: 'SO-2025-0233', orderCode: 'SO-2025-0233', customerId: 'c10', customerName: '招商银行', amount: 19600, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-06' },
-  { orderId: 'SO-2025-0232', orderCode: 'SO-2025-0232', customerId: 'c11', customerName: '天福茗茶', amount: 82600, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-05' },
-  { orderId: 'SO-2025-0231', orderCode: 'SO-2025-0231', customerId: 'c12', customerName: '八马茶业', amount: 64500, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-04' },
-  { orderId: 'SO-2025-0230', orderCode: 'SO-2025-0230', customerId: 'c13', customerName: '大益茶体验馆', amount: 49800, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-03' },
-  { orderId: 'SO-2025-0229', orderCode: 'SO-2025-0229', customerId: 'c14', customerName: '茶里王国', amount: 31200, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-02' },
-  { orderId: 'SO-2025-0228', orderCode: 'SO-2025-0228', customerId: 'c1', customerName: '华茗堂茶庄', amount: 28600, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-01' },
-  { orderId: 'SO-2025-0227', orderCode: 'SO-2025-0227', customerId: 'c2', customerName: '清心茶坊', amount: 45200, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-06-30' },
-  { orderId: 'SO-2025-0226', orderCode: 'SO-2025-0226', customerId: 'c4', customerName: '翠竹茶行', amount: 19800, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-06-29' },
-  { orderId: 'SO-2025-0225', orderCode: 'SO-2025-0225', customerId: 'c6', customerName: '浦发银行', amount: 38500, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-06-28' },
-  { orderId: 'SO-2025-0224', orderCode: 'SO-2025-0224', customerId: 'c8', customerName: '中信证券', amount: 52600, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-06-27' },
-  { orderId: 'SO-2025-0223', orderCode: 'SO-2025-0223', customerId: 'c11', customerName: '天福茗茶', amount: 72800, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-06-26' },
+  { orderId: 'SO-2025-0242', orderCode: 'SO-2025-0242', customerId: 'c1', customerName: '华茗堂茶庄', amount: 34800, actualSalesPrice: 34800, actualPurchasePrice: 21576, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-15' },
+  { orderId: 'SO-2025-0241', orderCode: 'SO-2025-0241', customerId: 'c2', customerName: '清心茶坊', amount: 36000, actualSalesPrice: 36000, actualPurchasePrice: 23400, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-14' },
+  { orderId: 'SO-2025-0240', orderCode: 'SO-2025-0240', customerId: 'c3', customerName: '品茗轩', amount: 44800, actualSalesPrice: 44800, actualPurchasePrice: 26880, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-13' },
+  { orderId: 'SO-2025-0239', orderCode: 'SO-2025-0239', customerId: 'c4', customerName: '翠竹茶行', amount: 18000, actualSalesPrice: 18000, actualPurchasePrice: 11700, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-12' },
+  { orderId: 'SO-2025-0238', orderCode: 'SO-2025-0238', customerId: 'c5', customerName: '云顶茶舍', amount: 17600, actualSalesPrice: 17600, actualPurchasePrice: 11440, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-11' },
+  { orderId: 'SO-2025-0237', orderCode: 'SO-2025-0237', customerId: 'c6', customerName: '浦发银行', amount: 42500, actualSalesPrice: 42500, actualPurchasePrice: 26350, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-10' },
+  { orderId: 'SO-2025-0236', orderCode: 'SO-2025-0236', customerId: 'c7', customerName: '交通银行', amount: 36800, actualSalesPrice: 36800, actualPurchasePrice: 22908, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-09' },
+  { orderId: 'SO-2025-0235', orderCode: 'SO-2025-0235', customerId: 'c8', customerName: '中信证券', amount: 53600, actualSalesPrice: 53600, actualPurchasePrice: 33768, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-08' },
+  { orderId: 'SO-2025-0234', orderCode: 'SO-2025-0234', customerId: 'c9', customerName: '中国平安', amount: 28500, actualSalesPrice: 28500, actualPurchasePrice: 17670, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-07' },
+  { orderId: 'SO-2025-0233', orderCode: 'SO-2025-0233', customerId: 'c10', customerName: '招商银行', amount: 19600, actualSalesPrice: 19600, actualPurchasePrice: 12152, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-06' },
+  { orderId: 'SO-2025-0232', orderCode: 'SO-2025-0232', customerId: 'c11', customerName: '天福茗茶', amount: 82600, actualSalesPrice: 82600, actualPurchasePrice: 49560, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-05' },
+  { orderId: 'SO-2025-0231', orderCode: 'SO-2025-0231', customerId: 'c12', customerName: '八马茶业', amount: 64500, actualSalesPrice: 64500, actualPurchasePrice: 40020, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-04' },
+  { orderId: 'SO-2025-0230', orderCode: 'SO-2025-0230', customerId: 'c13', customerName: '大益茶体验馆', amount: 49800, actualSalesPrice: 49800, actualPurchasePrice: 30876, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-07-03' },
+  { orderId: 'SO-2025-0229', orderCode: 'SO-2025-0229', customerId: 'c14', customerName: '茶里王国', amount: 31200, actualSalesPrice: 31200, actualPurchasePrice: 19344, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-07-02' },
+  { orderId: 'SO-2025-0228', orderCode: 'SO-2025-0228', customerId: 'c1', customerName: '华茗堂茶庄', amount: 28600, actualSalesPrice: 28600, actualPurchasePrice: 17732, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-07-01' },
+  { orderId: 'SO-2025-0227', orderCode: 'SO-2025-0227', customerId: 'c2', customerName: '清心茶坊', amount: 45200, actualSalesPrice: 45200, actualPurchasePrice: 28024, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-06-30' },
+  { orderId: 'SO-2025-0226', orderCode: 'SO-2025-0226', customerId: 'c4', customerName: '翠竹茶行', amount: 19800, actualSalesPrice: 19800, actualPurchasePrice: 12276, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-06-29' },
+  { orderId: 'SO-2025-0225', orderCode: 'SO-2025-0225', customerId: 'c6', customerName: '浦发银行', amount: 38500, actualSalesPrice: 38500, actualPurchasePrice: 23870, followerEmpId: 'emp-8', followerName: '王强', paymentDate: '2025-06-28' },
+  { orderId: 'SO-2025-0224', orderCode: 'SO-2025-0224', customerId: 'c8', customerName: '中信证券', amount: 52600, actualSalesPrice: 52600, actualPurchasePrice: 32612, followerEmpId: undefined, followerName: undefined, paymentDate: '2025-06-27' },
+  { orderId: 'SO-2025-0223', orderCode: 'SO-2025-0223', customerId: 'c11', customerName: '天福茗茶', amount: 72800, actualSalesPrice: 72800, actualPurchasePrice: 43680, followerEmpId: 'emp-9', followerName: '张伟', paymentDate: '2025-06-26' },
 ];
 
 /* ── 绩效统计工具函数 ── */
 
 /**
- * 计算员工销售绩效
+ * 计算员工绩效（销售绩效 + 绩效利润）
  *
- * 统计逻辑：
- * 1. 从已完成回款的订单中，根据订单对应的"跟单员"统计，金额×40%计入该跟单员的销售金额
- * 2. 对没有选择"跟单员"的订单，根据订单对应客户的"客户经理"统计，金额×40%计入该客户经理的销售金额
- * 3. 不管订单是否有"跟单员"，金额×50%的金额再计入该客户对应的"客户经理"名下
+ * 【销售绩效】基于订单金额：
+ * 1. 有跟单员 → 订单金额 × 40% 计入跟单员
+ * 2. 无跟单员 → 订单金额 × 40% 计入客户经理
+ * 3. 不管有无跟单员 → 订单金额 × 50% 计入客户经理
+ *
+ * 【绩效利润】基于订单利润（=（销售实价 - 采购实价）× 90%），规则同上：
+ * 1. 有跟单员 → 订单利润 × 40% 计入跟单员
+ * 2. 无跟单员 → 订单利润 × 40% 计入客户经理
+ * 3. 不管有无跟单员 → 订单利润 × 50% 计入客户经理
  */
 export function calculateEmployeePerformance(): EmployeePerformance[] {
   const resultMap = new Map<string, EmployeePerformance>();
@@ -136,6 +150,9 @@ export function calculateEmployeePerformance(): EmployeePerformance[] {
         followerAmount: 0,
         managerAmount: 0,
         totalAmount: 0,
+        followerProfit: 0,
+        managerProfit: 0,
+        totalProfit: 0,
         orderCount: 0,
       });
     }
@@ -145,12 +162,15 @@ export function calculateEmployeePerformance(): EmployeePerformance[] {
   completedOrders.forEach((order) => {
     const managerEmpId = customerManagerMap[order.customerId];
     const followerEmpId = order.followerEmpId;
+    const profit = getOrderProfit(order); // 订单利润
 
+    // ── 销售绩效（基于订单金额）──
     // 规则1：有跟单员 → 金额×40% 计入跟单员
     if (followerEmpId) {
       const perf = resultMap.get(followerEmpId);
       if (perf) {
         perf.followerAmount += order.amount * 0.4;
+        perf.followerProfit += profit * 0.4;
         perf.orderCount += 1;
       }
     } else {
@@ -159,6 +179,7 @@ export function calculateEmployeePerformance(): EmployeePerformance[] {
         const perf = resultMap.get(managerEmpId);
         if (perf) {
           perf.managerAmount += order.amount * 0.4;
+          perf.managerProfit += profit * 0.4;
           perf.orderCount += 1;
         }
       }
@@ -169,10 +190,8 @@ export function calculateEmployeePerformance(): EmployeePerformance[] {
       const perf = resultMap.get(managerEmpId);
       if (perf) {
         perf.managerAmount += order.amount * 0.5;
-        // 如果跟单员存在时已经+1过，这里不再重复计数
-        if (!followerEmpId) {
-          // 无跟单员时已在规则2中+1
-        } else {
+        perf.managerProfit += profit * 0.5;
+        if (followerEmpId) {
           perf.orderCount += 1;
         }
       }
@@ -185,9 +204,12 @@ export function calculateEmployeePerformance(): EmployeePerformance[] {
     p.followerAmount = Math.round(p.followerAmount);
     p.managerAmount = Math.round(p.managerAmount);
     p.totalAmount = p.followerAmount + p.managerAmount;
+    p.followerProfit = Math.round(p.followerProfit);
+    p.managerProfit = Math.round(p.managerProfit);
+    p.totalProfit = p.followerProfit + p.managerProfit;
   });
 
-  // 按总额降序
+  // 按销售绩效总额降序
   results.sort((a, b) => b.totalAmount - a.totalAmount);
   return results;
 }

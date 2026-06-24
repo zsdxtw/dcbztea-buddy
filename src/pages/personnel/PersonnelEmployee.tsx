@@ -388,11 +388,25 @@ function PerformanceTab() {
           </svg>
           <span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-darkest)' }}>绩效计算规则</span>
         </div>
-        <ul style={{ margin: 0, paddingLeft: 'var(--space-5)', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', lineHeight: 1.8 }}>
-          <li>跟单员绩效：已完成回款订单金额 × 40%</li>
-          <li>客户经理绩效（无跟单员时）：订单金额 × 40%</li>
-          <li>客户经理绩效（所有订单）：订单金额 × 50%</li>
-        </ul>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+          <div>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)', marginBottom: 'var(--space-1)' }}>销售绩效（基于订单金额）</div>
+            <ul style={{ margin: 0, paddingLeft: 'var(--space-5)', fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
+              <li>跟单员：订单金额 × 40%</li>
+              <li>客户经理（无跟单员时）：订单金额 × 40%</li>
+              <li>客户经理（所有订单）：订单金额 × 50%</li>
+            </ul>
+          </div>
+          <div>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-personnel-secondary)', marginBottom: 'var(--space-1)' }}>绩效利润（基于订单利润）</div>
+            <ul style={{ margin: 0, paddingLeft: 'var(--space-5)', fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
+              <li>订单利润 =（销售实价 - 采购实价）× 90%</li>
+              <li>跟单员：订单利润 × 40%</li>
+              <li>客户经理（无跟单员时）：订单利润 × 40%</li>
+              <li>客户经理（所有订单）：订单利润 × 50%</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <Card style={{ padding: 0 }}>
@@ -400,7 +414,7 @@ function PerformanceTab() {
           <EmptyState text="暂无绩效数据。" />
         ) : (
           <Table
-            headers={['排名', '员工姓名', '部门', '职位', '角色', '跟单绩效(¥)', '客户经理绩效(¥)', '总绩效(¥)', '关联订单数']}
+            headers={['排名', '员工', '部门', '角色', '跟单销售(¥)', '经理销售(¥)', '销售合计(¥)', '跟单利润(¥)', '经理利润(¥)', '利润合计(¥)', '订单数']}
             rows={performanceData.map((perf, idx) => {
               const rank = idx + 1;
               return [
@@ -422,7 +436,6 @@ function PerformanceTab() {
                 </div>,
                 <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{perf.employeeName}</span>,
                 perf.departmentName,
-                perf.position,
                 <span
                   key="role"
                   style={{
@@ -436,9 +449,12 @@ function PerformanceTab() {
                 >
                   {ROLE_LABELS[perf.role]}
                 </span>,
-                <span key="follower" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.followerAmount)}</span>,
-                <span key="manager" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.managerAmount)}</span>,
-                <span key="total" style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{formatYuan(perf.totalAmount)}</span>,
+                <span key="follAmt" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.followerAmount)}</span>,
+                <span key="mgrAmt" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.managerAmount)}</span>,
+                <span key="totAmt" style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{formatYuan(perf.totalAmount)}</span>,
+                <span key="follPft" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.followerProfit)}</span>,
+                <span key="mgrPft" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.managerProfit)}</span>,
+                <span key="totPft" style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-personnel-secondary)' }}>{formatYuan(perf.totalProfit)}</span>,
                 <span key="count" style={{ color: 'var(--color-text-secondary)' }}>{perf.orderCount}</span>,
               ];
             })}
