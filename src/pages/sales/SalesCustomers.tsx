@@ -61,7 +61,7 @@ export default function SalesCustomers() {
     const platformActive = platforms.filter(p => p.status === 'active').length;
     return [
       { label: '客户总数', value: String(data.length + platforms.length), unit: '家', trend: { direction: 'up', value: `合作中 ${activeCount + platformActive}` }, icon: <IconUsers /> },
-      { label: '直营客户', value: String(direct.length), unit: '家', trend: { direction: 'up', value: `含平台方 ${withPlatform}` }, icon: <IconHome /> },
+      { label: '直营客户', value: String(direct.length), unit: '家', trend: { direction: 'up', value: `合作中 ${direct.filter(c => c.status === 'active').length}` }, icon: <IconHome /> },
       { label: '渠道客户', value: String(channel.length), unit: '家', trend: { direction: 'up', value: `合作中 ${channel.filter(c => c.status === 'active').length}` }, icon: <IconChannel /> },
       { label: '个人客户', value: String(personal.length), unit: '人', trend: { direction: 'up', value: `合作中 ${personal.filter(c => c.status === 'active').length}` }, icon: <IconPersonal /> },
       { label: '平台客户', value: String(platforms.length), unit: '家', trend: { direction: 'up', value: `在册 ${platformActive}` }, icon: <IconPlatform /> },
