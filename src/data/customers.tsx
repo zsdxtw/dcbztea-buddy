@@ -111,10 +111,10 @@ export const CUSTOMER_TYPE_LABELS: Record<CustomerItem['type'], string> = {
 };
 
 export const CUSTOMER_TYPE_DESC: Record<CustomerItem['type'], string> = {
-  direct: '客情自有，自己维护的终端客户',
-  channel: '客情非自有，卖给渠道二次销售',
-  personal: '个人茶友，终端散客消费者',
-  platform: '京东慧采、史泰博、齐心、易积通等中间商',
+  direct: '企业客户，包括直接销售和经平台销售的客户',
+  channel: '企业客户，非终端客户，采购后二次销售的客户',
+  personal: '个人客户，不区分采购后是个人消费还是二次销售',
+  platform: '京东慧采、史泰博、易积通等集采平台客户',
 };
 
 export const LEVEL_COLORS: Record<string, { bg: string; color: string }> = {
