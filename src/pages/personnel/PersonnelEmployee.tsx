@@ -205,7 +205,7 @@ export default function PersonnelEmployee() {
                 marginBottom: '-1px',
               }}
             >
-              {tab === 'list' ? '员工列表' : '销售绩效'}
+              {tab === 'list' ? '员工列表' : '员工绩效'}
             </button>
           );
         })}
@@ -364,7 +364,7 @@ function EmployeeListTab({
   );
 }
 
-/* ── 子组件：销售绩效 Tab ── */
+/* ── 子组件：员工绩效 Tab ── */
 
 function PerformanceTab() {
   const performanceData: EmployeePerformance[] = useMemo(() => calculateEmployeePerformance(), []);
@@ -390,7 +390,7 @@ function PerformanceTab() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
           <div>
-            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)', marginBottom: 'var(--space-1)' }}>销售绩效（基于订单金额）</div>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)', marginBottom: 'var(--space-1)' }}>绩效金额（基于订单金额）</div>
             <ul style={{ margin: 0, paddingLeft: 'var(--space-5)', fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
               <li>跟单员：订单金额 × 40%</li>
               <li>客户经理（无跟单员时）：订单金额 × 40%</li>
@@ -414,7 +414,7 @@ function PerformanceTab() {
           <EmptyState text="暂无绩效数据。" />
         ) : (
           <Table
-            headers={['排名', '员工', '部门', '角色', '跟单销售(¥)', '经理销售(¥)', '销售合计(¥)', '跟单利润(¥)', '经理利润(¥)', '利润合计(¥)', '订单数']}
+            headers={['排名', '员工', '部门', '角色', '跟单金额(¥)', '经理金额(¥)', '金额合计(¥)', '跟单利润(¥)', '经理利润(¥)', '利润合计(¥)', '订单数']}
             rows={performanceData.map((perf, idx) => {
               const rank = idx + 1;
               return [

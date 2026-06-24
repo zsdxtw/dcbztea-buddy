@@ -881,18 +881,18 @@ export interface Employee {
   remark?: string;
 }
 
-/** 员工销售绩效统计 */
+/** 员工绩效统计（绩效金额 + 绩效利润） */
 export interface EmployeePerformance {
   employeeId: string;
   employeeName: string;
   departmentName: string;
   position: string;
   role: EmployeeRole;
-  /** 销售绩效 - 作为跟单员的销售金额（订单金额 × 40%） */
+  /** 绩效金额 - 作为跟单员的销售金额（订单金额 × 40%） */
   followerAmount: number;
-  /** 销售绩效 - 作为客户经理的销售金额（跟单员缺失时 × 40% + 所有订单 × 50%） */
+  /** 绩效金额 - 作为客户经理的销售金额（跟单员缺失时 × 40% + 所有订单 × 50%） */
   managerAmount: number;
-  /** 销售绩效总额 */
+  /** 绩效金额总额 */
   totalAmount: number;
   /** 绩效利润 - 作为跟单员的利润金额（订单利润 × 40%） */
   followerProfit: number;

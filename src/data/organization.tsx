@@ -122,9 +122,9 @@ export const completedOrders: CompletedOrderForPerformance[] = [
 /* ── 绩效统计工具函数 ── */
 
 /**
- * 计算员工绩效（销售绩效 + 绩效利润）
+ * 计算员工绩效（绩效金额 + 绩效利润）
  *
- * 【销售绩效】基于订单金额：
+ * 【绩效金额】基于订单金额：
  * 1. 有跟单员 → 订单金额 × 40% 计入跟单员
  * 2. 无跟单员 → 订单金额 × 40% 计入客户经理
  * 3. 不管有无跟单员 → 订单金额 × 50% 计入客户经理
@@ -164,7 +164,7 @@ export function calculateEmployeePerformance(): EmployeePerformance[] {
     const followerEmpId = order.followerEmpId;
     const profit = getOrderProfit(order); // 订单利润
 
-    // ── 销售绩效（基于订单金额）──
+    // ── 绩效金额（基于订单金额）──
     // 规则1：有跟单员 → 金额×40% 计入跟单员
     if (followerEmpId) {
       const perf = resultMap.get(followerEmpId);
@@ -209,7 +209,7 @@ export function calculateEmployeePerformance(): EmployeePerformance[] {
     p.totalProfit = p.followerProfit + p.managerProfit;
   });
 
-  // 按销售绩效总额降序
+  // 按绩效金额总额降序
   results.sort((a, b) => b.totalAmount - a.totalAmount);
   return results;
 }
