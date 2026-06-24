@@ -11,6 +11,7 @@ import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 import { generateCustomerCode } from '../../utils/customerCode';
 import { useDrawerWidth } from '../../hooks/useDrawerWidth';
 import { employees, getEmployeeName } from '../../data/organization';
+import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
 
 const PRIMARY = '#0F64B5';
 const PRIMARY_LIGHT = '#EBF3FC';
@@ -403,7 +404,7 @@ export default function SalesCustomers() {
                 <Field label="平台编号"><Text className="mono">{detailPlatform.code}</Text></Field>
                 <Field label="联系人">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPerson ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPerson}</Text>}</Field>
                 <Field label="联系人职务">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPosition ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPosition: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPosition || '—'}</Text>}</Field>
-                <Field label="对接人">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.liaisonEmpId ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, liaisonEmpId: e.target.value || undefined } : prev)}><option value="">请选择</option>{employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}（{emp.position}）</option>)}</select> : <Text>{detailPlatform.liaisonEmpId ? getEmployeeName(detailPlatform.liaisonEmpId) : '—'}</Text>}</Field>
+                <Field label="对接人" full>{editingPlatform ? <DeptEmployeeSelect value={editPlatformForm?.liaisonEmpId ?? ''} onChange={(empId) => setEditPlatformForm(prev => prev ? { ...prev, liaisonEmpId: empId || undefined } : prev)} /> : <Text>{detailPlatform.liaisonEmpId ? getEmployeeName(detailPlatform.liaisonEmpId) : '—'}</Text>}</Field>
                 <Field label="联系电话">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPhone ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPhone}</Text>}</Field>
                 <Field label="省份">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.province ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, province: e.target.value, city: '', district: '' } : prev)}><option value="">请选择</option>{PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}</select> : <Text>{detailPlatform.province || '—'}</Text>}</Field>
                 <Field label="城市">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.city ?? ''} disabled={!editPlatformForm?.province} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, city: e.target.value, district: '' } : prev)}><option value="">请选择</option>{(editPlatformForm?.province ? getCityNames(editPlatformForm.province) : []).map(c => <option key={c} value={c}>{c}</option>)}</select> : <Text>{detailPlatform.city || '—'}</Text>}</Field>
@@ -566,7 +567,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
             {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }} value={form.settlementMethod || ''} onChange={e => update('settlementMethod', e.target.value)}><option value="月结">月结</option><option value="预付">预付</option><option value="季度">季度结算</option><option value="现款">现款</option></select></div>}
             <div className="drawer-form-field"><label className="drawer-label">客户来源</label><select className="filter-select" style={{ width: '100%' }} value={form.source || ''} onChange={e => update('source', e.target.value)}><option value="">请选择</option><option value="主动开发">主动开发</option><option value="展会拓客">展会拓客</option><option value="老客户转介">老客户转介</option><option value="平台引流">平台引流</option><option value="线上咨询">线上咨询</option><option value="其他">其他</option></select></div>
             {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>}
-            <div className="drawer-form-field"><label className="drawer-label">对接人</label><select className="filter-select" style={{ width: '100%' }} value={form.liaisonEmpId ?? ''} onChange={e => update('liaisonEmpId', e.target.value || undefined)}><option value="">请选择</option>{employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}（{emp.position}）</option>)}</select></div>
+            <div className="drawer-form-field" style={{ flex: 2 }}><label className="drawer-label">对接人</label><DeptEmployeeSelect value={form.liaisonEmpId ?? ''} onChange={(empId) => update('liaisonEmpId', empId || undefined)} style={{ width: '100%' }} /></div>
           </div>
           <div className="drawer-form-row">
             <div className="drawer-form-field" style={{ flex: 1 }}><label className="drawer-label">备注</label><input className="filter-input" style={{ width: '100%' }} value={form.remark || ''} onChange={e => update('remark', e.target.value)} /></div>
@@ -721,7 +722,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
             <Field label="平台编号（自动生成）" full><input className="filter-input" style={{ width: '100%' }} value={previewCode} readOnly placeholder="输入平台简称后自动生成" /></Field>
             <Field label="联系人"><input className="filter-input" style={{ width: '100%' }} value={form.contactPerson ?? ''} onChange={e => update('contactPerson', e.target.value)} /></Field>
             <Field label="联系人职务"><input className="filter-input" style={{ width: '100%' }} value={form.contactPosition ?? ''} onChange={e => update('contactPosition', e.target.value)} placeholder="如：采购总监" /></Field>
-            <Field label="对接人"><select className="filter-select" style={{ width: '100%' }} value={form.liaisonEmpId ?? ''} onChange={e => update('liaisonEmpId', e.target.value || undefined)}><option value="">请选择</option>{employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}（{emp.position}）</option>)}</select></Field>
+            <Field label="对接人" full><DeptEmployeeSelect value={form.liaisonEmpId ?? ''} onChange={(empId) => update('liaisonEmpId', empId || undefined)} /></Field>
             <Field label="联系电话"><input className="filter-input" style={{ width: '100%' }} value={form.contactPhone ?? ''} onChange={e => update('contactPhone', e.target.value)} /></Field>
           </div>
 

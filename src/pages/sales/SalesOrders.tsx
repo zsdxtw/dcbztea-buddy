@@ -12,6 +12,7 @@ import type { StatCardData, SalesOrderItem } from '../../types';
 import { PRICE_CUSTOMERS, getSalesDefaultPrice } from '../../data/prices';
 import { teaProducts } from '../../data/teaProducts';
 import { employees, getEmployeeName } from '../../data/organization';
+import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
 
 /* ── 工具函数 ── */
 function categoryToTeaCategory(category: string): TeaCategory {
@@ -694,12 +695,9 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
               <label className="drawer-label">下单日期 *</label>
               <input type="date" className="filter-input" style={{ width: '100%' }} value={orderDate} onChange={(e) => setOrderDate(e.target.value)} />
             </div>
-            <div className="drawer-form-field">
+            <div className="drawer-form-field" style={{ flex: 2 }}>
               <label className="drawer-label">跟单人</label>
-              <select className="filter-select" style={{ width: '100%' }} value={followerEmpId} onChange={(e) => setFollowerEmpId(e.target.value)}>
-                <option value="">请选择</option>
-                {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}（{emp.position}）</option>)}
-              </select>
+              <DeptEmployeeSelect value={followerEmpId} onChange={(empId) => setFollowerEmpId(empId)} />
             </div>
             <div className="drawer-form-field">
               <label className="drawer-label">联系人</label>
