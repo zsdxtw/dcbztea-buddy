@@ -6,6 +6,9 @@ import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import StatCard from '../../components/common/StatCard';
 import FilterBar from '../../components/business/FilterBar';
+import IdCardUpload, { parseIdCardNo, type IdCardOcrResult } from '../../components/business/IdCardUpload';
+import ContractUpload from '../../components/business/ContractUpload';
+import EducationRecordsEditor, { STAGE_LABELS } from '../../components/business/EducationRecordsEditor';
 import { useDrawerWidth } from '../../hooks/useDrawerWidth';
 import {
   orgNodes,
@@ -18,6 +21,7 @@ import type {
   Employee,
   EmployeePerformance,
   EmployeeStatus,
+  EducationRecord,
   StatCardData,
   StatusVariant,
 } from '../../types';
@@ -70,6 +74,7 @@ export default function PersonnelEmployee() {
   const [activeTab, setActiveTab] = useState<'list' | 'performance'>('list');
   const [showDrawer, setShowDrawer] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [detailEmployee, setDetailEmployee] = useState<Employee | null>(null);
 
   const stats: StatCardData[] = useMemo(() => {
     const total = employeeList.length;
@@ -118,6 +123,10 @@ export default function PersonnelEmployee() {
     setShowDrawer(true);
   };
 
+  const handleDetail = (emp: Employee) => {
+    setDetailEmployee(emp);
+  };
+
   const handleDelete = (emp: Employee) => {
     if (window.confirm(`确定要删除员工「${emp.name}」（${emp.empNo}）吗？此操作不可撤销。`)) {
       setEmployeeList((prev) => prev.filter((e) => e.id !== emp.id));
@@ -139,6 +148,10 @@ export default function PersonnelEmployee() {
   const handleCloseDrawer = () => {
     setShowDrawer(false);
     setEditingEmployee(null);
+  };
+
+  const handleCloseDetail = () => {
+    setDetailEmployee(null);
   };
 
   return (
@@ -184,6 +197,7 @@ export default function PersonnelEmployee() {
           employeeList={employeeList}
           onAdd={handleAdd}
           onEdit={handleEdit}
+          onDetail={handleDetail}
           onDelete={handleDelete}
         />
       ) : (
@@ -199,6 +213,18 @@ export default function PersonnelEmployee() {
           onSave={handleSave}
         />
       )}
+
+      {/* 详情抽屉 */}
+      {detailEmployee && (
+        <EmployeeDetailDrawer
+          employee={detailEmployee}
+          onClose={handleCloseDetail}
+          onEdit={(emp) => {
+            setDetailEmployee(null);
+            handleEdit(emp);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -209,11 +235,13 @@ function EmployeeListTab({
   employeeList,
   onAdd,
   onEdit,
+  onDetail,
   onDelete,
 }: {
   employeeList: Employee[];
   onAdd: () => void;
   onEdit: (emp: Employee) => void;
+  onDetail: (emp: Employee) => void;
   onDelete: (emp: Employee) => void;
 }) {
   const [keyword, setKeyword] = useState('');
@@ -294,6 +322,7 @@ function EmployeeListTab({
               emp.joinDate,
               <StatusTag key="status" variant={empStatusVariant(emp.status)} label={EMP_STATUS_LABELS[emp.status]} />,
               <div key="ops" style={{ display: 'flex', gap: 'var(--space-1)' }}>
+                <Button size="sm" variant="ghost" onClick={() => onDetail(emp)}>查看</Button>
                 <Button size="sm" variant="ghost" onClick={() => onEdit(emp)}>编辑</Button>
                 <Button size="sm" variant="ghost" onClick={() => onDelete(emp)} style={{ color: '#CB405D' }}>删除</Button>
               </div>,
@@ -435,6 +464,23 @@ function EditEmployeeDrawer({
       joinDate: new Date().toISOString().slice(0, 10),
       status: 'probation',
       remark: '',
+      idCardNo: '',
+      idCardImages: [],
+      idCardAddress: '',
+      ethnicity: '',
+      nativePlace: '',
+      birthDate: '',
+      hobbies: '',
+      height: undefined,
+      weight: undefined,
+      localAddress: '',
+      education: '',
+      degree: '',
+      educationRecords: [],
+      settlement: { accountNo: '', accountName: '', bankName: '', bankNo: '' },
+      contracts: [],
+      emergencyContactName: '',
+      emergencyContactPhone: '',
     },
   );
 
@@ -448,6 +494,30 @@ function EditEmployeeDrawer({
 
   const handleDeptChange = (deptId: string) => {
     setForm((prev) => ({ ...prev, departmentId: deptId, teamId: '' }));
+  };
+
+  /** OCR 识别结果回填 */
+  const handleOcrRecognized = (result: IdCardOcrResult) => {
+    setForm((prev) => ({
+      ...prev,
+      name: result.name && !prev.name ? result.name : prev.name,
+      gender: result.gender ?? prev.gender,
+      birthDate: result.birthDate ?? prev.birthDate,
+      idCardAddress: result.idCardAddress ?? prev.idCardAddress,
+      idCardNo: result.idCardNo ?? prev.idCardNo,
+      ethnicity: result.ethnicity ?? prev.ethnicity,
+    }));
+  };
+
+  /** 身份证号变更时自动解析出生日期与性别 */
+  const handleIdCardNoChange = (value: string) => {
+    const parsed = parseIdCardNo(value);
+    setForm((prev) => ({
+      ...prev,
+      idCardNo: value,
+      birthDate: parsed.birthDate ?? prev.birthDate,
+      gender: parsed.gender ?? prev.gender,
+    }));
   };
 
   const canSave = form.name.trim().length > 0;
@@ -470,6 +540,7 @@ function EditEmployeeDrawer({
         </div>
 
         <div className="drawer-body">
+          {/* 基本信息 */}
           <div className="drawer-section-title">基本信息</div>
           <div className="drawer-form-row">
             <div className="drawer-form-field">
@@ -522,6 +593,164 @@ function EditEmployeeDrawer({
             </div>
           </div>
 
+          {/* 身份证信息 */}
+          <div className="drawer-section-title">身份证信息</div>
+          <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+            <div className="drawer-form-field" style={{ width: '100%' }}>
+              <label className="drawer-label">身份证图片（正反面，支持 OCR 识别）</label>
+              <IdCardUpload
+                images={form.idCardImages ?? []}
+                onChange={(imgs) => update('idCardImages', imgs)}
+                onOcrRecognized={handleOcrRecognized}
+                idCardNo={form.idCardNo}
+              />
+            </div>
+          </div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">身份证号</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.idCardNo ?? ''}
+                onChange={(e) => handleIdCardNoChange(e.target.value)}
+                placeholder="请输入身份证号"
+              />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">民族</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.ethnicity ?? ''}
+                onChange={(e) => update('ethnicity', e.target.value)}
+                placeholder="如：汉族"
+              />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">出生日期</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                type="date"
+                value={form.birthDate ?? ''}
+                onChange={(e) => update('birthDate', e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">籍贯</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.nativePlace ?? ''}
+                onChange={(e) => update('nativePlace', e.target.value)}
+                placeholder="如：浙江杭州"
+              />
+            </div>
+            <div className="drawer-form-field" style={{ flex: 2 }}>
+              <label className="drawer-label">身份证住址</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.idCardAddress ?? ''}
+                onChange={(e) => update('idCardAddress', e.target.value)}
+                placeholder="请输入身份证住址"
+              />
+            </div>
+          </div>
+
+          {/* 个人信息 */}
+          <div className="drawer-section-title">个人信息</div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">身高（cm）</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                type="number"
+                value={form.height ?? ''}
+                onChange={(e) => update('height', e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="如：175"
+              />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">体重（kg）</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                type="number"
+                value={form.weight ?? ''}
+                onChange={(e) => update('weight', e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="如：68"
+              />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">兴趣爱好</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.hobbies ?? ''}
+                onChange={(e) => update('hobbies', e.target.value)}
+                placeholder="如：茶道、书法"
+              />
+            </div>
+          </div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field" style={{ flex: 1 }}>
+              <label className="drawer-label">本地住址</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.localAddress ?? ''}
+                onChange={(e) => update('localAddress', e.target.value)}
+                placeholder="请输入本地住址"
+              />
+            </div>
+          </div>
+
+          {/* 学历信息 */}
+          <div className="drawer-section-title">学历信息</div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">学历</label>
+              <select
+                className="filter-select"
+                style={{ width: '100%' }}
+                value={form.education ?? ''}
+                onChange={(e) => update('education', e.target.value)}
+              >
+                <option value="">请选择学历</option>
+                <option value="高中">高中</option>
+                <option value="大专">大专</option>
+                <option value="本科">本科</option>
+                <option value="硕士">硕士</option>
+                <option value="博士">博士</option>
+              </select>
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">学位</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.degree ?? ''}
+                onChange={(e) => update('degree', e.target.value)}
+                placeholder="如：工学学士"
+              />
+            </div>
+          </div>
+          <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+            <div className="drawer-form-field" style={{ width: '100%' }}>
+              <label className="drawer-label">学习经历（高中 / 大专 / 大学 可多选）</label>
+              <EducationRecordsEditor
+                records={form.educationRecords ?? []}
+                onChange={(records: EducationRecord[]) => update('educationRecords', records)}
+              />
+            </div>
+          </div>
+
+          {/* 组织信息 */}
           <div className="drawer-section-title">组织信息</div>
           <div className="drawer-form-row">
             <div className="drawer-form-field">
@@ -590,6 +819,91 @@ function EditEmployeeDrawer({
             </div>
           </div>
 
+          {/* 结算信息 */}
+          <div className="drawer-section-title">结算信息</div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">户名</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.settlement?.accountName ?? ''}
+                onChange={(e) => update('settlement', { ...(form.settlement ?? { accountNo: '', accountName: '', bankName: '', bankNo: '' }), accountName: e.target.value })}
+                placeholder="请输入户名"
+              />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">卡号</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.settlement?.accountNo ?? ''}
+                onChange={(e) => update('settlement', { ...(form.settlement ?? { accountNo: '', accountName: '', bankName: '', bankNo: '' }), accountNo: e.target.value })}
+                placeholder="请输入卡号"
+              />
+            </div>
+          </div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">开户银行</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.settlement?.bankName ?? ''}
+                onChange={(e) => update('settlement', { ...(form.settlement ?? { accountNo: '', accountName: '', bankName: '', bankNo: '' }), bankName: e.target.value })}
+                placeholder="如：中国工商银行杭州分行"
+              />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">开户行号</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.settlement?.bankNo ?? ''}
+                onChange={(e) => update('settlement', { ...(form.settlement ?? { accountNo: '', accountName: '', bankName: '', bankNo: '' }), bankNo: e.target.value })}
+                placeholder="如：102331000234"
+              />
+            </div>
+          </div>
+
+          {/* 合同文件 */}
+          <div className="drawer-section-title">合同文件（PDF，最多 5 个）</div>
+          <div className="drawer-form-row" style={{ flexDirection: 'column' }}>
+            <div className="drawer-form-field" style={{ width: '100%' }}>
+              <ContractUpload
+                files={form.contracts ?? []}
+                onChange={(files) => update('contracts', files)}
+                max={5}
+              />
+            </div>
+          </div>
+
+          {/* 紧急联系人 */}
+          <div className="drawer-section-title">紧急联系人</div>
+          <div className="drawer-form-row">
+            <div className="drawer-form-field">
+              <label className="drawer-label">紧急联系人姓名</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.emergencyContactName ?? ''}
+                onChange={(e) => update('emergencyContactName', e.target.value)}
+                placeholder="请输入紧急联系人姓名"
+              />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">紧急联系人电话</label>
+              <input
+                className="filter-input"
+                style={{ width: '100%' }}
+                value={form.emergencyContactPhone ?? ''}
+                onChange={(e) => update('emergencyContactPhone', e.target.value)}
+                placeholder="请输入紧急联系人电话"
+              />
+            </div>
+          </div>
+
+          {/* 其他 */}
           <div className="drawer-section-title">其他</div>
           <div className="drawer-form-row">
             <div className="drawer-form-field" style={{ flex: 1 }}>
@@ -608,6 +922,164 @@ function EditEmployeeDrawer({
         <div className="drawer-footer">
           <Button variant="ghost" onClick={onCancel}>取消</Button>
           <Button onClick={handleSave} disabled={!canSave}>保存</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── 子组件：员工详情抽屉 ── */
+
+function EmployeeDetailDrawer({
+  employee,
+  onClose,
+  onEdit,
+}: {
+  employee: Employee;
+  onClose: () => void;
+  onEdit: (emp: Employee) => void;
+}) {
+  const drawerWidth = useDrawerWidth();
+
+  const fieldStyle: CSSProperties = {
+    padding: 'var(--space-2) 0',
+    borderBottom: '1px solid var(--color-border-primary)',
+    display: 'flex',
+    gap: 'var(--space-3)',
+  };
+  const labelStyle: CSSProperties = {
+    width: 110,
+    flexShrink: 0,
+    color: 'var(--color-text-tertiary)',
+    fontSize: 'var(--text-sm)',
+  };
+  const valueStyle: CSSProperties = {
+    flex: 1,
+    color: 'var(--color-text-primary)',
+    fontSize: 'var(--text-sm)',
+    wordBreak: 'break-all',
+  };
+
+  const renderField = (label: string, value?: string | number | null) => (
+    <div style={fieldStyle}>
+      <span style={labelStyle}>{label}</span>
+      <span style={valueStyle}>{value || <span style={{ color: 'var(--color-text-tertiary)' }}>-</span>}</span>
+    </div>
+  );
+
+  return (
+    <div className="drawer-overlay" onClick={onClose}>
+      <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: drawerWidth }}>
+        <div className="drawer-header">
+          <span className="drawer-title">员工详情</span>
+          <button className="drawer-close" onClick={onClose}>
+            <svg viewBox="0 0 16 16" fill="none">
+              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="drawer-body">
+          {/* 基本信息 */}
+          <div className="drawer-section-title">基本信息</div>
+          {renderField('工号', employee.empNo)}
+          {renderField('姓名', employee.name)}
+          {renderField('性别', GENDER_LABELS[employee.gender])}
+          {renderField('手机号', employee.phone)}
+          {renderField('邮箱', employee.email)}
+          {renderField('部门', getOrgNodeName(employee.departmentId))}
+          {renderField('团队', employee.teamId ? getOrgNodeName(employee.teamId) : '-')}
+          {renderField('职位', employee.position)}
+          {renderField('入职日期', employee.joinDate)}
+          {renderField('状态', EMP_STATUS_LABELS[employee.status])}
+
+          {/* 身份证信息 */}
+          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>身份证信息</div>
+          {renderField('身份证号', employee.idCardNo)}
+          {renderField('民族', employee.ethnicity)}
+          {renderField('出生日期', employee.birthDate)}
+          {renderField('籍贯', employee.nativePlace)}
+          {renderField('身份证住址', employee.idCardAddress)}
+          {employee.idCardImages && employee.idCardImages.length > 0 && (
+            <div style={{ padding: 'var(--space-2) 0' }}>
+              <div style={{ ...labelStyle, marginBottom: 'var(--space-2)' }}>身份证图片</div>
+              <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                {employee.idCardImages.map((img, i) => (
+                  <img key={i} src={img} alt={`身份证${i === 0 ? '正面' : '反面'}`} style={{ width: 120, height: 76, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-primary)' }} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 个人信息 */}
+          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>个人信息</div>
+          {renderField('身高（cm）', employee.height)}
+          {renderField('体重（kg）', employee.weight)}
+          {renderField('兴趣爱好', employee.hobbies)}
+          {renderField('本地住址', employee.localAddress)}
+
+          {/* 学历信息 */}
+          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>学历信息</div>
+          {renderField('学历', employee.education)}
+          {renderField('学位', employee.degree)}
+          {employee.educationRecords && employee.educationRecords.length > 0 ? (
+            <div style={{ padding: 'var(--space-2) 0' }}>
+              <div style={{ ...labelStyle, marginBottom: 'var(--space-2)' }}>学习经历</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                {employee.educationRecords.map((rec, i) => (
+                  <div key={i} style={{ padding: 'var(--space-2) var(--space-3)', background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)' }}>
+                    <span style={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)', marginRight: 'var(--space-2)' }}>
+                      {STAGE_LABELS[rec.stage]}
+                    </span>
+                    {rec.school}{rec.college ? ` · ${rec.college}` : ''}{rec.major ? ` · ${rec.major}` : ''}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            renderField('学习经历', '-')
+          )}
+
+          {/* 结算信息 */}
+          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>结算信息</div>
+          {renderField('户名', employee.settlement?.accountName)}
+          {renderField('卡号', employee.settlement?.accountNo)}
+          {renderField('开户银行', employee.settlement?.bankName)}
+          {renderField('开户行号', employee.settlement?.bankNo)}
+
+          {/* 合同文件 */}
+          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>合同文件</div>
+          {employee.contracts && employee.contracts.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: 'var(--space-2) 0' }}>
+              {employee.contracts.map((f, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-secondary)' }}>
+                  <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, color: '#CB405D', flexShrink: 0 }}>
+                    <path d="M4 1.5h5L13 5.5V14a.5.5 0 0 1-.5.5h-8A.5.5 0 0 1 4 14V2a.5.5 0 0 1 .5-.5z" stroke="currentColor" strokeWidth="1.2" />
+                  </svg>
+                  <a href={f.url} target="_blank" rel="noreferrer" style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--color-module-current-base)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={f.name}>
+                    {f.name}
+                  </a>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{f.uploadedAt}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            renderField('合同文件', '-')
+          )}
+
+          {/* 紧急联系人 */}
+          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>紧急联系人</div>
+          {renderField('联系人姓名', employee.emergencyContactName)}
+          {renderField('联系人电话', employee.emergencyContactPhone)}
+
+          {/* 其他 */}
+          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>其他</div>
+          {renderField('备注', employee.remark)}
+        </div>
+
+        <div className="drawer-footer">
+          <Button variant="ghost" onClick={onClose}>关闭</Button>
+          <Button onClick={() => onEdit(employee)}>编辑</Button>
         </div>
       </div>
     </div>

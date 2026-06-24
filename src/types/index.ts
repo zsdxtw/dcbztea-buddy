@@ -853,6 +853,43 @@ export interface OrgNode {
 /** 员工状态 */
 export type EmployeeStatus = 'active' | 'inactive' | 'probation';
 
+/** 学习经历阶段 */
+export type EducationStage = 'high_school' | 'college' | 'university';
+
+/** 学习经历条目 */
+export interface EducationRecord {
+  /** 阶段：高中 / 大专 / 大学 */
+  stage: EducationStage;
+  /** 学校 */
+  school: string;
+  /** 学院 */
+  college: string;
+  /** 专业 */
+  major: string;
+}
+
+/** 员工结算信息 */
+export interface EmployeeSettlement {
+  /** 卡号 */
+  accountNo: string;
+  /** 户名 */
+  accountName: string;
+  /** 开户银行 */
+  bankName: string;
+  /** 开户行号 */
+  bankNo: string;
+}
+
+/** 合同文件 */
+export interface ContractFile {
+  /** 文件名 */
+  name: string;
+  /** 文件 URL（ObjectURL 或外链） */
+  url: string;
+  /** 上传时间 */
+  uploadedAt: string;
+}
+
 /** 员工 */
 export interface Employee {
   id: string;
@@ -878,6 +915,52 @@ export interface Employee {
   status: EmployeeStatus;
   /** 备注 */
   remark?: string;
+
+  /* ── 身份证信息 ── */
+  /** 身份证号 */
+  idCardNo?: string;
+  /** 身份证图片（正面/反面，ObjectURL 或外链） */
+  idCardImages?: string[];
+  /** 身份证住址 */
+  idCardAddress?: string;
+  /** 民族 */
+  ethnicity?: string;
+  /** 籍贯 */
+  nativePlace?: string;
+  /** 出生日期 */
+  birthDate?: string;
+
+  /* ── 个人信息 ── */
+  /** 兴趣爱好 */
+  hobbies?: string;
+  /** 身高（cm） */
+  height?: number;
+  /** 体重（kg） */
+  weight?: number;
+  /** 本地住址 */
+  localAddress?: string;
+
+  /* ── 学历信息 ── */
+  /** 学历 */
+  education?: string;
+  /** 学位 */
+  degree?: string;
+  /** 学习经历（高中/大专/大学可多选） */
+  educationRecords?: EducationRecord[];
+
+  /* ── 结算信息 ── */
+  /** 结算信息 */
+  settlement?: EmployeeSettlement;
+
+  /* ── 合同文件 ── */
+  /** 合同文件列表（PDF，最多5个） */
+  contracts?: ContractFile[];
+
+  /* ── 紧急联系人 ── */
+  /** 紧急联系人姓名 */
+  emergencyContactName?: string;
+  /** 紧急联系人电话 */
+  emergencyContactPhone?: string;
 }
 
 /** 员工绩效统计（绩效金额 + 绩效利润） */
