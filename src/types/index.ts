@@ -819,3 +819,81 @@ export interface SalesOrderItem {
   /** 金额 = 数量 × 销售实价 */
   amount: string;
 }
+
+/* ════════════════════════════════════════
+ * 组织架构 & 员工管理
+ * ════════════════════════════════════════ */
+
+/** 组织节点类型：公司 / 部门 / 团队 */
+export type OrgNodeType = 'company' | 'department' | 'team';
+
+/** 组织架构节点 */
+export interface OrgNode {
+  id: string;
+  /** 节点类型 */
+  type: OrgNodeType;
+  /** 名称 */
+  name: string;
+  /** 父节点 ID（公司层为空） */
+  parentId: string | null;
+  /** 负责人姓名 */
+  leader?: string;
+  /** 排序号 */
+  sort: number;
+  /** 状态 */
+  status: 'active' | 'inactive';
+  /** 备注 */
+  remark?: string;
+}
+
+/** 员工角色 */
+export type EmployeeRole = 'manager' | 'salesperson' | 'follower' | 'staff';
+
+/** 员工状态 */
+export type EmployeeStatus = 'active' | 'inactive' | 'probation';
+
+/** 员工 */
+export interface Employee {
+  id: string;
+  /** 工号 */
+  empNo: string;
+  /** 姓名 */
+  name: string;
+  /** 性别 */
+  gender: 'male' | 'female';
+  /** 手机号 */
+  phone: string;
+  /** 邮箱 */
+  email?: string;
+  /** 部门 ID */
+  departmentId: string;
+  /** 团队 ID（可选） */
+  teamId?: string;
+  /** 职位 */
+  position: string;
+  /** 角色：客户经理 / 跟单员 / 普通员工 */
+  role: EmployeeRole;
+  /** 入职日期 */
+  joinDate: string;
+  /** 状态 */
+  status: EmployeeStatus;
+  /** 备注 */
+  remark?: string;
+}
+
+/** 员工销售绩效统计 */
+export interface EmployeePerformance {
+  employeeId: string;
+  employeeName: string;
+  departmentName: string;
+  position: string;
+  role: EmployeeRole;
+  /** 作为跟单员的销售金额（订单金额 × 40%） */
+  followerAmount: number;
+  /** 作为客户经理的销售金额（跟单员缺失时 × 40% + 所有订单 × 50%） */
+  managerAmount: number;
+  /** 总销售绩效金额 */
+  totalAmount: number;
+  /** 关联订单数 */
+  orderCount: number;
+}

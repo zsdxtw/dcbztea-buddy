@@ -203,6 +203,12 @@ const PersonnelTabIcon = () => (
 const TeaProfessionalIcon = () => (
   <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" strokeWidth="1.3"/><path d="M3 18a7 7 0 0114 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><path d="M14 4l2-2M16 4l-2-2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
 );
+const OrgChartIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><rect x="8" y="2" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="2" y="13" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="8" y="13" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><rect x="14" y="13" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.3"/><path d="M10 6v3M10 9H4v4M10 9h6v4" stroke="currentColor" strokeWidth="1.2"/></svg>
+);
+const EmployeeIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="6" r="3" stroke="currentColor" strokeWidth="1.3"/><path d="M1 17a6 6 0 0112 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><circle cx="15" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.2"/><path d="M13 16a4 4 0 015 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+);
 
 /* ── 模块配置 ── */
 
@@ -316,6 +322,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '系统',
     menus: [
       { key: 'settings-system', label: '系统设置', icon: <SystemSettingsIcon /> },
+      { key: 'settings-organization', label: '组织架构', icon: <OrgChartIcon /> },
       { key: 'settings-roles', label: '角色权限', icon: <RolesIcon /> },
       { key: 'settings-logs', label: '操作日志', icon: <LogsIcon /> },
       { key: 'settings-about', label: '关于', icon: <AboutIcon /> },
@@ -328,6 +335,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     key: ModuleKey.PERSONNEL,
     label: '人员',
     menus: [
+      { key: 'personnel-employee', label: '员工管理', icon: <EmployeeIcon /> },
       { key: 'personnel-tea-professional', label: '茶人管理', icon: <TeaProfessionalIcon /> },
     ],
   },
