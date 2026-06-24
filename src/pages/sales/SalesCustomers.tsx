@@ -156,7 +156,6 @@ export default function SalesCustomers() {
               </div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginLeft: 40 }}>
                 {t.desc}
-                {t.key === 'direct' && <span style={{ color: SECONDARY, marginLeft: 8 }}>含平台方 {withPlatform} 家</span>}
               </div>
             </div>
           );
