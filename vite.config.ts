@@ -8,6 +8,11 @@ export default defineConfig({
     host: true,
     open: false,
     strictPort: false,
+    allowedHosts: true,
+    cors: {
+      origin: true,
+      credentials: true,
+    },
     hmr: {
       host: 'localhost',
       port: 3000,
