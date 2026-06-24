@@ -11,6 +11,7 @@ import { TeaCategory, OrderStatus } from '../../types';
 import type { StatCardData, SalesOrderItem } from '../../types';
 import { PRICE_CUSTOMERS, getSalesDefaultPrice } from '../../data/prices';
 import { teaProducts } from '../../data/teaProducts';
+import { employees, getEmployeeName } from '../../data/organization';
 
 /* ── 工具函数 ── */
 function categoryToTeaCategory(category: string): TeaCategory {
@@ -92,6 +93,10 @@ interface SalesOrderRecord {
   remark: string;
   products: SalesOrderItem[];
   timeline: { time: string; event: string; operator: string }[];
+  /** 跟单人员工 ID */
+  followerEmpId?: string;
+  /** 跟单人姓名 */
+  followerName?: string;
 }
 
 const orderData: SalesOrderRecord[] = [
@@ -101,6 +106,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-12', status: OrderStatus.PENDING,
     contactPerson: '王经理', contactPhone: '0571-87651234', deliveryAddress: '杭州市西湖区龙井路88号',
     remark: '需冷藏运输，指定顺丰',
+    followerEmpId: 'emp-8', followerName: '王强',
     products: [
       { productId: '1', name: '明前龙井 — 特级', teaCategory: TeaCategory.GREEN, quantity: '20 kg', marketPrice: 580, defaultPrice: 452, actualSalesPrice: 452, priceSource: 'sales', amount: '¥ 23,200' },
       { productId: '2', name: '碧螺春 — 一级', teaCategory: TeaCategory.GREEN, quantity: '10 kg', marketPrice: 420, defaultPrice: 328, actualSalesPrice: 328, priceSource: 'sales', amount: '¥ 11,600' },
@@ -116,6 +122,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-11', status: OrderStatus.APPROVED,
     contactPerson: '赵总', contactPhone: '0599-51234567', deliveryAddress: '武夷山市度假区茶博园6号',
     remark: '长期合作客户，月结',
+    followerEmpId: 'emp-9', followerName: '张伟',
     products: [
       { productId: '7', name: '金骏眉 — 特级', teaCategory: TeaCategory.RED, quantity: '15 kg', marketPrice: 1280, defaultPrice: 1024, actualSalesPrice: 1024, priceSource: 'sales', amount: '¥ 36,000' },
     ],
@@ -131,6 +138,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-10', status: OrderStatus.SHIPPING,
     contactPerson: '林老板', contactPhone: '0768-2345678', deliveryAddress: '潮州市湘桥区太平路168号',
     remark: '分两批发货',
+    followerEmpId: 'emp-8', followerName: '王强',
     products: [
       { productId: '12', name: '凤凰单丛 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '25 kg', marketPrice: 560, defaultPrice: 426, actualSalesPrice: 426, priceSource: 'sales', amount: '¥ 28,000' },
       { productId: '10', name: '大红袍 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '15 kg', marketPrice: 720, defaultPrice: 547, actualSalesPrice: 547, priceSource: 'sales', amount: '¥ 16,800' },
@@ -148,6 +156,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-09', status: OrderStatus.COMPLETED,
     contactPerson: '张女士', contactPhone: '0593-5678901', deliveryAddress: '福鼎市太姥山镇茶都路22号',
     remark: '已签收，客户满意',
+    followerEmpId: undefined, followerName: undefined,
     products: [
       { productId: '13', name: '白毫银针 — 特级', teaCategory: TeaCategory.WHITE, quantity: '20 kg', marketPrice: 960, defaultPrice: 787, actualSalesPrice: 787, priceSource: 'sales', amount: '¥ 38,400' },
     ],
@@ -165,6 +174,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-08', status: OrderStatus.COMPLETED,
     contactPerson: '周经理', contactPhone: '0774-7234567', deliveryAddress: '梧州市万秀区西江路56号',
     remark: '季度采购，常规订单',
+    followerEmpId: 'emp-9', followerName: '张伟',
     products: [
       { productId: '33', name: '六堡茶 — 二级', teaCategory: TeaCategory.DARK, quantity: '30 kg', marketPrice: 280, defaultPrice: 210, actualSalesPrice: 210, priceSource: 'sales', amount: '¥ 10,800' },
       { productId: '18', name: '熟普洱 — 三级', teaCategory: TeaCategory.DARK, quantity: '20 kg', marketPrice: 260, defaultPrice: 195, actualSalesPrice: 195, priceSource: 'sales', amount: '¥ 7,200' },
@@ -183,6 +193,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-07', status: OrderStatus.PENDING,
     contactPerson: '何老板', contactPhone: '0730-8234567', deliveryAddress: '岳阳市君山区洞庭大道99号',
     remark: '新客户首单，需提供样品检测报告',
+    followerEmpId: undefined, followerName: undefined,
     products: [
       { productId: '16', name: '君山银针 — 特级', teaCategory: TeaCategory.YELLOW, quantity: '10 kg', marketPrice: 880, defaultPrice: 695, actualSalesPrice: 695, priceSource: 'sales', amount: '¥ 17,600' },
     ],
@@ -196,6 +207,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-06', status: OrderStatus.APPROVED,
     contactPerson: '江总', contactPhone: '0599-5234567', deliveryAddress: '武夷山市星村镇茶场路12号',
     remark: '有机认证产品，需附证书',
+    followerEmpId: 'emp-8', followerName: '王强',
     products: [
       { productId: '6', name: '正山小种 — 特级', teaCategory: TeaCategory.RED, quantity: '25 kg', marketPrice: 480, defaultPrice: 384, actualSalesPrice: 384, priceSource: 'sales', amount: '¥ 24,000' },
     ],
@@ -211,6 +223,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-05', status: OrderStatus.SHIPPING,
     contactPerson: '吴经理', contactPhone: '0595-2345678', deliveryAddress: '安溪县凤城镇茶都路188号',
     remark: '清香型，真空包装',
+    followerEmpId: 'emp-9', followerName: '张伟',
     products: [
       { productId: '11', name: '铁观音 — 一级', teaCategory: TeaCategory.OOLONG, quantity: '40 kg', marketPrice: 320, defaultPrice: 243, actualSalesPrice: 243, priceSource: 'sales', amount: '¥ 25,600' },
       { productId: '11', name: '铁观音 — 二级', teaCategory: TeaCategory.OOLONG, quantity: '20 kg', marketPrice: 320, defaultPrice: 243, actualSalesPrice: 243, priceSource: 'sales', amount: '¥ 12,800' },
@@ -228,6 +241,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-04', status: OrderStatus.COMPLETED,
     contactPerson: '王经理', contactPhone: '0571-87651234', deliveryAddress: '杭州市西湖区龙井路88号',
     remark: '月度补货订单',
+    followerEmpId: 'emp-8', followerName: '王强',
     products: [
       { productId: '9', name: '祁门红茶 — 特级', teaCategory: TeaCategory.RED, quantity: '35 kg', marketPrice: 520, defaultPrice: 416, actualSalesPrice: 416, priceSource: 'sales', amount: '¥ 36,400' },
     ],
@@ -245,6 +259,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-03', status: OrderStatus.CANCELLED,
     contactPerson: '赵总', contactPhone: '0599-51234567', deliveryAddress: '武夷山市度假区茶博园6号',
     remark: '客户取消，改订茉莉花茶',
+    followerEmpId: undefined, followerName: undefined,
     products: [
       { productId: '24', name: '玫瑰花茶 — 一级', teaCategory: TeaCategory.FLOWER, quantity: '20 kg', marketPrice: 158, defaultPrice: 122, actualSalesPrice: 122, priceSource: 'sales', amount: '¥ 5,120' },
     ],
@@ -300,7 +315,7 @@ export default function SalesOrders() {
 
         <Card>
           <Table
-            headers={['订单编号', '客户', '客户类型', '商品', '茶类', '数量', '单价', '金额', '下单日期', '状态', '操作']}
+            headers={['订单编号', '客户', '客户类型', '跟单人', '商品', '茶类', '数量', '单价', '金额', '下单日期', '状态', '操作']}
             rows={orders.map((o) => [
               <span className="mono">{o.code}</span>,
               o.customer,
@@ -310,6 +325,7 @@ export default function SalesOrders() {
                 color: o.customerType === 'direct' ? '#1565C0' : o.customerType === 'channel' ? '#E65100' : '#2E7D32',
                 border: `1px solid ${o.customerType === 'direct' ? '#90CAF9' : o.customerType === 'channel' ? '#FFCC80' : '#A5D6A7'}`,
               }}>{CUSTOMER_TYPE_LABELS[o.customerType]}</span>,
+              <span key="follower" style={{ fontSize: 'var(--text-sm)', color: o.followerName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.followerName ?? '—'}</span>,
               o.product,
               <Tag category={o.teaCategory} />,
               <span className="mono">{o.quantity}</span>,
@@ -364,6 +380,10 @@ export default function SalesOrders() {
                       color: selectedOrder.customerType === 'direct' ? '#1565C0' : selectedOrder.customerType === 'channel' ? '#E65100' : '#2E7D32',
                       border: `1px solid ${selectedOrder.customerType === 'direct' ? '#90CAF9' : selectedOrder.customerType === 'channel' ? '#FFCC80' : '#A5D6A7'}`,
                     }}>{CUSTOMER_TYPE_LABELS[selectedOrder.customerType]}</span>
+                  </div>
+                  <div>
+                    <label className="drawer-label">跟单人</label>
+                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.followerName ?? '—'}</div>
                   </div>
                   <div>
                     <label className="drawer-label">下单日期</label>
@@ -492,6 +512,7 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
   const [quantity, setQuantity] = useState('');
   const [actualSalesPrice, setActualSalesPrice] = useState('');
   const [orderDate, setOrderDate] = useState(new Date().toISOString().slice(0, 10));
+  const [followerEmpId, setFollowerEmpId] = useState('');
   const [contactPerson, setContactPerson] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
@@ -540,6 +561,8 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
       contactPhone: contactPhone || '—',
       deliveryAddress: deliveryAddress || '—',
       remark,
+      followerEmpId: followerEmpId || undefined,
+      followerName: followerEmpId ? getEmployeeName(followerEmpId) : undefined,
       products: [{
         productId: selectedProduct.id,
         name: `${selectedProduct.name} — ${selectedProduct.grade}`,
@@ -670,6 +693,13 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
             <div className="drawer-form-field">
               <label className="drawer-label">下单日期 *</label>
               <input type="date" className="filter-input" style={{ width: '100%' }} value={orderDate} onChange={(e) => setOrderDate(e.target.value)} />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">跟单人</label>
+              <select className="filter-select" style={{ width: '100%' }} value={followerEmpId} onChange={(e) => setFollowerEmpId(e.target.value)}>
+                <option value="">请选择</option>
+                {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}（{emp.position}）</option>)}
+              </select>
             </div>
             <div className="drawer-form-field">
               <label className="drawer-label">联系人</label>

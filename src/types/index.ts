@@ -595,6 +595,8 @@ export interface PlatformItem {
   district?: string;
   cooperationDate: string;
   commissionRate: string;
+  /** 对接人员工 ID（负责该平台客户的拓展与维护） */
+  liaisonEmpId?: string;
   bankAccounts: PlatformBankAccount[];
   invoiceInfos: PlatformInvoiceInfo[];
   status: 'active' | 'inactive';
@@ -626,6 +628,8 @@ export interface CustomerItem {
   totalAmount: number;
   /** 直营客户关联的平台ID列表；渠道客户为空 */
   platformIds: string[];
+  /** 对接人员工 ID（负责该客户的拓展与维护） */
+  liaisonEmpId?: string;
   cooperationDate: string;
   status: 'active' | 'inactive';
   settlementMethod?: string;
@@ -846,9 +850,6 @@ export interface OrgNode {
   remark?: string;
 }
 
-/** 员工角色 */
-export type EmployeeRole = 'manager' | 'salesperson' | 'follower' | 'staff';
-
 /** 员工状态 */
 export type EmployeeStatus = 'active' | 'inactive' | 'probation';
 
@@ -871,8 +872,6 @@ export interface Employee {
   teamId?: string;
   /** 职位 */
   position: string;
-  /** 角色：客户经理 / 跟单员 / 普通员工 */
-  role: EmployeeRole;
   /** 入职日期 */
   joinDate: string;
   /** 状态 */
@@ -887,17 +886,16 @@ export interface EmployeePerformance {
   employeeName: string;
   departmentName: string;
   position: string;
-  role: EmployeeRole;
-  /** 绩效金额 - 作为跟单员的销售金额（订单金额 × 40%） */
+  /** 绩效金额 - 作为跟单人的销售金额（订单金额 × 40%） */
   followerAmount: number;
-  /** 绩效金额 - 作为客户经理的销售金额（跟单员缺失时 × 40% + 所有订单 × 50%） */
-  managerAmount: number;
+  /** 绩效金额 - 作为对接人的销售金额（跟单人缺失时 × 40% + 所有订单 × 50%） */
+  liaisonAmount: number;
   /** 绩效金额总额 */
   totalAmount: number;
-  /** 绩效利润 - 作为跟单员的利润金额（订单利润 × 40%） */
+  /** 绩效利润 - 作为跟单人的利润金额（订单利润 × 40%） */
   followerProfit: number;
-  /** 绩效利润 - 作为客户经理的利润金额（订单利润 × 40%/50%） */
-  managerProfit: number;
+  /** 绩效利润 - 作为对接人的利润金额（订单利润 × 40%/50%） */
+  liaisonProfit: number;
   /** 绩效利润总额 */
   totalProfit: number;
   /** 关联订单数 */

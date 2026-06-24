@@ -12,13 +12,11 @@ import {
   employees as initialEmployees,
   calculateEmployeePerformance,
   getOrgNodeName,
-  ROLE_LABELS,
   EMP_STATUS_LABELS,
 } from '../../data/organization';
 import type {
   Employee,
   EmployeePerformance,
-  EmployeeRole,
   EmployeeStatus,
   StatCardData,
   StatusVariant,
@@ -39,37 +37,6 @@ function empStatusVariant(status: EmployeeStatus): StatusVariant {
       return 'info';
     default:
       return 'default';
-  }
-}
-
-/** 角色标签样式：客户经理用模块主色、跟单员用辅色（鹅黄） */
-function roleTagStyle(role: EmployeeRole): CSSProperties {
-  switch (role) {
-    case 'manager':
-      return {
-        background: 'var(--color-module-current-lightest)',
-        color: 'var(--color-module-current-base)',
-        border: '1px solid var(--color-module-current-base)',
-      };
-    case 'follower':
-      return {
-        background: 'var(--color-module-personnel-secondary)',
-        color: '#6B5A1A',
-        border: '1px solid #E0C94A',
-      };
-    case 'salesperson':
-      return {
-        background: 'var(--color-bg-tertiary)',
-        color: 'var(--color-text-secondary)',
-        border: '1px solid var(--color-border-primary)',
-      };
-    case 'staff':
-    default:
-      return {
-        background: 'var(--color-bg-tertiary)',
-        color: 'var(--color-text-tertiary)',
-        border: '1px solid var(--color-border-primary)',
-      };
   }
 }
 
@@ -107,8 +74,8 @@ export default function PersonnelEmployee() {
   const stats: StatCardData[] = useMemo(() => {
     const total = employeeList.length;
     const active = employeeList.filter((e) => e.status === 'active').length;
-    const managers = employeeList.filter((e) => e.role === 'manager').length;
-    const followers = employeeList.filter((e) => e.role === 'follower').length;
+    const probation = employeeList.filter((e) => e.status === 'probation').length;
+    const inactive = employeeList.filter((e) => e.status === 'inactive').length;
     return [
       {
         label: '员工总数',
@@ -125,17 +92,17 @@ export default function PersonnelEmployee() {
         icon: <IconActive />,
       },
       {
-        label: '客户经理数',
-        value: String(managers),
+        label: '试用期员工',
+        value: String(probation),
         unit: '人',
-        trend: { direction: 'up', value: '负责客户拓展' },
+        trend: { direction: 'up', value: '待转正' },
         icon: <IconManager />,
       },
       {
-        label: '跟单员数',
-        value: String(followers),
+        label: '离职员工',
+        value: String(inactive),
         unit: '人',
-        trend: { direction: 'up', value: '负责订单跟单' },
+        trend: { direction: 'down', value: '已离职' },
         icon: <IconFollower />,
       },
     ];
@@ -251,7 +218,6 @@ function EmployeeListTab({
 }) {
   const [keyword, setKeyword] = useState('');
   const [deptFilter, setDeptFilter] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
   const departments = useMemo(() => orgNodes.filter((n) => n.type === 'department'), []);
@@ -261,11 +227,10 @@ function EmployeeListTab({
     return employeeList.filter((e) => {
       if (kw && !e.name.toLowerCase().includes(kw) && !e.empNo.toLowerCase().includes(kw)) return false;
       if (deptFilter && e.departmentId !== deptFilter) return false;
-      if (roleFilter && e.role !== roleFilter) return false;
       if (statusFilter && e.status !== statusFilter) return false;
       return true;
     });
-  }, [employeeList, keyword, deptFilter, roleFilter, statusFilter]);
+  }, [employeeList, keyword, deptFilter, statusFilter]);
 
   return (
     <div>
@@ -287,17 +252,6 @@ function EmployeeListTab({
           <option value="">全部部门</option>
           {departments.map((d) => (
             <option key={d.id} value={d.id}>{d.name}</option>
-          ))}
-        </select>
-        <select
-          className="filter-select"
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          style={{ width: 140 }}
-        >
-          <option value="">全部角色</option>
-          {(Object.entries(ROLE_LABELS) as [EmployeeRole, string][]).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
           ))}
         </select>
         <select
@@ -328,7 +282,7 @@ function EmployeeListTab({
           <EmptyState text="暂无符合条件的员工，可调整筛选条件或新增员工。" />
         ) : (
           <Table
-            headers={['工号', '姓名', '性别', '部门', '团队', '职位', '角色', '手机号', '入职日期', '状态', '操作']}
+            headers={['工号', '姓名', '性别', '部门', '团队', '职位', '手机号', '入职日期', '状态', '操作']}
             rows={filtered.map((emp) => [
               <span key="empNo" className="mono" style={{ fontSize: 'var(--text-sm)' }}>{emp.empNo}</span>,
               <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{emp.name}</span>,
@@ -336,19 +290,6 @@ function EmployeeListTab({
               getOrgNodeName(emp.departmentId),
               emp.teamId ? getOrgNodeName(emp.teamId) : <span key="team" style={{ color: 'var(--color-text-tertiary)' }}>-</span>,
               emp.position,
-              <span
-                key="role"
-                style={{
-                  display: 'inline-block',
-                  padding: '1px 8px',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 'var(--font-medium)',
-                  ...roleTagStyle(emp.role),
-                }}
-              >
-                {ROLE_LABELS[emp.role]}
-              </span>,
               <span key="phone" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{emp.phone}</span>,
               emp.joinDate,
               <StatusTag key="status" variant={empStatusVariant(emp.status)} label={EMP_STATUS_LABELS[emp.status]} />,
@@ -392,18 +333,18 @@ function PerformanceTab() {
           <div>
             <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)', marginBottom: 'var(--space-1)' }}>绩效金额（基于订单金额）</div>
             <ul style={{ margin: 0, paddingLeft: 'var(--space-5)', fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
-              <li>跟单员：订单金额 × 40%</li>
-              <li>客户经理（无跟单员时）：订单金额 × 40%</li>
-              <li>客户经理（所有订单）：订单金额 × 50%</li>
+              <li>跟单人：订单金额 × 40%</li>
+              <li>对接人（无跟单人时）：订单金额 × 40%</li>
+              <li>对接人（所有订单）：订单金额 × 50%</li>
             </ul>
           </div>
           <div>
             <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-personnel-secondary)', marginBottom: 'var(--space-1)' }}>绩效利润（基于订单利润）</div>
             <ul style={{ margin: 0, paddingLeft: 'var(--space-5)', fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
               <li>订单利润 =（销售实价 - 采购实价）× 90%</li>
-              <li>跟单员：订单利润 × 40%</li>
-              <li>客户经理（无跟单员时）：订单利润 × 40%</li>
-              <li>客户经理（所有订单）：订单利润 × 50%</li>
+              <li>跟单人：订单利润 × 40%</li>
+              <li>对接人（无跟单人时）：订单利润 × 40%</li>
+              <li>对接人（所有订单）：订单利润 × 50%</li>
             </ul>
           </div>
         </div>
@@ -414,7 +355,7 @@ function PerformanceTab() {
           <EmptyState text="暂无绩效数据。" />
         ) : (
           <Table
-            headers={['排名', '员工', '部门', '角色', '跟单金额(¥)', '经理金额(¥)', '金额合计(¥)', '跟单利润(¥)', '经理利润(¥)', '利润合计(¥)', '订单数']}
+            headers={['排名', '员工', '部门', '跟单金额(¥)', '对接金额(¥)', '金额合计(¥)', '跟单利润(¥)', '对接利润(¥)', '利润合计(¥)', '订单数']}
             rows={performanceData.map((perf, idx) => {
               const rank = idx + 1;
               return [
@@ -436,24 +377,11 @@ function PerformanceTab() {
                 </div>,
                 <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{perf.employeeName}</span>,
                 perf.departmentName,
-                <span
-                  key="role"
-                  style={{
-                    display: 'inline-block',
-                    padding: '1px 8px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--text-xs)',
-                    fontWeight: 'var(--font-medium)',
-                    ...roleTagStyle(perf.role),
-                  }}
-                >
-                  {ROLE_LABELS[perf.role]}
-                </span>,
                 <span key="follAmt" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.followerAmount)}</span>,
-                <span key="mgrAmt" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.managerAmount)}</span>,
+                <span key="liaAmt" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.liaisonAmount)}</span>,
                 <span key="totAmt" style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{formatYuan(perf.totalAmount)}</span>,
                 <span key="follPft" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.followerProfit)}</span>,
-                <span key="mgrPft" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.managerProfit)}</span>,
+                <span key="liaPft" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.liaisonProfit)}</span>,
                 <span key="totPft" style={{ fontWeight: 'var(--font-semibold)', color: 'var(--color-module-personnel-secondary)' }}>{formatYuan(perf.totalProfit)}</span>,
                 <span key="count" style={{ color: 'var(--color-text-secondary)' }}>{perf.orderCount}</span>,
               ];
@@ -504,7 +432,6 @@ function EditEmployeeDrawer({
       departmentId: '',
       teamId: '',
       position: '',
-      role: 'staff',
       joinDate: new Date().toISOString().slice(0, 10),
       status: 'probation',
       remark: '',
@@ -638,19 +565,6 @@ function EditEmployeeDrawer({
             </div>
           </div>
           <div className="drawer-form-row">
-            <div className="drawer-form-field">
-              <label className="drawer-label">角色</label>
-              <select
-                className="filter-select"
-                style={{ width: '100%' }}
-                value={form.role}
-                onChange={(e) => update('role', e.target.value as EmployeeRole)}
-              >
-                {(Object.entries(ROLE_LABELS) as [EmployeeRole, string][]).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
-                ))}
-              </select>
-            </div>
             <div className="drawer-form-field">
               <label className="drawer-label">入职日期</label>
               <input

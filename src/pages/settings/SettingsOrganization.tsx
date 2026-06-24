@@ -11,7 +11,6 @@ import {
   getOrgTree,
   getEmployeesByNode,
   getOrgNodeName,
-  ROLE_LABELS,
   EMP_STATUS_LABELS,
 } from '../../data/organization';
 import type { OrgNode, Employee, OrgNodeType, StatCardData, StatusVariant } from '../../types';
@@ -571,13 +570,12 @@ function NodeDetailPanel(props: NodeDetailPanelProps) {
           </div>
         ) : (
           <Table
-            headers={['工号', '姓名', '职位', '角色', '手机号', '状态', canManageEmployees ? '操作' : ''].filter(Boolean)}
+            headers={['工号', '姓名', '职位', '手机号', '状态', canManageEmployees ? '操作' : ''].filter(Boolean)}
             rows={employees.map((e) => {
               const cells: React.ReactNode[] = [
                 <span className="mono" style={{ fontWeight: 'var(--font-medium)' }}>{e.empNo}</span>,
                 e.name,
                 <span style={{ color: 'var(--color-module-current-base)' }}>{e.position}</span>,
-                ROLE_LABELS[e.role] ?? e.role,
                 <span className="mono">{e.phone}</span>,
                 <StatusTag variant={empStatusToVariant(e.status)} label={EMP_STATUS_LABELS[e.status] ?? e.status} />,
               ];
