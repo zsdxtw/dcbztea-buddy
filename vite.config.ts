@@ -5,13 +5,24 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: '0.0.0.0',
+    host: true,
     open: false,
-    strictPort: true,
+    strictPort: false,
+    hmr: {
+      host: 'localhost',
+      port: 3000,
+    },
+    watch: {
+      usePolling: true,
+      interval: 100,
+    },
   },
   preview: {
     port: 3000,
-    host: '0.0.0.0',
-    strictPort: true,
+    host: true,
+    strictPort: false,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom', 'zustand'],
   },
 });
