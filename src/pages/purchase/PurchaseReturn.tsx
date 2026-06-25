@@ -222,7 +222,10 @@ export default function PurchaseReturn() {
               <span className="mono">{r.amount}</span>,
               r.reason,
               <StatusTag variant={returnStatusToVariant(r.status)} label={returnStatusLabel(r.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(r)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(r)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -231,7 +234,7 @@ export default function PurchaseReturn() {
       {/* 退货详情抽屉 */}
       {showDetail && selectedReturn && (
         <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 680 }}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
             {/* 头部 */}
             <div className="drawer-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>

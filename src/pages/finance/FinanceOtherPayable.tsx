@@ -89,12 +89,15 @@ export default function FinanceOtherPayable() {
             headers={['单号', '往来单位', '事由', '金额', '应付日期', '状态', '操作']}
             rows={payableItems.map((p) => [
               <span className="mono">{p.code}</span>,
-              <span style={{ fontWeight: 'var(--font-medium)' }}>{p.partner}</span>,
+              <span className="cell-emph">{p.partner}</span>,
               <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${reasonColor(p.reason)}12`, color: reasonColor(p.reason), border: `1px solid ${reasonColor(p.reason)}30` }}>{p.reason}</span>,
               <span className="mono">{p.amount}</span>,
               <span className="mono">{p.dueDate}</span>,
               <StatusTag variant={payableStatusToVariant(p.status)} label={payableStatusLabel(p.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(p)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(p)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -102,7 +105,7 @@ export default function FinanceOtherPayable() {
 
       {showDetail && selectedItem && (
         <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 560 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">应付详情</span>
               <button className="drawer-close" onClick={() => setShowDetail(false)}>

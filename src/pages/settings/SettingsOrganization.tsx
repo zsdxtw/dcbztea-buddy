@@ -573,7 +573,7 @@ function NodeDetailPanel(props: NodeDetailPanelProps) {
             headers={['工号', '姓名', '职位', '手机号', '状态', canManageEmployees ? '操作' : ''].filter(Boolean)}
             rows={employees.map((e) => {
               const cells: React.ReactNode[] = [
-                <span className="mono" style={{ fontWeight: 'var(--font-medium)' }}>{e.empNo}</span>,
+                <span className="cell-mono-emph">{e.empNo}</span>,
                 e.name,
                 <span style={{ color: 'var(--color-module-current-base)' }}>{e.position}</span>,
                 <span className="mono">{e.phone}</span>,
@@ -581,14 +581,16 @@ function NodeDetailPanel(props: NodeDetailPanelProps) {
               ];
               if (canManageEmployees) {
                 cells.push(
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    style={{ color: 'var(--color-semantic-error)' }}
-                    onClick={() => onRemoveEmployee(e.id)}
-                  >
-                    移出
-                  </Button>,
+                  <div className="row-actions">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      style={{ color: 'var(--color-semantic-error)' }}
+                      onClick={() => onRemoveEmployee(e.id)}
+                    >
+                      移出
+                    </Button>
+                  </div>,
                 );
               }
               return cells;
@@ -640,7 +642,7 @@ function EditNodeDrawer(props: EditNodeDrawerProps) {
 
   return (
     <div className="drawer-overlay" onClick={onClose}>
-      <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 520 }}>
+      <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
         <div className="drawer-header">
           <span className="drawer-title">{titleMap[drawer.mode]}</span>
           <button className="drawer-close" onClick={onClose}>×</button>

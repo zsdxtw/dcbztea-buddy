@@ -144,6 +144,8 @@
   --color-module-current-light: var(--color-module-dashboard-light);
   --color-module-current-dark: var(--color-module-dashboard-dark);
   --color-module-current-darkest: var(--color-module-dashboard-darkest);
+  /* 当前模块辅色调（用于删除按钮等强调场景），默认回退到语义错误色 */
+  --color-module-current-secondary: var(--color-semantic-error);
 }
 
 [data-module="dashboard"] {
@@ -152,6 +154,7 @@
   --color-module-current-light: var(--color-module-dashboard-light);
   --color-module-current-dark: var(--color-module-dashboard-dark);
   --color-module-current-darkest: var(--color-module-dashboard-darkest);
+  --color-module-current-secondary: var(--color-module-dashboard-secondary);
 }
 [data-module="purchase"] {
   --color-module-current-base: var(--color-module-purchase-base);
@@ -159,6 +162,7 @@
   --color-module-current-light: var(--color-module-purchase-light);
   --color-module-current-dark: var(--color-module-purchase-dark);
   --color-module-current-darkest: var(--color-module-purchase-darkest);
+  --color-module-current-secondary: var(--color-module-purchase-secondary);
 }
 [data-module="sales"] {
   --color-module-current-base: var(--color-module-sales-base);
@@ -166,6 +170,7 @@
   --color-module-current-light: var(--color-module-sales-light);
   --color-module-current-dark: var(--color-module-sales-dark);
   --color-module-current-darkest: var(--color-module-sales-darkest);
+  --color-module-current-secondary: var(--color-module-sales-secondary);
 }
 [data-module="inventory"] {
   --color-module-current-base: var(--color-module-inventory-base);
@@ -173,6 +178,7 @@
   --color-module-current-light: var(--color-module-inventory-light);
   --color-module-current-dark: var(--color-module-inventory-dark);
   --color-module-current-darkest: var(--color-module-inventory-darkest);
+  --color-module-current-secondary: var(--color-module-inventory-secondary);
 }
 [data-module="product"] {
   --color-module-current-base: var(--color-module-product-base);
@@ -180,6 +186,7 @@
   --color-module-current-light: var(--color-module-product-light);
   --color-module-current-dark: var(--color-module-product-dark);
   --color-module-current-darkest: var(--color-module-product-darkest);
+  --color-module-current-secondary: var(--color-module-product-secondary);
 }
 [data-module="finance"] {
   --color-module-current-base: var(--color-module-finance-base);
@@ -187,6 +194,7 @@
   --color-module-current-light: var(--color-module-finance-light);
   --color-module-current-dark: var(--color-module-finance-dark);
   --color-module-current-darkest: var(--color-module-finance-darkest);
+  --color-module-current-secondary: var(--color-module-finance-secondary);
 }
 [data-module="statistics"] {
   --color-module-current-base: var(--color-module-statistics-base);
@@ -716,7 +724,7 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ── 抽屉面板 ── */
 .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1000; display: flex; justify-content: flex-end; animation: fadeIn 0.2s ease; }
-.drawer-panel { background: var(--color-neutral-0); width: 780px; max-width: 90vw; height: 100vh; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,0.1); animation: slideInRight 0.25s ease; }
+.drawer-panel { background: var(--color-neutral-0); width: 66.66vw; min-width: 1200px; max-width: 95vw; height: 100vh; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,0.1); animation: slideInRight 0.25s ease; }
 .drawer-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--color-neutral-200); flex-shrink: 0; }
 .drawer-title { font-size: var(--text-lg); font-weight: var(--font-semibold); color: var(--color-neutral-800); }
 .drawer-close { background: none; border: none; cursor: pointer; color: var(--color-neutral-400); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); transition: var(--transition-fast); }
@@ -724,7 +732,8 @@ tbody tr:last-child td { border-bottom: none; }
 .drawer-close svg { width: 16px; height: 16px; }
 .drawer-body { flex: 1; overflow-y: auto; padding: var(--space-6); }
 .drawer-footer { display: flex; justify-content: flex-end; gap: var(--space-3); padding: var(--space-4) var(--space-6); border-top: 1px solid var(--color-neutral-200); flex-shrink: 0; }
-.drawer-section-title { font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--color-neutral-700); margin: var(--space-5) 0 var(--space-3); padding-bottom: var(--space-2); border-bottom: 1px solid var(--color-neutral-100); }
+.drawer-section-title { font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--color-neutral-700); margin: var(--space-5) 0 var(--space-3); padding: 0 0 var(--space-2) var(--space-3); border-bottom: 1px solid var(--color-neutral-100); position: relative; }
+.drawer-section-title::before { content: ''; position: absolute; left: 0; top: 1px; bottom: calc(var(--space-2) + 1px); width: 3px; border-radius: var(--radius-xs); background: var(--color-module-current-base); transition: background var(--duration-module) var(--ease-default); }
 .drawer-section-title:first-child { margin-top: 0; }
 .drawer-label { display: block; font-size: var(--text-sm); font-weight: var(--font-medium); color: var(--color-neutral-600); margin-bottom: var(--space-1); }
 .drawer-form-row { display: flex; gap: var(--space-4); margin-bottom: var(--space-4); }
@@ -744,3 +753,80 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ── 图片设为展示图悬停提示 ── */
 div:hover > .img-hover-label { opacity: 1 !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+ * 列表页 / 详情页 统一规则样式
+ * ═══════════════════════════════════════════════════════════════ */
+
+/* ── 列表单元格：强调（编号、名称等） ── */
+.cell-emph { font-weight: var(--font-medium); color: var(--color-neutral-800); }
+.cell-mono-emph { font-family: var(--font-family-mono); font-weight: var(--font-medium); color: var(--color-neutral-800); }
+.cell-muted { font-size: var(--text-sm); color: var(--color-neutral-500); }
+/* 操作栏按钮组 */
+.row-actions { display: flex; align-items: center; gap: var(--space-1); }
+.row-actions .btn-ghost { height: 26px; padding: 0 var(--space-2); font-size: var(--text-sm); }
+.row-actions .btn-ghost.btn-row-danger { color: var(--color-module-current-secondary); }
+.row-actions .btn-ghost.btn-row-danger:hover { background: var(--color-module-current-secondary); color: var(--color-neutral-0); opacity: 0.9; }
+
+/* ── 辅色调删除按钮（模块辅色，用于列表/工具栏删除） ── */
+.btn-danger { background: var(--color-module-current-secondary); color: var(--color-neutral-0); box-shadow: 0 1px 2px rgba(0,0,0,0.06); transition: var(--transition-fast); }
+.btn-danger:hover { filter: brightness(0.92); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+/* ── 分类/页面标签卡片 ── */
+/* 不带介绍：紧凑型标签卡 */
+.tab-card-simple {
+  display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg); border: 2px solid var(--color-neutral-200); background: var(--color-neutral-0);
+  cursor: pointer; transition: var(--transition-fast); font-size: var(--text-sm); font-weight: var(--font-medium);
+  color: var(--color-neutral-600);
+}
+.tab-card-simple:hover { border-color: var(--color-module-current-light); }
+.tab-card-simple.active { border-color: var(--color-module-current-base); background: var(--color-module-current-lightest); color: var(--color-module-current-base); }
+.tab-card-simple-count { margin-left: auto; font-family: var(--font-family-mono); font-size: var(--text-xs); color: var(--color-neutral-400); }
+.tab-card-simple.active .tab-card-simple-count { color: var(--color-module-current-base); }
+
+/* 带介绍：标题 + 描述 + 数量 */
+.tab-card-desc {
+  cursor: pointer; border-radius: var(--radius-lg); padding: var(--space-5);
+  border: 2px solid var(--color-neutral-200); background: var(--color-neutral-0);
+  box-shadow: var(--shadow-sm); transition: var(--transition-fast);
+}
+.tab-card-desc:hover { border-color: var(--color-module-current-light); }
+.tab-card-desc.active { border-color: var(--color-module-current-base); background: color-mix(in srgb, var(--color-module-current-base) 3%, transparent); }
+.tab-card-desc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-1); }
+.tab-card-desc-title-wrap { display: flex; align-items: center; gap: var(--space-2); }
+.tab-card-desc-icon { width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-module-current-lightest); display: flex; align-items: center; justify-content: center; color: var(--color-module-current-base); transition: var(--transition-fast); }
+.tab-card-desc-icon svg { width: 18px; height: 18px; }
+.tab-card-desc-title { font-weight: var(--font-semibold); font-size: var(--text-base); color: var(--color-neutral-800); }
+.tab-card-desc.active .tab-card-desc-title { color: var(--color-module-current-base); }
+.tab-card-desc-count { font-size: var(--text-xl); font-weight: var(--font-bold); color: var(--color-neutral-500); }
+.tab-card-desc.active .tab-card-desc-count { color: var(--color-module-current-base); }
+.tab-card-desc-desc { font-size: var(--text-xs); color: var(--color-neutral-500); margin-left: 44px; }
+
+/* ── 详情信息网格（查看态） ── */
+.detail-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4) var(--space-6); }
+.detail-info-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.detail-info-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.detail-info-item { min-width: 0; }
+.detail-info-item.span-2 { grid-column: span 2; }
+.detail-info-item.span-3 { grid-column: span 3; }
+.detail-info-item .drawer-label { margin-bottom: var(--space-1); }
+.detail-info-value { font-size: var(--text-sm); color: var(--color-neutral-800); line-height: var(--leading-base); word-break: break-all; }
+.detail-info-value.emph { font-weight: var(--font-medium); }
+.detail-info-value.mono { font-family: var(--font-family-mono); font-weight: var(--font-medium); }
+
+/* ── 详情抽屉头部徽标 ── */
+.drawer-header-badge { width: 40px; height: 40px; border-radius: var(--radius-lg); background: var(--color-module-current-lightest); display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); font-weight: var(--font-bold); color: var(--color-module-current-base); flex-shrink: 0; transition: var(--transition-module); }
+.drawer-header-sub { font-size: var(--text-xs); color: var(--color-neutral-500); margin-top: 2px; }
+
+/* ── 详情抽屉编辑表单行（兼容旧 drawer-form-row） ── */
+.drawer-edit-row { display: flex; gap: var(--space-4); margin-bottom: var(--space-4); }
+.drawer-edit-row.col-stack { flex-direction: column; gap: var(--space-3); }
+.drawer-edit-field { flex: 1; min-width: 0; }
+.drawer-edit-field .filter-input, .drawer-edit-field .filter-select { width: 100%; }
+
+/* 详情内嵌表格 */
+.detail-inline-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); border: 1px solid var(--color-neutral-200); border-radius: var(--radius-md); overflow: hidden; }
+.detail-inline-table thead th { background: var(--color-neutral-100); padding: var(--space-2) var(--space-3); text-align: left; font-weight: var(--font-medium); color: var(--color-neutral-600); font-size: var(--text-sm); white-space: nowrap; }
+.detail-inline-table tbody td { padding: var(--space-2) var(--space-3); border-top: 1px solid var(--color-neutral-150); color: var(--color-neutral-700); }
+.detail-inline-table tbody tr:hover { background: var(--color-neutral-50); }

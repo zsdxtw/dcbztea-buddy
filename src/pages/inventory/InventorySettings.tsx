@@ -149,7 +149,7 @@ export default function InventorySettings() {
             <Table
               headers={['仓库名称', '仓库编码', '地址', '负责人', '电话', '默认', '状态', '操作']}
               rows={ownList.map(w => [
-                <span style={{ fontWeight: 'var(--font-medium)' }}>{w.name}</span>,
+                <span className="cell-emph">{w.name}</span>,
                 <span className="mono">{w.code}</span>,
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-600)' }}>{[w.province, w.city, w.district].filter(Boolean).join(' / ')}</span>
@@ -170,9 +170,9 @@ export default function InventorySettings() {
                   {w.isDefault ? '默认' : '设为默认'}
                 </span>,
                 <Toggle active={w.enabled} onChange={(active) => handleToggle(w.id, active)} />,
-                <div style={{ display: 'flex', gap: 'var(--space-1)' }}>
+                <div className="row-actions">
                   <Button variant="ghost" size="sm" onClick={() => openEdit(w)}>编辑</Button>
-                  <Button variant="ghost" size="sm" style={{ color: 'var(--color-semantic-error)' }} onClick={() => setDeleteTarget(w)}>删除</Button>
+                  <Button variant="ghost" size="sm" className="btn-row-danger" onClick={() => setDeleteTarget(w)}>删除</Button>
                 </div>,
               ])}
             />
@@ -189,7 +189,7 @@ export default function InventorySettings() {
             <Table
               headers={['仓库名称', '仓库编码', '地址', '负责人', '电话', '来源门店', '状态']}
               rows={storeList.map(w => [
-                <span style={{ fontWeight: 'var(--font-medium)' }}>{w.name}</span>,
+                <span className="cell-emph">{w.name}</span>,
                 <span className="mono">{w.code}</span>,
                 <span style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-sm)' }}>{w.address}</span>,
                 w.manager,
@@ -224,7 +224,7 @@ export default function InventorySettings() {
             <Table
               headers={['仓库名称', '仓库编码', '地址', '联系人', '电话', '来源供应商', '默认', '状态']}
               rows={partnerList.map(w => [
-                <span style={{ fontWeight: 'var(--font-medium)' }}>{w.name}</span>,
+                <span className="cell-emph">{w.name}</span>,
                 <span className="mono">{w.code}</span>,
                 <span style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-sm)' }}>{w.address}</span>,
                 w.manager,
@@ -314,7 +314,7 @@ export default function InventorySettings() {
       {/* 新增/编辑抽屉 */}
       {showDrawer && (
         <div className="drawer-overlay" onClick={() => setShowDrawer(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 600 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">{editing ? '编辑仓库' : '新增仓库'}</span>
               <button className="drawer-close" onClick={() => setShowDrawer(false)}>×</button>

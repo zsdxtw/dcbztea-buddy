@@ -83,17 +83,17 @@ export default function InventoryAlertSettings() {
           <Table
             headers={['商品', '茶类', '仓库', '预警类型', '阈值', '状态', '操作']}
             rows={rules.map((r) => [
-              <span style={{ fontWeight: 'var(--font-medium)' }}>{r.product}</span>,
+              <span className="cell-emph">{r.product}</span>,
               <Tag category={r.teaCategory} />,
               r.warehouse,
-              <span style={{ color: r.alertType === '库存下限' ? 'var(--color-semantic-warning)' : 'var(--color-semantic-info)', fontWeight: 'var(--font-medium)' }}>{r.alertType}</span>,
+              <span className="cell-emph" style={{ color: r.alertType === '库存下限' ? 'var(--color-semantic-warning)' : 'var(--color-semantic-info)' }}>{r.alertType}</span>,
               <span className="mono">{r.threshold}</span>,
               r.triggered && r.enabled
                 ? <StatusTag variant="error" label="已触发" />
                 : r.enabled
                   ? <StatusTag variant="success" label="已启用" />
                   : <StatusTag variant="warning" label="已禁用" />,
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <div className="row-actions">
                 <Toggle active={r.enabled} onChange={(active) => handleToggle(r.id, active)} />
                 <Button size="sm" variant="ghost" onClick={() => handleEdit(r)}>编辑</Button>
               </div>,
@@ -105,7 +105,7 @@ export default function InventoryAlertSettings() {
       {/* 新增/编辑预警规则抽屉 */}
       {showDrawer && (
         <div className="drawer-overlay" onClick={handleCloseDrawer}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 480 }}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">{editingRule ? '编辑预警规则' : '新增预警规则'}</span>
               <button className="drawer-close" onClick={handleCloseDrawer}>

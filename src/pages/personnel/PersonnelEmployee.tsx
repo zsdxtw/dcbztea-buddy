@@ -313,7 +313,7 @@ function EmployeeListTab({
             headers={['工号', '姓名', '性别', '部门', '团队', '职位', '手机号', '入职日期', '状态', '操作']}
             rows={filtered.map((emp) => [
               <span key="empNo" className="mono" style={{ fontSize: 'var(--text-sm)' }}>{emp.empNo}</span>,
-              <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{emp.name}</span>,
+              <span key="name" className="cell-emph">{emp.name}</span>,
               GENDER_LABELS[emp.gender],
               getOrgNodeName(emp.departmentId),
               emp.teamId ? getOrgNodeName(emp.teamId) : <span key="team" style={{ color: 'var(--color-text-tertiary)' }}>-</span>,
@@ -321,10 +321,10 @@ function EmployeeListTab({
               <span key="phone" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{emp.phone}</span>,
               emp.joinDate,
               <StatusTag key="status" variant={empStatusVariant(emp.status)} label={EMP_STATUS_LABELS[emp.status]} />,
-              <div key="ops" style={{ display: 'flex', gap: 'var(--space-1)' }}>
+              <div key="ops" className="row-actions">
                 <Button size="sm" variant="ghost" onClick={() => onDetail(emp)}>查看</Button>
                 <Button size="sm" variant="ghost" onClick={() => onEdit(emp)}>编辑</Button>
-                <Button size="sm" variant="ghost" onClick={() => onDelete(emp)} style={{ color: '#CB405D' }}>删除</Button>
+                <Button size="sm" variant="ghost" className="btn-row-danger" onClick={() => onDelete(emp)}>删除</Button>
               </div>,
             ])}
           />
@@ -405,7 +405,7 @@ function PerformanceTab() {
                 >
                   {rank}
                 </div>,
-                <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{perf.employeeName}</span>,
+                <span key="name" className="cell-emph">{perf.employeeName}</span>,
                 perf.departmentName,
                 <span key="follAmt" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.followerAmount)}</span>,
                 <span key="liaAmt" style={{ color: 'var(--color-text-secondary)' }}>{formatYuan(perf.hostAmount)}</span>,
@@ -530,7 +530,7 @@ function EditEmployeeDrawer({
 
   return (
     <div className="drawer-overlay" onClick={onCancel}>
-      <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: drawerWidth }}>
+      <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
         <div className="drawer-header">
           <span className="drawer-title">{isEdit ? '编辑员工' : '新增员工'}</span>
           <button className="drawer-close" onClick={onCancel}>
@@ -970,7 +970,7 @@ function EmployeeDetailDrawer({
 
   return (
     <div className="drawer-overlay" onClick={onClose}>
-      <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: drawerWidth }}>
+      <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
         <div className="drawer-header">
           <span className="drawer-title">员工详情</span>
           <button className="drawer-close" onClick={onClose}>

@@ -115,7 +115,7 @@ export default function InventoryTransfer() {
           <Table
             headers={['调拨单号', '商品', '茶类', '调拨数量', '调出仓库', '调入仓库', '调拨日期', '状态', '操作']}
             rows={mockTransferOrders.map((o) => [
-              <span className="mono" style={{ fontWeight: 'var(--font-medium)' }}>{o.code}</span>,
+              <span className="cell-mono-emph">{o.code}</span>,
               o.product,
               <Tag category={o.teaCategory} />,
               <span className="mono">{o.quantity}</span>,
@@ -123,7 +123,10 @@ export default function InventoryTransfer() {
               o.toWarehouse,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{o.transferDate}</span>,
               <StatusTag variant={transferStatusToVariant(o.status)} label={transferStatusLabel(o.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -132,7 +135,7 @@ export default function InventoryTransfer() {
       {/* 调拨详情抽屉 */}
       {showDetail && selectedOrder && (
         <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 560 }}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
@@ -201,6 +204,7 @@ export default function InventoryTransfer() {
 
             <div className="drawer-footer">
               <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
+              <Button variant="primary" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
             </div>
           </div>
         </div>

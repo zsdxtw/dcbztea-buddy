@@ -164,7 +164,7 @@ export default function InventoryPurchaseInbound() {
           <Table
             headers={['入库单号', '采购单号', '供应商', '商品', '茶类', '入库数量', '仓库', '入库日期', '状态', '操作']}
             rows={mockInboundOrders.map((o) => [
-              <span className="mono" style={{ fontWeight: 'var(--font-medium)' }}>{o.inboundCode}</span>,
+              <span className="cell-mono-emph">{o.inboundCode}</span>,
               <span className="mono" style={{ color: 'var(--color-text-secondary)' }}>{o.purchaseCode}</span>,
               o.supplier,
               o.product,
@@ -173,7 +173,10 @@ export default function InventoryPurchaseInbound() {
               o.warehouse,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{o.inboundDate}</span>,
               <StatusTag variant={inboundStatusToVariant(o.status)} label={inboundStatusLabel(o.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -182,7 +185,7 @@ export default function InventoryPurchaseInbound() {
       {/* 入库详情抽屉 */}
       {showDetail && selectedOrder && (
         <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 640 }}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
@@ -293,6 +296,7 @@ export default function InventoryPurchaseInbound() {
 
             <div className="drawer-footer">
               <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
+              <Button variant="primary" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
             </div>
           </div>
         </div>

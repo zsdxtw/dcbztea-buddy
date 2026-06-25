@@ -220,7 +220,7 @@ export default function SalesCustomers() {
               headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '平台编号', '客户名称', '主办人', '联系人', '联系人职务', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
               rows={filteredPlatforms.map((p, idx) => [
                 deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(p.id)} onChange={() => togglePlatformSelect(p.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
-                <span key="sn" style={{ fontWeight: 'var(--font-medium)' }}>{p.shortName}</span>,
+                <span key="sn" className="cell-emph">{p.shortName}</span>,
                 <span key="code" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.code}</span>,
                 <span key="name">{p.name}</span>,
                 <span key="liaison">{p.hostId ? getHostName(p.hostId, p.hostType) : '—'}</span>,
@@ -231,7 +231,10 @@ export default function SalesCustomers() {
                 <span key="ba" className="mono">{p.bankAccounts.length}个</span>,
                 <span key="ii">{p.invoiceInfos.length > 0 ? p.invoiceInfos[0].invoiceEntity : '—'}</span>,
                 <span key="st">{statusTag(p.status, 'platform')}</span>,
-                <Button key="act" size="sm" variant="ghost" onClick={() => handleViewPlatform(p)}>查看</Button>,
+                <div className="row-actions" key="act">
+                  <Button size="sm" variant="ghost" onClick={() => handleViewPlatform(p)}>查看</Button>
+                  <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+                </div>,
               ])}
             />
           </Card>
@@ -272,7 +275,7 @@ export default function SalesCustomers() {
               rows={filtered.map((c, idx) => {
                 const cells: React.ReactNode[] = [
                   deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(c.id)} onChange={() => toggleSelect(c.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
-                  <span key="sn" style={{ fontWeight: 'var(--font-medium)' }}>{c.shortName || c.name}</span>,
+                  <span key="sn" className="cell-emph">{c.shortName || c.name}</span>,
                   <span key="cc" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{c.customerCode || '—'}</span>,
                   <span key="name">{c.name}</span>,
                   <span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>,
@@ -287,7 +290,10 @@ export default function SalesCustomers() {
                   <span key="ord" className="mono">{c.orders}</span>,
                   <span key="amt" className="mono" style={{ fontWeight: 'var(--font-medium)', color: SECONDARY }}>¥{(c.totalAmount / 10000).toFixed(1)}万</span>,
                   <span key="st">{statusTag(c.status)}</span>,
-                  <Button key="act" size="sm" variant="ghost" onClick={() => setDetailCustomer(c)}>查看</Button>,
+                  <div className="row-actions" key="act">
+                    <Button size="sm" variant="ghost" onClick={() => setDetailCustomer(c)}>查看</Button>
+                    <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+                  </div>,
                 );
                 return cells;
               })}
@@ -411,7 +417,7 @@ export default function SalesCustomers() {
       {/* 平台客户详情/编辑抽屉 */}
       {showPlatformDetail && detailPlatform && (
         <div className="drawer-overlay" onClick={() => { setShowPlatformDetail(false); setEditingPlatform(false); setEditPlatformForm(null); }}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: drawerWidth }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>
                 <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', background: PRIMARY_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-base)', fontWeight: 'var(--font-bold)', color: PRIMARY, flexShrink: 0 }}>{detailPlatform.shortName.charAt(0)}</div>
@@ -581,7 +587,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
 
   return (
     <div className="drawer-overlay" onClick={onCancel}>
-      <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: drawerWidth }}>
+      <div className="drawer-panel" onClick={e => e.stopPropagation()}>
         <div className="drawer-header">
           <span className="drawer-title">新增{CUSTOMER_TYPE_LABELS[customerType]}</span>
           <button className="drawer-close" onClick={onCancel}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
@@ -776,7 +782,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
 
   return (
     <div className="drawer-overlay" onClick={onCancel}>
-      <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: drawerWidth }}>
+      <div className="drawer-panel" onClick={e => e.stopPropagation()}>
         <div className="drawer-header">
           <span className="drawer-title">新增平台客户</span>
           <button className="drawer-close" onClick={onCancel}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>

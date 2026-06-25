@@ -269,7 +269,7 @@ export default function PurchaseOrders() {
           <Table
             headers={['订单编号', '供应商', '商品', '茶类', '数量', '单价', '金额', '下单日期', '交货日期', '状态', '操作']}
             rows={orders.map((o) => [
-              <span className="mono" style={{ fontWeight: 'var(--font-medium)' }}>{o.code}</span>,
+              <span className="cell-mono-emph">{o.code}</span>,
               <span>{o.supplier}</span>,
               <span>{o.product}</span>,
               <Tag category={o.teaCategory} />,
@@ -279,7 +279,10 @@ export default function PurchaseOrders() {
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{o.orderDate}</span>,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{o.deliveryDate}</span>,
               <StatusTag variant={orderStatusToVariant(o.status)} label={orderStatusLabel(o.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -297,7 +300,7 @@ export default function PurchaseOrders() {
       {/* 订单详情抽屉 */}
       {showDetail && selectedOrder && (
         <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 680 }}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
@@ -520,7 +523,7 @@ function CreatePurchaseDrawer({ nextNumber, onCancel, onSave }: {
 
   return (
     <div className="drawer-overlay" onClick={onCancel}>
-      <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 680 }}>
+      <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
         <div className="drawer-header">
           <span className="drawer-title">新建采购单</span>
           <button className="drawer-close" onClick={onCancel}>

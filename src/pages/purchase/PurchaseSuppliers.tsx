@@ -180,7 +180,7 @@ export default function PurchaseSuppliers() {
           ]}
           rows={filtered.map(s => [
             ...(deleteMode ? [<input key="chk" type="checkbox" checked={selectedForDelete.has(s.id)} onChange={() => handleToggleSelect(s.id)} />] : []),
-            <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{s.name}</span>,
+            <span key="name" className="cell-emph">{s.name}</span>,
             <span key="type" style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${SUPPLIER_TYPE_COLORS[s.type]}15`, color: SUPPLIER_TYPE_COLORS[s.type], border: `1px solid ${SUPPLIER_TYPE_COLORS[s.type]}30` }}>{SUPPLIER_TYPE_LABELS[s.type]}</span>,
             <span key="grade" style={{ fontWeight: 'var(--font-bold)', color: GRADE_COLORS[s.grade] || GRADE_COLORS['C'] }}>{s.grade}级</span>,
             <span key="cat" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{s.mainCategories.join('、')}</span>,
@@ -189,7 +189,10 @@ export default function PurchaseSuppliers() {
             <span key="wh" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{s.warehouses.length}个</span>,
             <span key="drop" style={{ fontSize: 'var(--text-sm)', color: s.supportDropship ? '#01795D' : 'var(--color-text-tertiary)' }}>{s.supportDropship ? '是' : '否'}</span>,
             <span key="st" style={{ padding: '2px 8px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: s.status === 'active' ? '#E8F5E9' : '#FFF3E0', color: s.status === 'active' ? '#2E7D32' : '#E65100' }}>{s.status === 'active' ? '在册' : '停用'}</span>,
-            <Button key="view" size="sm" variant="ghost" onClick={() => handleView(s)}>查看</Button>,
+            <div key="view" className="row-actions">
+              <Button size="sm" variant="ghost" onClick={() => handleView(s)}>查看</Button>
+              <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+            </div>,
           ])}
         />
       </Card>
@@ -211,7 +214,7 @@ export default function PurchaseSuppliers() {
       {/* 详情抽屉 */}
       {showDetail && selectedSupplier && (
         <div className="drawer-overlay" onClick={() => { setShowDetail(false); setEditing(false); setEditForm(null); }}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 680 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             {/* 头部 */}
             <div className="drawer-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>

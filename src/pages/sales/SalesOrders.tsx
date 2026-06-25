@@ -366,7 +366,10 @@ export default function SalesOrders() {
               <span className="mono">{o.amount}</span>,
               <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>{o.date}</span>,
               <StatusTag variant={orderStatusToVariant(o.status)} label={orderStatusLabel(o.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ];})}
           />
         </Card>
@@ -384,7 +387,7 @@ export default function SalesOrders() {
       {/* 订单详情抽屉 */}
       {showDetail && selectedOrder && (
         <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 680 }}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">订单详情</span>
               <button className="drawer-close" onClick={handleCloseDetail}>
@@ -771,7 +774,7 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
 
   return (
     <div className="drawer-overlay" onClick={onCancel}>
-      <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 680 }}>
+      <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
         <div className="drawer-header">
           <span className="drawer-title">新建销售单</span>
           <button className="drawer-close" onClick={onCancel}>

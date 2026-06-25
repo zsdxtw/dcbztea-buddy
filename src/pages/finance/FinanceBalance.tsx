@@ -130,13 +130,16 @@ export default function FinanceBalance() {
           <Table
             headers={['账户名称', '账户类型', '开户行', '账号', '余额', '状态', '操作']}
             rows={accountItems.map((a) => [
-              <span style={{ fontWeight: 'var(--font-medium)' }}>{a.name}</span>,
+              <span className="cell-emph">{a.name}</span>,
               <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${accountTypeColor(a.type)}12`, color: accountTypeColor(a.type), border: `1px solid ${accountTypeColor(a.type)}30` }}>{a.type}</span>,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{a.bank}</span>,
               <span className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-finance-secondary)' }}>{a.accountNo}</span>,
               <span className="mono" style={{ fontWeight: 'var(--font-semibold)' }}>{a.balance}</span>,
               <StatusTag variant={a.status === 'active' ? 'success' : 'error'} label={a.status === 'active' ? '正常' : '冻结'} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(a)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(a)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -144,7 +147,7 @@ export default function FinanceBalance() {
 
       {showDetail && selectedAccount && (
         <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 640 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">{selectedAccount.name}</span>
               <button className="drawer-close" onClick={() => setShowDetail(false)}>

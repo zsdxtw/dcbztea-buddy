@@ -340,7 +340,10 @@ export default function SalesQuotations() {
                 <span className="mono" style={{ fontWeight: 'var(--font-medium)' }}>{formatAmount(q.amount)}</span>,
                 <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>{q.validUntil}</span>,
                 <StatusTag variant={quotationStatusToVariant(q.status)} label={quotationStatusLabel(q.status)} />,
-                <Button size="sm" variant="ghost" onClick={() => handleView(q)}>查看</Button>,
+                <div className="row-actions">
+                  <Button size="sm" variant="ghost" onClick={() => handleView(q)}>查看</Button>
+                  <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+                </div>,
               ];
             })}
           />
@@ -350,7 +353,7 @@ export default function SalesQuotations() {
       {/* 报价详情抽屉 */}
       {showDetailDrawer && selectedQuotation && (
         <div className="drawer-overlay" onClick={handleCloseDetailDrawer}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 600 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">报价详情</span>
               <button className="drawer-close" onClick={handleCloseDetailDrawer}>
@@ -504,7 +507,7 @@ export default function SalesQuotations() {
       {/* 新建报价抽屉 */}
       {showFormDrawer && (
         <div className="drawer-overlay" onClick={handleCloseForm}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 600 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">新建报价</span>
               <button className="drawer-close" onClick={handleCloseForm}>

@@ -86,13 +86,16 @@ export default function FinanceSalesCollection() {
             headers={['回款单号', '客户', '对账单号', '回款金额', '回款方式', '回款日期', '状态', '操作']}
             rows={collectionItems.map((c) => [
               <span className="mono">{c.code}</span>,
-              <span style={{ fontWeight: 'var(--font-medium)' }}>{c.customer}</span>,
+              <span className="cell-emph">{c.customer}</span>,
               <span className="mono">{c.reconciliationCode}</span>,
               <span className="mono">{c.amount}</span>,
               c.method,
               <span className="mono">{c.date}</span>,
               <StatusTag variant={collectionStatusToVariant(c.status)} label={collectionStatusLabel(c.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(c)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(c)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -100,7 +103,7 @@ export default function FinanceSalesCollection() {
 
       {showDetail && selectedCollection && (
         <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 600 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">回款详情</span>
               <button className="drawer-close" onClick={() => setShowDetail(false)}>

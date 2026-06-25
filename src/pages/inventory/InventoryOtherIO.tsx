@@ -126,8 +126,8 @@ export default function InventoryOtherIO() {
           <Table
             headers={['单号', '出入库类型', '商品', '数量', '仓库', '原因', '操作人', '日期', '状态', '操作']}
             rows={mockRecords.map((r) => [
-              <span className="mono" style={{ fontWeight: 'var(--font-medium)' }}>{r.code}</span>,
-              <span style={{ color: r.ioType === '其他入库' ? 'var(--color-semantic-success)' : 'var(--color-module-current-base)', fontWeight: 'var(--font-medium)' }}>{r.ioType}</span>,
+              <span className="cell-mono-emph">{r.code}</span>,
+              <span className="cell-emph" style={{ color: r.ioType === '其他入库' ? 'var(--color-semantic-success)' : 'var(--color-module-current-base)' }}>{r.ioType}</span>,
               <span>{r.product}</span>,
               <span className="mono">{r.quantity}</span>,
               r.warehouse,
@@ -135,7 +135,10 @@ export default function InventoryOtherIO() {
               r.operator,
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{r.date}</span>,
               <StatusTag variant={ioStatusToVariant(r.status)} label={ioStatusLabel(r.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(r)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(r)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -144,7 +147,7 @@ export default function InventoryOtherIO() {
       {/* 详情抽屉 */}
       {showDetail && selectedRecord && (
         <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 560 }}>
+          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
@@ -217,6 +220,7 @@ export default function InventoryOtherIO() {
 
             <div className="drawer-footer">
               <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
+              <Button variant="primary" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
             </div>
           </div>
         </div>

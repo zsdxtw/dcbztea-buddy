@@ -23,6 +23,7 @@ export default function Button({
         variant === 'primary' && 'btn-primary',
         variant === 'secondary' && 'btn-secondary',
         variant === 'ghost' && 'btn-ghost',
+        variant === 'danger' && 'btn-danger',
         size === 'sm' && 'btn-sm',
         className,
       )}

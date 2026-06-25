@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem, RowActions, RowDeleteButton } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 /* ── 统计数据 ── */
@@ -133,15 +134,30 @@ function diffResultLabel(result: string) {
 export default function InventoryCheck() {
   const [showDetail, setShowDetail] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<CheckOrder | null>(null);
+  const [mode, setMode] = useState<'view' | 'edit'>('view');
 
   const handleView = (order: CheckOrder) => {
     setSelectedOrder(order);
+    setMode('view');
     setShowDetail(true);
+  };
+
+  const handleEditRow = (order: CheckOrder) => {
+    setSelectedOrder(order);
+    setMode('edit');
+    setShowDetail(true);
+  };
+
+  const handleDelete = (order: CheckOrder) => {
+    if (window.confirm(`确定要删除盘点单「${order.code}」吗？此操作不可撤销。`)) {
+      window.alert('已删除（演示）');
+    }
   };
 
   const handleCloseDetail = () => {
     setShowDetail(false);
     setSelectedOrder(null);
+    setMode('view');
   };
 
   return (
@@ -160,124 +176,78 @@ export default function InventoryCheck() {
           <Table
             headers={['盘点单号', '仓库', '盘点范围', '系统数量', '实盘数量', '差异数', '盘点日期', '状态', '操作']}
             rows={mockCheckOrders.map((o) => [
-              <span className="mono" style={{ fontWeight: 'var(--font-medium)' }}>{o.code}</span>,
+              <span className="cell-mono-emph">{o.code}</span>,
               o.warehouse,
               o.scope,
               <span className="mono">{o.systemQty}</span>,
               <span className="mono">{o.actualQty}</span>,
-              <span className="mono" style={{ color: o.diffQty.startsWith('+') ? 'var(--color-semantic-success)' : o.diffQty.startsWith('-') ? 'var(--color-semantic-error)' : 'var(--color-text-secondary)' }}>{o.diffQty}</span>,
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{o.checkDate}</span>,
+              <span className="mono" style={{ color: o.diffQty.startsWith('+') ? 'var(--color-semantic-success)' : o.diffQty.startsWith('-') ? 'var(--color-semantic-error)' : 'var(--color-neutral-500)' }}>{o.diffQty}</span>,
+              <span className="cell-muted">{o.checkDate}</span>,
               <StatusTag variant={checkStatusToVariant(o.status)} label={checkStatusLabel(o.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>,
+              <RowActions>
+                <Button size="sm" variant="ghost" onClick={() => handleView(o)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => handleEditRow(o)}>编辑</Button>
+                <RowDeleteButton onClick={() => handleDelete(o)} />
+              </RowActions>,
             ])}
           />
         </Card>
       </div>
 
       {/* 盘点详情抽屉 */}
-      {showDetail && selectedOrder && (
-        <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()} style={{ width: 640 }}>
-            <div className="drawer-header">
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 'var(--radius-lg)',
-                    background: 'var(--color-module-current-lightest)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)',
-                    color: 'var(--color-module-current-base)', flexShrink: 0,
-                  }}>
-                    PD
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                      <span className="drawer-title">{selectedOrder.code}</span>
-                      <StatusTag variant={checkStatusToVariant(selectedOrder.status)} label={checkStatusLabel(selectedOrder.status)} />
-                    </div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-                      {selectedOrder.warehouse} · {selectedOrder.scope}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button className="drawer-close" onClick={handleCloseDetail}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              </button>
-            </div>
+      <DetailDrawer
+        open={showDetail && !!selectedOrder}
+        onClose={handleCloseDetail}
+        badge="PD"
+        title={selectedOrder?.code}
+        statusTag={selectedOrder && <StatusTag variant={checkStatusToVariant(selectedOrder.status)} label={checkStatusLabel(selectedOrder.status)} />}
+        subtitle={selectedOrder && `${selectedOrder.warehouse} · ${selectedOrder.scope}`}
+        mode={mode}
+        onEdit={() => setMode('edit')}
+        onCancelEdit={() => setMode('view')}
+        onSave={() => { setMode('view'); }}
+      >
+        {selectedOrder && (
+          <>
+            <DrawerSection title="盘点信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="盘点单号" emph mono>{selectedOrder.code}</InfoItem>
+                <InfoItem label="仓库">{selectedOrder.warehouse}</InfoItem>
+                <InfoItem label="盘点范围">{selectedOrder.scope}</InfoItem>
+                <InfoItem label="盘点日期" >{selectedOrder.checkDate}</InfoItem>
+                <InfoItem label="操作人">{selectedOrder.operator}</InfoItem>
+                <InfoItem label="差异汇总" mono valueStyle={{ color: selectedOrder.diffQty.startsWith('+') ? 'var(--color-semantic-success)' : selectedOrder.diffQty.startsWith('-') ? 'var(--color-semantic-error)' : 'var(--color-neutral-500)' }}>{selectedOrder.diffQty}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedOrder.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-body">
-              {/* 盘点基本信息 */}
-              <div className="drawer-section-title">盘点信息</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-                <div>
-                  <label className="drawer-label">盘点单号</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedOrder.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">仓库</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.warehouse}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">盘点范围</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.scope}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">盘点日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.checkDate}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">操作人</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.operator}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">差异汇总</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: selectedOrder.diffQty.startsWith('+') ? 'var(--color-semantic-success)' : selectedOrder.diffQty.startsWith('-') ? 'var(--color-semantic-error)' : 'var(--color-text-secondary)' }} className="mono">{selectedOrder.diffQty}</div>
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label className="drawer-label">备注</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedOrder.remark || '—'}</div>
-                </div>
-              </div>
-
-              {/* 逐项对比表 */}
-              <div className="drawer-section-title">盘点明细</div>
-              <div style={{
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-primary)',
-                overflow: 'hidden',
-              }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                  <thead>
-                    <tr style={{ background: 'var(--color-bg-tertiary)' }}>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'left', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>商品</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>系统数量</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>实盘数量</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>差异</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'center', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>结果</th>
+            <DrawerSection title="盘点明细">
+              <table className="detail-inline-table">
+                <thead>
+                  <tr>
+                    <th>商品</th>
+                    <th style={{ textAlign: 'right' }}>系统数量</th>
+                    <th style={{ textAlign: 'right' }}>实盘数量</th>
+                    <th style={{ textAlign: 'right' }}>差异</th>
+                    <th style={{ textAlign: 'center' }}>结果</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedOrder.items.map((item, i) => (
+                    <tr key={i}>
+                      <td style={{ fontWeight: 'var(--font-medium)' }}>{item.product}</td>
+                      <td style={{ textAlign: 'right' }} className="mono">{item.systemQty}</td>
+                      <td style={{ textAlign: 'right' }} className="mono">{item.actualQty}</td>
+                      <td style={{ textAlign: 'right', color: item.diff.startsWith('+') ? 'var(--color-semantic-success)' : item.diff.startsWith('-') ? 'var(--color-semantic-error)' : 'var(--color-neutral-500)' }} className="mono">{item.diff}</td>
+                      <td style={{ textAlign: 'center' }}><StatusTag variant={diffResultToVariant(item.result)} label={diffResultLabel(item.result)} /></td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {selectedOrder.items.map((item, i) => (
-                      <tr key={i} style={{ borderTop: '1px solid var(--color-border-primary)' }}>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', fontWeight: 'var(--font-medium)' }}>{item.product}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right' }} className="mono">{item.systemQty}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right' }} className="mono">{item.actualQty}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', color: item.diff.startsWith('+') ? 'var(--color-semantic-success)' : item.diff.startsWith('-') ? 'var(--color-semantic-error)' : 'var(--color-text-secondary)' }} className="mono">{item.diff}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'center' }}><StatusTag variant={diffResultToVariant(item.result)} label={diffResultLabel(item.result)} /></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
-            </div>
-          </div>
-        </div>
-      )}
+                  ))}
+                </tbody>
+              </table>
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

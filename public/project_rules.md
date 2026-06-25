@@ -354,3 +354,106 @@ tmallPrice                 vipPrice
 - 带货人数据源：`src/data/streamers.tsx`
 - 带货人管理页面：`src/pages/personnel/PersonnelStreamer.tsx`
 - 茶人管理页面：`src/pages/personnel/PersonnelTeaProfessional.tsx`
+
+---
+
+## 列表页、详情页统一规则
+
+整个项目各模块的列表页与详情页（右侧抽拉）均遵循以下统一规范，确保排布规律、字体大小、整洁度一致。
+
+### 一、列表页规则
+
+#### 1.1 表格字体
+
+| 内容类型 | 样式 | 说明 |
+|----------|------|------|
+| 编号、名称等需强调的字段 | `cell-emph`（`font-weight: var(--font-medium)` + 深色） | 等宽编号用 `cell-mono-emph` |
+| 普通文本单元格 | 默认 `td`（`font-size: var(--text-base)` = 14px） | 次要信息（日期、备注）用 `cell-muted`（13px + 灰） |
+| 金额/数量 | `.mono`（等宽 + medium） | 差异等带正负色值单独着色 |
+
+#### 1.2 工具栏按钮
+
+- **新增按钮**：`<Button>`（`variant="primary"`，模块主色调）+ 加号图标，文案如「新增员工」「新建盘点」。
+- **删除按钮**：`<Button variant="danger">`（模块辅色调 `--color-module-current-secondary`）+ 垃圾桶图标。辅色过浅的模块（人员鹅黄、统计浅橙、设置）自动回退到语义错误色 `#CB405D`。
+- 其它次级操作（导出、批量删除等）用 `variant="ghost"`。
+
+#### 1.3 操作栏
+
+- 列表末列固定为「操作」栏（`th` 标题文本「操作」）。
+- 操作栏至少包含「查看」「编辑」两个按钮，按需追加「删除」。
+- 按钮组用 `<RowActions>` 包裹（`.row-actions`），使用 `<Button size="sm" variant="ghost">`；删除按钮用 `<RowDeleteButton>`（辅色调 ghost）。
+- 「查看」进入详情抽屉（只读），「编辑」进入编辑模式。
+
+#### 1.4 表头列宽
+
+- `<Table>` 组件已支持拖拽调节列宽：每个 `th` 右侧有 6px 拖拽把手，`mousedown` 后实时调整 `colWidths`，最小 40px。
+- 列宽根据内容自适应初始宽度，用户可自由拖拽调节并保留。
+
+### 二、详情页（右侧抽拉）规则
+
+#### 2.1 抽屉容器
+
+- 统一使用 `<DetailDrawer>` 组件或等效 `.drawer-overlay` + `.drawer-panel` 结构。
+- **宽度统一**：`width: 66.66vw`（视窗 2/3），`min-width: 1200px`，`max-width: 95vw`。
+- 从右侧滑入（`slideInRight` 动画），点击遮罩关闭。
+
+#### 2.2 标题栏（drawer-header）
+
+- 左侧：徽标方块（`.drawer-header-badge`，40×40，模块主色 lightest 底 + base 字，显示编号前缀如 "PD"/"SO"）+ 主标题（编号/名称，`.drawer-title`）+ 状态标签（`<StatusTag>`）。
+- 主标题下方：副标题（`.drawer-header-sub`，仓库 · 范围 等关键摘要）。
+- 右侧：关闭按钮（`.drawer-close`，× 图标）。
+
+#### 2.3 详细信息分类展示
+
+- 主体（`.drawer-body`）按类别分区，每个类别用 `<DrawerSection title="...">`，标题采用 `.drawer-section-title`：
+  - **标题前竖线**：3px 宽，模块主色调 `--color-module-current-base`，通过 `::before` 伪元素实现。
+  - 标题下方有 1px 分隔线。
+- 查看态字段用 `<InfoGrid>` + `<InfoItem>`（`.detail-info-grid`，默认 3 列，可选 2/4 列）：
+  - 标签 `.drawer-label`（13px medium 灰）+ 值 `.detail-info-value`（13px 深色，强调值加 `emph`/`mono`）。
+  - 长文本（备注、地址）用 `span={2|3}` 跨列。
+- 内嵌明细表用 `.detail-inline-table`（带边框圆角，表头灰底）。
+
+#### 2.4 底部按钮（drawer-footer）
+
+- **查看态**：左对齐「关闭」(`ghost`) + 右对齐「编辑」(`primary`，模块主色调)。
+- **编辑态**：「取消」(`ghost`) + 「保存」(`primary`)。
+- 由 `<DetailDrawer>` 的 `mode` / `onEdit` / `onCancelEdit` / `onSave` 自动渲染；点击「编辑」切换为编辑模式，点击「关闭/取消」关闭抽屉。
+
+### 三、编辑模式规则
+
+- 点击详情页底部「编辑」按钮进入编辑模式，复用同一抽屉，内容布局参照查看页。
+- 编辑表单行用 `<EditRow>` + `<EditField>`（`.drawer-edit-row` / `.drawer-edit-field`），输入控件复用 `.filter-input` / `.filter-select`。
+- 必填字段标签后加「*」。工号、编号等自动生成字段用 `readonly`。
+- 保存后回到查看态并刷新数据；取消则丢弃修改回到查看态。
+
+### 四、分类/页面标签卡片
+
+页面顶部的分类切换、Tab 选用统一的卡片样式：
+
+- **不带介绍**：`.tab-card-simple`（紧凑型，2px 边框，激活态模块主色边框 + lightest 底）。含图标 + 名称 + 右侧数量。
+- **带介绍**：`.tab-card-desc`（参考客户管理「直营客户」卡片：2px 边框、激活态主色边框 + 3% 主色底、左侧 32px 图标方块、标题 + 大号数量 + 下方 12px 灰色描述）。
+
+### 五、排布与整洁度规范
+
+参考人员模块「员工管理」编辑抽屉的排布标准：
+
+- 字号层级：标题 `--text-lg`、分类标题 `--text-sm` semibold、字段标签 `--text-sm` medium、字段值 `--text-sm`。
+- 表单行：同行字段用 `flex` 横排 + `gap: var(--space-4)`；上传/多选等整行字段用 `flex-direction: column`。
+- 分区间距：分类标题 `margin-top: var(--space-5)`，首个分类标题贴顶。
+- 输入控件高度统一 34-36px，圆角 `--radius-md`，聚焦态模块主色边框 + 3px light 光晕。
+
+### 关键约束
+
+1. **详情抽屉宽度全局统一**：所有详情/编辑抽屉均 2/3 视窗宽（min 1200px），不得各页自定义窄宽度。
+2. **分类竖线颜色随模块**：`drawer-section-title::before` 使用 `--color-module-current-base`，切换模块自动变色。
+3. **删除按钮辅色**：`btn-danger` 用 `--color-module-current-secondary`，浅辅色模块回退错误色。
+4. **操作栏必备查看/编辑**：列表行操作至少「查看」「编辑」，删除按需追加且用辅色。
+5. **表头可调宽**：所有列表表头支持拖拽调节列宽，初始按内容自适应。
+
+### 相关文件
+
+- 设计令牌与统一样式：`src/tokens/index.css`（`.drawer-panel`、`.drawer-section-title`、`.btn-danger`、`.cell-emph`、`.tab-card-*`、`.detail-info-grid`）
+- 详情抽屉公共组件：`src/components/common/DetailDrawer.tsx`
+- 表格组件（可调列宽）：`src/components/common/Table.tsx`
+- 按钮组件（含 danger 变体）：`src/components/common/Button.tsx`
+- 列表+详情参考页：`src/pages/inventory/InventoryCheck.tsx`、`src/pages/personnel/PersonnelEmployee.tsx`

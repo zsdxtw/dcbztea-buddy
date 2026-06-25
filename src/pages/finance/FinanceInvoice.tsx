@@ -91,7 +91,10 @@ export default function FinanceInvoice() {
               <span className="mono" style={{ color: 'var(--color-neutral-500)' }}>{inv.tax}</span>,
               <span className="mono">{inv.date}</span>,
               <StatusTag variant={invoiceStatusToVariant(inv.status)} label={invoiceStatusLabel(inv.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(inv)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(inv)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -99,7 +102,7 @@ export default function FinanceInvoice() {
 
       {showDetail && selectedInvoice && (
         <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 680 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">发票详情</span>
               <button className="drawer-close" onClick={() => setShowDetail(false)}>

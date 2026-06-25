@@ -87,13 +87,16 @@ export default function FinancePurchasePayment() {
             headers={['付款单号', '供应商', '对账单号', '付款金额', '付款方式', '付款日期', '状态', '操作']}
             rows={paymentItems.map((p) => [
               <span className="mono">{p.code}</span>,
-              <span style={{ fontWeight: 'var(--font-medium)' }}>{p.supplier}</span>,
+              <span className="cell-emph">{p.supplier}</span>,
               <span className="mono">{p.reconciliationCode}</span>,
               <span className="mono">{p.amount}</span>,
               p.method,
               <span className="mono">{p.date}</span>,
               <StatusTag variant={paymentStatusToVariant(p.status)} label={paymentStatusLabel(p.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(p)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(p)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -101,7 +104,7 @@ export default function FinancePurchasePayment() {
 
       {showDetail && selectedPayment && (
         <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 600 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">付款详情</span>
               <button className="drawer-close" onClick={() => setShowDetail(false)}>

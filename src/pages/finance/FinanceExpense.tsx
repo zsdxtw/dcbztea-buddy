@@ -99,7 +99,10 @@ export default function FinanceExpense() {
               e.applicant,
               <span className="mono">{e.date}</span>,
               <StatusTag variant={expenseStatusToVariant(e.status)} label={expenseStatusLabel(e.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(e)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(e)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -107,7 +110,7 @@ export default function FinanceExpense() {
 
       {showDetail && selectedExpense && (
         <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 600 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">费用详情</span>
               <button className="drawer-close" onClick={() => setShowDetail(false)}>

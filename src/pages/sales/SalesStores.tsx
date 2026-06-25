@@ -151,7 +151,7 @@ export default function SalesStores() {
             rows={filtered.map((s, idx) => [
               deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(s.id)} onChange={() => toggleSelect(s.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
               <span key="code" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{s.code}</span>,
-              <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{s.name}</span>,
+              <span key="name" className="cell-emph">{s.name}</span>,
               <span key="region" style={{ fontSize: 'var(--text-sm)' }}>{[s.province, s.city, s.district].filter(Boolean).join(' / ')}</span>,
               <span key="addr" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>{s.address}</span>,
               <span key="mgr">{s.manager}</span>,
@@ -159,7 +159,10 @@ export default function SalesStores() {
               <span key="bh" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>{s.businessHours}</span>,
               <span key="area" className="mono">{s.area}㎡</span>,
               <span key="st">{statusTag(s.status)}</span>,
-              <Button key="act" size="sm" variant="ghost" onClick={() => setDetailStore(s)}>查看</Button>,
+              <div className="row-actions" key="act">
+                <Button size="sm" variant="ghost" onClick={() => setDetailStore(s)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -182,7 +185,7 @@ export default function SalesStores() {
       {/* 详情弹窗 */}
       {detailStore && (
         <div className="drawer-overlay" onClick={() => setDetailStore(null)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 640 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">门店详情</span>
               <button className="drawer-close" onClick={() => setDetailStore(null)}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
@@ -227,7 +230,7 @@ export default function SalesStores() {
       {/* 新增/编辑抽屉 */}
       {showAddDrawer && (
         <div className="drawer-overlay" onClick={() => setShowAddDrawer(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 600 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">{editing ? '编辑门店' : '新增门店'}</span>
               <button className="drawer-close" onClick={() => setShowAddDrawer(false)}>×</button>

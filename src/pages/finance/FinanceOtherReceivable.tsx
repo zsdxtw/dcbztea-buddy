@@ -88,12 +88,15 @@ export default function FinanceOtherReceivable() {
             headers={['单号', '往来单位', '事由', '金额', '应收日期', '状态', '操作']}
             rows={receivableItems.map((r) => [
               <span className="mono">{r.code}</span>,
-              <span style={{ fontWeight: 'var(--font-medium)' }}>{r.partner}</span>,
+              <span className="cell-emph">{r.partner}</span>,
               <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${reasonColor(r.reason)}12`, color: reasonColor(r.reason), border: `1px solid ${reasonColor(r.reason)}30` }}>{r.reason}</span>,
               <span className="mono">{r.amount}</span>,
               <span className="mono">{r.dueDate}</span>,
               <StatusTag variant={receivableStatusToVariant(r.status)} label={receivableStatusLabel(r.status)} />,
-              <Button size="sm" variant="ghost" onClick={() => handleView(r)}>查看</Button>,
+              <div className="row-actions">
+                <Button size="sm" variant="ghost" onClick={() => handleView(r)}>查看</Button>
+                <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+              </div>,
             ])}
           />
         </Card>
@@ -101,7 +104,7 @@ export default function FinanceOtherReceivable() {
 
       {showDetail && selectedItem && (
         <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 560 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <span className="drawer-title">应收详情</span>
               <button className="drawer-close" onClick={() => setShowDetail(false)}>

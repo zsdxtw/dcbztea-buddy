@@ -91,7 +91,7 @@ export default function SalesPlatforms() {
           headers={[deleteMode ? '选择' : '序号', '平台名称', '编码', '简称', '联系人', '联系人职务', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
           rows={filtered.map((p, idx) => [
             deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(p.id)} onChange={() => toggleSelect(p.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
-            <span key="name" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>,
+            <span key="name" className="cell-emph">{p.name}</span>,
             <span key="code" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.code}</span>,
             <span key="sn">{p.shortName}</span>,
             <span key="cp">{p.contactPerson}</span>,
@@ -101,7 +101,10 @@ export default function SalesPlatforms() {
             <span key="ba" className="mono">{p.bankAccounts.length}个</span>,
             <span key="ii">{p.invoiceInfos.length > 0 ? p.invoiceInfos[0].invoiceEntity : '—'}</span>,
             <span key="st">{statusTag(p.status)}</span>,
-            <Button key="act" size="sm" variant="ghost" onClick={() => handleView(p)}>查看</Button>,
+            <div key="act" className="row-actions">
+              <Button size="sm" variant="ghost" onClick={() => handleView(p)}>查看</Button>
+              <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
+            </div>,
           ])}
         />
       </Card>
@@ -123,7 +126,7 @@ export default function SalesPlatforms() {
       {/* 详情/编辑抽屉 */}
       {showDetail && selected && (
         <div className="drawer-overlay" onClick={() => { setShowDetail(false); setEditing(false); setEditForm(null); }}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 680 }}>
+          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
             <div className="drawer-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>
                 <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', background: PRIMARY_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-base)', fontWeight: 'var(--font-bold)', color: PRIMARY, flexShrink: 0 }}>{selected.shortName.charAt(0)}</div>
@@ -239,7 +242,7 @@ function AddPlatformDrawer({ onCancel, onSave, existingCodes }: { onCancel: () =
 
   return (
     <div className="drawer-overlay" onClick={onCancel}>
-      <div className="drawer-panel" onClick={e => e.stopPropagation()} style={{ width: 680 }}>
+      <div className="drawer-panel" onClick={e => e.stopPropagation()}>
         <div className="drawer-header">
           <span className="drawer-title">新增平台</span>
           <button className="drawer-close" onClick={onCancel}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>

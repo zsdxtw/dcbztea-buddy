@@ -116,7 +116,7 @@ export interface TodoItemData {
 }
 
 /** 按钮变体 */
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'default' | 'sm';
 
 /** 状态标签变体 */
