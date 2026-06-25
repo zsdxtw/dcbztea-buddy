@@ -4,13 +4,11 @@ import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData, PlatformItem, PlatformBankAccount, PlatformInvoiceInfo } from '../../types';
 import { platformItems as initialPlatforms, generatePlatformCode } from '../../data/platforms';
 
-const PRIMARY = '#0F64B5';
-const PRIMARY_LIGHT = '#EBF3FC';
 const SECONDARY = '#CB405D';
-const SECONDARY_LIGHT = '#FEF2F4';
 
 export default function SalesPlatforms() {
   const [data, setData] = useState<PlatformItem[]>(initialPlatforms);
@@ -124,39 +122,51 @@ export default function SalesPlatforms() {
       )}
 
       {/* 详情/编辑抽屉 */}
-      {showDetail && selected && (
-        <div className="drawer-overlay" onClick={() => { setShowDetail(false); setEditing(false); setEditForm(null); }}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', background: PRIMARY_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-base)', fontWeight: 'var(--font-bold)', color: PRIMARY, flexShrink: 0 }}>{selected.shortName.charAt(0)}</div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <span className="drawer-title">{selected.name}</span>
-                    <span className="mono" style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{selected.code}</span>
-                    {statusTag(selected.status)}
-                  </div>
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginTop: 2 }}>扣点 {selected.commissionRate} · {selected.contactPerson} · {selected.contactPhone}</div>
+      <DetailDrawer
+        open={showDetail && !!selected}
+        onClose={() => { setShowDetail(false); setEditing(false); setEditForm(null); }}
+        badge="SF"
+        title={selected?.name}
+        statusTag={selected && statusTag(selected.status)}
+        subtitle={selected && `${selected.code} · 扣点 ${selected.commissionRate} · ${selected.contactPerson} · ${selected.contactPhone}`}
+        mode={editing ? 'edit' : 'view'}
+        onEdit={handleStartEdit}
+        onCancelEdit={handleCancelEdit}
+        onSave={handleSaveEdit}
+      >
+        {selected && (
+          <>
+            <DrawerSection title="基本信息">
+              {editing && editForm ? (
+                <div style={grid2}>
+                  <Field label="平台名称"><input className="filter-input" style={{ width: '100%' }} value={editForm.name ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, name: e.target.value } : prev)} /></Field>
+                  <Field label="平台简称"><input className="filter-input" style={{ width: '100%' }} value={editForm.shortName ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, shortName: e.target.value } : prev)} /></Field>
+                  <Field label="平台编码"><Text className="mono">{selected.code}</Text></Field>
+                  <Field label="联系人"><input className="filter-input" style={{ width: '100%' }} value={editForm.contactPerson ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /></Field>
+                  <Field label="联系人职务"><input className="filter-input" style={{ width: '100%' }} value={editForm.contactPosition ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPosition: e.target.value } : prev)} /></Field>
+                  <Field label="联系电话"><input className="filter-input" style={{ width: '100%' }} value={editForm.contactPhone ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /></Field>
+                  <Field label="联系地址"><input className="filter-input" style={{ width: '100%' }} value={editForm.contactAddress ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /></Field>
+                  <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={editForm.cooperationDate ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, cooperationDate: e.target.value } : prev)} /></Field>
+                  <Field label="平台扣点"><input className="filter-input" style={{ width: '100%' }} value={editForm.commissionRate ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, commissionRate: e.target.value } : prev)} /></Field>
+                  <Field label="备注" full><input className="filter-input" style={{ width: '100%' }} value={editForm.remark ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, remark: e.target.value } : prev)} /></Field>
                 </div>
-              </div>
-              <button className="drawer-close" onClick={() => { setShowDetail(false); setEditing(false); setEditForm(null); }}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
-            </div>
-            <div className="drawer-body">
-              <SectionTitle>基本信息</SectionTitle>
-              <div style={grid2}>
-                <Field label="平台名称">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.name ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, name: e.target.value } : prev)} /> : <Text>{selected.name}</Text>}</Field>
-                <Field label="平台简称">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.shortName ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, shortName: e.target.value } : prev)} /> : <Text>{selected.shortName}</Text>}</Field>
-                <Field label="平台编码"><Text className="mono">{selected.code}</Text></Field>
-                <Field label="联系人">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactPerson ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /> : <Text>{selected.contactPerson}</Text>}</Field>
-                <Field label="联系人职务">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactPosition ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPosition: e.target.value } : prev)} /> : <Text>{selected.contactPosition || '—'}</Text>}</Field>
-                <Field label="联系电话">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactPhone ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /> : <Text>{selected.contactPhone}</Text>}</Field>
-                <Field label="联系地址">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.contactAddress ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /> : <Text>{selected.contactAddress || '—'}</Text>}</Field>
-                <Field label="合作日期">{editing ? <input className="filter-input" style={{ width: '100%' }} type="date" value={editForm?.cooperationDate ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, cooperationDate: e.target.value } : prev)} /> : <Text>{selected.cooperationDate}</Text>}</Field>
-                <Field label="平台扣点">{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.commissionRate ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, commissionRate: e.target.value } : prev)} /> : <Text style={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{selected.commissionRate}</Text>}</Field>
-                <Field label="备注" full>{editing ? <input className="filter-input" style={{ width: '100%' }} value={editForm?.remark ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, remark: e.target.value } : prev)} /> : <Text>{selected.remark || '—'}</Text>}</Field>
-              </div>
+              ) : (
+                <InfoGrid cols={3}>
+                  <InfoItem label="平台名称" emph>{selected.name}</InfoItem>
+                  <InfoItem label="平台简称" emph>{selected.shortName}</InfoItem>
+                  <InfoItem label="平台编码" emph mono>{selected.code}</InfoItem>
+                  <InfoItem label="联系人">{selected.contactPerson}</InfoItem>
+                  <InfoItem label="联系人职务">{selected.contactPosition || '—'}</InfoItem>
+                  <InfoItem label="联系电话" mono>{selected.contactPhone}</InfoItem>
+                  <InfoItem label="联系地址" span={3}>{selected.contactAddress || '—'}</InfoItem>
+                  <InfoItem label="合作日期">{selected.cooperationDate}</InfoItem>
+                  <InfoItem label="平台扣点" mono valueStyle={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{selected.commissionRate}</InfoItem>
+                  <InfoItem label="备注" span={3}>{selected.remark || '—'}</InfoItem>
+                </InfoGrid>
+              )}
+            </DrawerSection>
 
-              <SectionTitle>结算账户（{selected.bankAccounts.length}/5）</SectionTitle>
+            <DrawerSection title={`结算账户（${selected.bankAccounts.length}/5）`}>
               {selected.bankAccounts.length === 0 ? <EmptyText>暂无结算账户</EmptyText> : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   {selected.bankAccounts.map((ba, i) => (
@@ -171,8 +181,9 @@ export default function SalesPlatforms() {
                   ))}
                 </div>
               )}
+            </DrawerSection>
 
-              <SectionTitle>发票信息（{selected.invoiceInfos.length}/5）</SectionTitle>
+            <DrawerSection title={`发票信息（${selected.invoiceInfos.length}/5）`}>
               {selected.invoiceInfos.length === 0 ? <EmptyText>暂无发票信息</EmptyText> : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   {selected.invoiceInfos.map((inv, i) => (
@@ -186,17 +197,10 @@ export default function SalesPlatforms() {
                   ))}
                 </div>
               )}
-            </div>
-            <div className="drawer-footer">
-              {editing ? (
-                <><Button variant="ghost" onClick={handleCancelEdit}>取消</Button><Button onClick={handleSaveEdit}>保存</Button></>
-              ) : (
-                <><Button variant="ghost" onClick={() => { setShowDetail(false); setEditing(false); setEditForm(null); }}>关闭</Button><Button onClick={handleStartEdit}>编辑</Button></>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
 
       {/* 新增抽屉 */}
       {showAddDrawer && <AddPlatformDrawer onCancel={() => setShowAddDrawer(false)} onSave={item => { setData(prev => [item, ...prev]); setShowAddDrawer(false); }} existingCodes={data.map(p => p.code)} />}

@@ -5,6 +5,7 @@ import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 const stats: StatCardData[] = [
@@ -145,78 +146,60 @@ export default function FinanceBalance() {
         </Card>
       </div>
 
-      {showDetail && selectedAccount && (
-        <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">{selectedAccount.name}</span>
-              <button className="drawer-close" onClick={() => setShowDetail(false)}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              </button>
-            </div>
-            <div className="drawer-body">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">账户名称</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedAccount.name}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">账户类型</label>
-                  <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${accountTypeColor(selectedAccount.type)}12`, color: accountTypeColor(selectedAccount.type), border: `1px solid ${accountTypeColor(selectedAccount.type)}30` }}>{selectedAccount.type}</span>
-                </div>
-                <div>
-                  <label className="drawer-label">开户行</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-finance-secondary)' }}>{selectedAccount.bank}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">账号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-finance-secondary)' }}>{selectedAccount.accountNo}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">当前余额</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: 'var(--color-module-current-base)' }}>{selectedAccount.balance}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">状态</label>
-                  <StatusTag variant={selectedAccount.status === 'active' ? 'success' : 'error'} label={selectedAccount.status === 'active' ? '正常' : '冻结'} />
-                </div>
-              </div>
+      <DetailDrawer
+        open={showDetail && !!selectedAccount}
+        onClose={() => setShowDetail(false)}
+        badge="BA"
+        title={selectedAccount?.name}
+        statusTag={selectedAccount && <StatusTag variant={selectedAccount.status === 'active' ? 'success' : 'error'} label={selectedAccount.status === 'active' ? '正常' : '冻结'} />}
+        subtitle={selectedAccount && `${selectedAccount.type} · ${selectedAccount.bank}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedAccount && (
+          <>
+            <DrawerSection title="账户信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="账户名称" emph>{selectedAccount.name}</InfoItem>
+                <InfoItem label="账户类型">{selectedAccount.type}</InfoItem>
+                <InfoItem label="状态">{selectedAccount.status === 'active' ? '正常' : '冻结'}</InfoItem>
+                <InfoItem label="开户行" span={2}>{selectedAccount.bank}</InfoItem>
+                <InfoItem label="账号" mono valueStyle={{ color: 'var(--color-module-finance-secondary)' }}>{selectedAccount.accountNo}</InfoItem>
+                <InfoItem label="当前余额" span={3} mono valueStyle={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: 'var(--color-module-current-base)' }}>{selectedAccount.balance}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>近期交易</h4>
+            <DrawerSection title="近期交易">
               {selectedAccount.recentTransactions && selectedAccount.recentTransactions.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {selectedAccount.recentTransactions.map((tx, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-2) var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: tx.type === 'in' ? '#E8F5E9' : '#FFEBEE', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <svg viewBox="0 0 12 12" fill="none" style={{ width: 12, height: 12 }}>
-                          {tx.type === 'in' ? (
-                            <path d="M6 9V3M3 6l3-3 3 3" stroke="#2E7D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          ) : (
-                            <path d="M6 3v6M3 6l3 3 3-3" stroke="#C62828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          )}
-                        </svg>
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{tx.description}</div>
-                        <div className="mono" style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{tx.date}</div>
-                      </div>
-                      <span className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: tx.type === 'in' ? '#2E7D32' : '#C62828' }}>
-                        {tx.type === 'in' ? '+' : '-'}{tx.amount}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <table className="detail-inline-table">
+                  <thead>
+                    <tr>
+                      <th>日期</th>
+                      <th>描述</th>
+                      <th style={{ textAlign: 'right' }}>金额</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedAccount.recentTransactions.map((tx, i) => (
+                      <tr key={i}>
+                        <td className="mono">{tx.date}</td>
+                        <td style={{ fontWeight: 'var(--font-medium)' }}>{tx.description}</td>
+                        <td style={{ textAlign: 'right' }} className="mono">
+                          <span style={{ color: tx.type === 'in' ? '#2E7D32' : '#C62828', fontWeight: 'var(--font-semibold)' }}>
+                            {tx.type === 'in' ? '+' : '-'}{tx.amount}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
                 <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: 'var(--space-4)' }}>暂无交易记录</p>
               )}
-            </div>
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={() => setShowDetail(false)}>关闭</Button>
-              <Button>交易明细</Button>
-            </div>
-          </div>
-        </div>
-      )}
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

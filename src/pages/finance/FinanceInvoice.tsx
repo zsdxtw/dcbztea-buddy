@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 const stats: StatCardData[] = [
@@ -100,93 +101,62 @@ export default function FinanceInvoice() {
         </Card>
       </div>
 
-      {showDetail && selectedInvoice && (
-        <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">发票详情</span>
-              <button className="drawer-close" onClick={() => setShowDetail(false)}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              </button>
-            </div>
-            <div className="drawer-body">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">发票号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedInvoice.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">发票类型</label>
-                  <StatusTag variant={selectedInvoice.type === '销项发票' ? 'info' : 'success'} label={selectedInvoice.type} />
-                </div>
-                <div>
-                  <label className="drawer-label">往来单位</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedInvoice.party}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">开票日期</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)' }}>{selectedInvoice.date}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">金额</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{selectedInvoice.amount}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">税额</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>{selectedInvoice.tax}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">状态</label>
-                  <StatusTag variant={invoiceStatusToVariant(selectedInvoice.status)} label={invoiceStatusLabel(selectedInvoice.status)} />
-                </div>
-              </div>
+      <DetailDrawer
+        open={showDetail && !!selectedInvoice}
+        onClose={() => setShowDetail(false)}
+        badge="IV"
+        title={selectedInvoice?.code}
+        statusTag={selectedInvoice && <StatusTag variant={invoiceStatusToVariant(selectedInvoice.status)} label={invoiceStatusLabel(selectedInvoice.status)} />}
+        subtitle={selectedInvoice && `${selectedInvoice.type} · ${selectedInvoice.party}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedInvoice && (
+          <>
+            <DrawerSection title="基本信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="发票号" emph mono>{selectedInvoice.code}</InfoItem>
+                <InfoItem label="发票类型">{selectedInvoice.type}</InfoItem>
+                <InfoItem label="状态">{invoiceStatusLabel(selectedInvoice.status)}</InfoItem>
+                <InfoItem label="往来单位" emph span={2}>{selectedInvoice.party}</InfoItem>
+                <InfoItem label="开票日期" mono>{selectedInvoice.date}</InfoItem>
+                <InfoItem label="金额" mono valueStyle={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)' }}>{selectedInvoice.amount}</InfoItem>
+                <InfoItem label="税额" mono valueStyle={{ color: 'var(--color-neutral-500)' }}>{selectedInvoice.tax}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedInvoice.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              {selectedInvoice.lineItems && selectedInvoice.lineItems.length > 0 && (
-                <>
-                  <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>明细项目</h4>
-                  <div style={{ marginBottom: 'var(--space-4)' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)' }}>
-                      <thead>
-                        <tr style={{ background: 'var(--color-bg-tertiary)' }}>
-                          <th style={{ padding: 'var(--space-2)', textAlign: 'left', fontWeight: 'var(--font-medium)' }}>品名</th>
-                          <th style={{ padding: 'var(--space-2)', textAlign: 'left', fontWeight: 'var(--font-medium)' }}>规格</th>
-                          <th style={{ padding: 'var(--space-2)', textAlign: 'right', fontWeight: 'var(--font-medium)' }}>数量</th>
-                          <th style={{ padding: 'var(--space-2)', textAlign: 'right', fontWeight: 'var(--font-medium)' }}>单价</th>
-                          <th style={{ padding: 'var(--space-2)', textAlign: 'right', fontWeight: 'var(--font-medium)' }}>金额</th>
-                          <th style={{ padding: 'var(--space-2)', textAlign: 'right', fontWeight: 'var(--font-medium)' }}>税率</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedInvoice.lineItems.map((item, i) => (
-                          <tr key={i} style={{ borderBottom: '1px solid var(--color-border-primary)' }}>
-                            <td style={{ padding: 'var(--space-2)' }}>{item.name}</td>
-                            <td style={{ padding: 'var(--space-2)', color: 'var(--color-text-secondary)' }}>{item.spec}</td>
-                            <td className="mono" style={{ padding: 'var(--space-2)', textAlign: 'right' }}>{item.quantity}</td>
-                            <td className="mono" style={{ padding: 'var(--space-2)', textAlign: 'right' }}>{item.unitPrice}</td>
-                            <td className="mono" style={{ padding: 'var(--space-2)', textAlign: 'right', fontWeight: 'var(--font-medium)' }}>{item.amount}</td>
-                            <td className="mono" style={{ padding: 'var(--space-2)', textAlign: 'right', color: 'var(--color-text-tertiary)' }}>{item.taxRate}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
-
-              {selectedInvoice.remark && (
-                <>
-                  <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>备注</h4>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedInvoice.remark}</div>
-                </>
-              )}
-            </div>
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={() => setShowDetail(false)}>关闭</Button>
-              {selectedInvoice.status === 'pending' && <Button>开具发票</Button>}
-            </div>
-          </div>
-        </div>
-      )}
+            {selectedInvoice.lineItems && selectedInvoice.lineItems.length > 0 && (
+              <DrawerSection title="发票明细">
+                <table className="detail-inline-table">
+                  <thead>
+                    <tr>
+                      <th>品名</th>
+                      <th>规格</th>
+                      <th style={{ textAlign: 'right' }}>数量</th>
+                      <th style={{ textAlign: 'right' }}>单价</th>
+                      <th style={{ textAlign: 'right' }}>金额</th>
+                      <th style={{ textAlign: 'right' }}>税率</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedInvoice.lineItems.map((item, i) => (
+                      <tr key={i}>
+                        <td style={{ fontWeight: 'var(--font-medium)' }}>{item.name}</td>
+                        <td style={{ color: 'var(--color-text-secondary)' }}>{item.spec}</td>
+                        <td style={{ textAlign: 'right' }} className="mono">{item.quantity}</td>
+                        <td style={{ textAlign: 'right' }} className="mono">{item.unitPrice}</td>
+                        <td style={{ textAlign: 'right', fontWeight: 'var(--font-medium)' }} className="mono">{item.amount}</td>
+                        <td style={{ textAlign: 'right', color: 'var(--color-text-tertiary)' }} className="mono">{item.taxRate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </DrawerSection>
+            )}
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

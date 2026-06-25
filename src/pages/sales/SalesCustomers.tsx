@@ -13,20 +13,12 @@ import { useDrawerWidth } from '../../hooks/useDrawerWidth';
 import { employees, getEmployeeName } from '../../data/organization';
 import { streamers } from '../../data/streamers';
 import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 
 const PRIMARY = '#0F64B5';
 const PRIMARY_LIGHT = '#EBF3FC';
 const SECONDARY = '#CB405D';
 const SECONDARY_LIGHT = '#FEF2F4';
-
-/* 客户类型标签颜色映射 */
-const customerTypeColors: Record<CustomerType, { bg: string; color: string; border: string }> = {
-  direct: { bg: '#E3F2FD', color: '#1565C0', border: '#90CAF9' },
-  channel: { bg: '#FFF3E0', color: '#E65100', border: '#FFCC80' },
-  personal: { bg: '#F3E5F5', color: '#7B1FA2', border: '#CE93D8' },
-  platform: { bg: '#E8F5E9', color: '#2E7D32', border: '#A5D6A7' },
-  guest: { bg: '#ECEFF1', color: '#455A64', border: '#B0BEC5' },
-};
 
 const TABS: { key: CustomerType; label: string; desc: string; icon: React.ReactNode }[] = [
   { key: 'direct', label: '直营客户', desc: CUSTOMER_TYPE_DESC.direct, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg> },
@@ -316,200 +308,261 @@ export default function SalesCustomers() {
         </div>
       )}
 
-      {/* 直营/渠道客户详情弹窗 */}
-      {detailCustomer && (
-        <div className="category-dialog-overlay" onClick={() => setDetailCustomer(null)}>
-          <div className="category-dialog" onClick={e => e.stopPropagation()} style={{ maxWidth: 720, maxHeight: '90vh', overflow: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-              <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: PRIMARY_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: PRIMARY, flexShrink: 0 }}>{detailCustomer.name.charAt(0)}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 4 }}>
-                  <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)' }}>{detailCustomer.name}</span>
-                  <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: customerTypeColors[detailCustomer.type].bg, color: customerTypeColors[detailCustomer.type].color, border: `1px solid ${customerTypeColors[detailCustomer.type].border}` }}>{CUSTOMER_TYPE_LABELS[detailCustomer.type]}</span>
-                  {levelTag(detailCustomer.level)}{statusTag(detailCustomer.status)}
-                </div>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>{detailCustomer.region} · {detailCustomer.contactPerson} · {detailCustomer.contactPhone}</div>
-              </div>
-              <button className="drawer-close" onClick={() => setDetailCustomer(null)}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-              {([
-                ['客户简称', detailCustomer.shortName || '—'],
-                ['客户编号', detailCustomer.customerCode || '—'],
-                ['所在地区', [detailCustomer.province, detailCustomer.city, detailCustomer.district].filter(Boolean).join(' / ') || detailCustomer.region || '—'],
-                ['主办人', detailCustomer.hostId ? getHostName(detailCustomer.hostId, detailCustomer.hostType) : '—'],
-                ['联系邮箱', detailCustomer.contactEmail || '—'],
-                ['联系地址', detailCustomer.contactAddress || '—'],
-                ...(detailCustomer.type !== 'personal' ? [['结算方式', detailCustomer.settlementMethod || '—']] as [string, string][] : []),
-                ['客户来源', detailCustomer.source || '—'],
-                ...(detailCustomer.type !== 'personal' ? [['税号', detailCustomer.taxNo || '—']] as [string, string][] : []),
-                ['合作日期', detailCustomer.cooperationDate],
-                ['累计金额', `¥${(detailCustomer.totalAmount / 10000).toFixed(1)}万`],
-              ] as [string, string][]).map(([label, value]) => (
-                <div key={label} style={{ fontSize: 'var(--text-sm)' }}><span style={{ color: 'var(--color-neutral-500)' }}>{label}：</span><span style={{ color: 'var(--color-neutral-800)', fontWeight: 'var(--font-medium)' }}>{value}</span></div>
-              ))}
-              {detailCustomer.remark && <div style={{ gridColumn: '1 / -1', fontSize: 'var(--text-sm)' }}><span style={{ color: 'var(--color-neutral-500)' }}>备注：</span><span style={{ color: 'var(--color-neutral-800)' }}>{detailCustomer.remark}</span></div>}
-            </div>
+      {/* 直营/渠道客户详情抽屉 */}
+      <DetailDrawer
+        open={!!detailCustomer}
+        onClose={() => setDetailCustomer(null)}
+        badge="CU"
+        title={detailCustomer?.name}
+        statusTag={detailCustomer && <>{levelTag(detailCustomer.level)}{statusTag(detailCustomer.status)}</>}
+        subtitle={detailCustomer && `${CUSTOMER_TYPE_LABELS[detailCustomer.type]} · ${detailCustomer.region} · ${detailCustomer.contactPerson} ${detailCustomer.contactPhone}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {detailCustomer && (
+          <>
+            <DrawerSection title="基本信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="客户编号" emph mono>{detailCustomer.customerCode || '—'}</InfoItem>
+                <InfoItem label="客户简称" emph>{detailCustomer.shortName || '—'}</InfoItem>
+                <InfoItem label="客户名称" emph>{detailCustomer.name}</InfoItem>
+                <InfoItem label="客户类型">{CUSTOMER_TYPE_LABELS[detailCustomer.type]}</InfoItem>
+                <InfoItem label="客户等级">{detailCustomer.level}</InfoItem>
+                <InfoItem label="客户来源">{detailCustomer.source || '—'}</InfoItem>
+                <InfoItem label="合作日期">{detailCustomer.cooperationDate}</InfoItem>
+                <InfoItem label="累计金额" mono>{`¥${(detailCustomer.totalAmount / 10000).toFixed(1)}万`}</InfoItem>
+                <InfoItem label="主办人">{detailCustomer.hostId ? getHostName(detailCustomer.hostId, detailCustomer.hostType) : '—'}</InfoItem>
+                <InfoItem label="备注" span={3}>{detailCustomer.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            {/* 结算账户与发票信息（个人客户不展示） */}
+            <DrawerSection title="联系信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="联系人">{detailCustomer.contactPerson || '—'}</InfoItem>
+                <InfoItem label="联系电话" mono>{detailCustomer.contactPhone || '—'}</InfoItem>
+                <InfoItem label="联系邮箱">{detailCustomer.contactEmail || '—'}</InfoItem>
+                <InfoItem label="所在地区">{[detailCustomer.province, detailCustomer.city, detailCustomer.district].filter(Boolean).join(' / ') || detailCustomer.region || '—'}</InfoItem>
+                <InfoItem label="联系地址" span={2}>{detailCustomer.contactAddress || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+
             {detailCustomer.type !== 'personal' && (
-              <>
-            <div style={{ marginBottom: 'var(--space-4)' }}>
-              <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)' }}>结算账户（{(detailCustomer.bankAccounts ?? []).length}）</h4>
-              {(detailCustomer.bankAccounts ?? []).length === 0 ? (
-                <EmptyText>暂无结算账户</EmptyText>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {(detailCustomer.bankAccounts ?? []).map((ba, i) => (
-                    <div key={i} style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>户名：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{ba.accountName}</span></div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>账号：</span><span className="mono">{ba.accountNo}</span></div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>开户行：</span>{ba.bankName}</div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>行号：</span><span className="mono">{ba.bankNo}</span></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+              <DrawerSection title="财务信息">
+                <InfoGrid cols={3}>
+                  <InfoItem label="结算方式">{detailCustomer.settlementMethod || '—'}</InfoItem>
+                  <InfoItem label="税号" mono>{detailCustomer.taxNo || '—'}</InfoItem>
+                </InfoGrid>
+                <div style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-700)', marginBottom: 'var(--space-2)' }}>结算账户（{(detailCustomer.bankAccounts ?? []).length}）</div>
+                {(detailCustomer.bankAccounts ?? []).length === 0 ? (
+                  <EmptyText>暂无结算账户</EmptyText>
+                ) : (
+                  <table className="detail-inline-table">
+                    <thead>
+                      <tr>
+                        <th>户名</th>
+                        <th>账号</th>
+                        <th>开户行</th>
+                        <th>行号</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(detailCustomer.bankAccounts ?? []).map((ba, i) => (
+                        <tr key={i}>
+                          <td style={{ fontWeight: 'var(--font-medium)' }}>{ba.accountName}</td>
+                          <td className="mono">{ba.accountNo}</td>
+                          <td>{ba.bankName}</td>
+                          <td className="mono">{ba.bankNo}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </DrawerSection>
+            )}
 
-            {/* 发票信息 */}
-            <div style={{ marginBottom: 'var(--space-4)' }}>
-              <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)' }}>发票信息（{(detailCustomer.invoiceInfos ?? []).length}）</h4>
-              {(detailCustomer.invoiceInfos ?? []).length === 0 ? (
-                <EmptyText>暂无发票信息</EmptyText>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {(detailCustomer.invoiceInfos ?? []).map((inv, i) => (
-                    <div key={i} style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>发票主体：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{inv.invoiceEntity}</span></div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>税号：</span><span className="mono">{inv.taxNo}</span></div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>税率：</span>{inv.taxRate}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-              </>
+            {detailCustomer.type !== 'personal' && (
+              <DrawerSection title="开票信息">
+                {(detailCustomer.invoiceInfos ?? []).length === 0 ? (
+                  <EmptyText>暂无发票信息</EmptyText>
+                ) : (
+                  <table className="detail-inline-table">
+                    <thead>
+                      <tr>
+                        <th>发票主体</th>
+                        <th>税号</th>
+                        <th>税率</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(detailCustomer.invoiceInfos ?? []).map((inv, i) => (
+                        <tr key={i}>
+                          <td style={{ fontWeight: 'var(--font-medium)' }}>{inv.invoiceEntity}</td>
+                          <td className="mono">{inv.taxNo}</td>
+                          <td>{inv.taxRate}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </DrawerSection>
             )}
 
             {detailCustomer.type === 'direct' && detailCustomer.platformIds.length > 0 && (
-              <div style={{ marginBottom: 'var(--space-4)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)' }}>关联平台（{detailCustomer.platformIds.length}）</h4>
-                <Card style={{ padding: 0 }}>
-                  <Table headers={['平台名称', '编码', '简称', '扣点', '联系人', '联系电话']}
-                    rows={detailCustomer.platformIds.map(id => {
+              <DrawerSection title={`平台关联（${detailCustomer.platformIds.length}）`}>
+                <table className="detail-inline-table">
+                  <thead>
+                    <tr>
+                      <th>平台名称</th>
+                      <th>编码</th>
+                      <th>简称</th>
+                      <th>扣点</th>
+                      <th>联系人</th>
+                      <th>联系电话</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailCustomer.platformIds.map(id => {
                       const p = platforms.find(x => x.id === id);
-                      return p ? [<span key="n" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>, <span key="c" className="mono">{p.code}</span>, <span key="s">{p.shortName}</span>, <span key="cr" style={{ color: SECONDARY }}>{p.commissionRate}</span>, <span key="cp">{p.contactPerson}</span>, <span key="cph" className="mono">{p.contactPhone}</span>] : [<span key="n">未知平台</span>];
+                      return p ? (
+                        <tr key={id}>
+                          <td style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</td>
+                          <td className="mono">{p.code}</td>
+                          <td>{p.shortName}</td>
+                          <td style={{ color: SECONDARY }}>{p.commissionRate}</td>
+                          <td>{p.contactPerson}</td>
+                          <td className="mono">{p.contactPhone}</td>
+                        </tr>
+                      ) : (
+                        <tr key={id}><td>未知平台</td></tr>
+                      );
                     })}
-                  />
-                </Card>
-              </div>
+                  </tbody>
+                </table>
+              </DrawerSection>
             )}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-4)' }}><Button variant="ghost" onClick={() => setDetailCustomer(null)}>关闭</Button></div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </DetailDrawer>
 
       {/* 平台客户详情/编辑抽屉 */}
-      {showPlatformDetail && detailPlatform && (
-        <div className="drawer-overlay" onClick={() => { setShowPlatformDetail(false); setEditingPlatform(false); setEditPlatformForm(null); }}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', background: PRIMARY_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-base)', fontWeight: 'var(--font-bold)', color: PRIMARY, flexShrink: 0 }}>{detailPlatform.shortName.charAt(0)}</div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <span className="drawer-title">{detailPlatform.name}</span>
-                    <span className="mono" style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>{detailPlatform.code}</span>
-                    {statusTag(detailPlatform.status, 'platform')}
-                  </div>
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginTop: 2 }}>扣点 {detailPlatform.commissionRate} · {detailPlatform.contactPerson} · {detailPlatform.contactPhone}</div>
-                </div>
-              </div>
-              <button className="drawer-close" onClick={() => { setShowPlatformDetail(false); setEditingPlatform(false); setEditPlatformForm(null); }}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
-            </div>
-            <div className="drawer-body">
-              <SectionTitle>基本信息</SectionTitle>
-              <div style={grid2}>
-                <Field label="平台名称">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.name ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, name: e.target.value } : prev)} /> : <Text>{detailPlatform.name}</Text>}</Field>
-                <Field label="平台简称">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.shortName ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, shortName: e.target.value } : prev)} /> : <Text>{detailPlatform.shortName}</Text>}</Field>
-                <Field label="平台编号"><Text className="mono">{detailPlatform.code}</Text></Field>
-                <Field label="联系人">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPerson ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPerson}</Text>}</Field>
-                <Field label="联系人职务">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPosition ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPosition: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPosition || '—'}</Text>}</Field>
-                <Field label="主办人" full>{editingPlatform ? (
-                  <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                    <select className="filter-select" style={{ width: 100 }} value={editPlatformForm?.hostType ?? ''} onChange={(e) => { setEditPlatformForm(prev => prev ? { ...prev, hostType: (e.target.value || undefined) as 'employee' | 'streamer' | undefined, hostId: undefined } : prev); }}>
-                      <option value="">请选择</option>
-                      <option value="employee">员工</option>
-                      <option value="streamer">带货人</option>
-                    </select>
-                    {editPlatformForm?.hostType === 'employee' ? (
-                      <DeptEmployeeSelect value={editPlatformForm?.hostId ?? ''} onChange={(empId) => setEditPlatformForm(prev => prev ? { ...prev, hostId: empId || undefined } : prev)} style={{ flex: 1 }} />
-                    ) : editPlatformForm?.hostType === 'streamer' ? (
-                      <select className="filter-select" style={{ flex: 1 }} value={editPlatformForm?.hostId ?? ''} onChange={(e) => setEditPlatformForm(prev => prev ? { ...prev, hostId: e.target.value || undefined } : prev)}>
-                        <option value="">选择带货人</option>
-                        {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+      <DetailDrawer
+        open={showPlatformDetail && !!detailPlatform}
+        onClose={() => { setShowPlatformDetail(false); setEditingPlatform(false); setEditPlatformForm(null); }}
+        badge={detailPlatform?.shortName?.charAt(0) || 'PT'}
+        title={detailPlatform?.name}
+        statusTag={detailPlatform && statusTag(detailPlatform.status, 'platform')}
+        subtitle={detailPlatform && `扣点 ${detailPlatform.commissionRate} · ${detailPlatform.contactPerson} · ${detailPlatform.contactPhone}`}
+        mode={editingPlatform ? 'edit' : 'view'}
+        onEdit={handleStartEditPlatform}
+        onCancelEdit={handleCancelEditPlatform}
+        onSave={handleSaveEditPlatform}
+      >
+        {detailPlatform && (
+          <>
+            <DrawerSection title="基本信息">
+              {editingPlatform && editPlatformForm ? (
+                <div style={grid2}>
+                  <Field label="平台名称"><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.name ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, name: e.target.value } : prev)} /></Field>
+                  <Field label="平台简称"><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.shortName ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, shortName: e.target.value } : prev)} /></Field>
+                  <Field label="平台编号"><Text className="mono">{detailPlatform.code}</Text></Field>
+                  <Field label="联系人"><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.contactPerson ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPerson: e.target.value } : prev)} /></Field>
+                  <Field label="联系人职务"><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.contactPosition ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPosition: e.target.value } : prev)} /></Field>
+                  <Field label="主办人" full>
+                    <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                      <select className="filter-select" style={{ width: 100 }} value={editPlatformForm.hostType ?? ''} onChange={(e) => { setEditPlatformForm(prev => prev ? { ...prev, hostType: (e.target.value || undefined) as 'employee' | 'streamer' | undefined, hostId: undefined } : prev); }}>
+                        <option value="">请选择</option>
+                        <option value="employee">员工</option>
+                        <option value="streamer">带货人</option>
                       </select>
-                    ) : (
-                      <div style={{ flex: 1, height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
-                    )}
-                  </div>
-                ) : <Text>{getHostName(detailPlatform.hostId, detailPlatform.hostType)}</Text>}</Field>
-                <Field label="联系电话">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactPhone ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /> : <Text>{detailPlatform.contactPhone}</Text>}</Field>
-                <Field label="省份">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.province ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, province: e.target.value, city: '', district: '' } : prev)}><option value="">请选择</option>{PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}</select> : <Text>{detailPlatform.province || '—'}</Text>}</Field>
-                <Field label="城市">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.city ?? ''} disabled={!editPlatformForm?.province} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, city: e.target.value, district: '' } : prev)}><option value="">请选择</option>{(editPlatformForm?.province ? getCityNames(editPlatformForm.province) : []).map(c => <option key={c} value={c}>{c}</option>)}</select> : <Text>{detailPlatform.city || '—'}</Text>}</Field>
-                <Field label="区县">{editingPlatform ? <select className="filter-select" style={{ width: '100%' }} value={editPlatformForm?.district ?? ''} disabled={!editPlatformForm?.city} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, district: e.target.value } : prev)}><option value="">请选择</option>{(editPlatformForm?.province && editPlatformForm?.city ? getDistricts(editPlatformForm.province, editPlatformForm.city) : []).map(d => <option key={d} value={d}>{d}</option>)}</select> : <Text>{detailPlatform.district || '—'}</Text>}</Field>
-                <Field label="具体地址" full>{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.contactAddress ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /> : <Text>{detailPlatform.contactAddress || '—'}</Text>}</Field>
-                <Field label="合作日期">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} type="date" value={editPlatformForm?.cooperationDate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, cooperationDate: e.target.value } : prev)} /> : <Text>{detailPlatform.cooperationDate}</Text>}</Field>
-                <Field label="平台扣点">{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.commissionRate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, commissionRate: e.target.value } : prev)} /> : <Text style={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{detailPlatform.commissionRate}</Text>}</Field>
-                <Field label="备注" full>{editingPlatform ? <input className="filter-input" style={{ width: '100%' }} value={editPlatformForm?.remark ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, remark: e.target.value } : prev)} /> : <Text>{detailPlatform.remark || '—'}</Text>}</Field>
-              </div>
-
-              <SectionTitle>结算账户（{detailPlatform.bankAccounts.length}/5）</SectionTitle>
-              {detailPlatform.bankAccounts.length === 0 ? <EmptyText>暂无结算账户</EmptyText> : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {detailPlatform.bankAccounts.map((ba, i) => (
-                    <div key={i} style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>户名：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{ba.accountName}</span></div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>账号：</span><span className="mono">{ba.accountNo}</span></div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>开户行：</span>{ba.bankName}</div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>行号：</span><span className="mono">{ba.bankNo}</span></div>
-                      </div>
+                      {editPlatformForm.hostType === 'employee' ? (
+                        <DeptEmployeeSelect value={editPlatformForm.hostId ?? ''} onChange={(empId) => setEditPlatformForm(prev => prev ? { ...prev, hostId: empId || undefined } : prev)} style={{ flex: 1 }} />
+                      ) : editPlatformForm.hostType === 'streamer' ? (
+                        <select className="filter-select" style={{ flex: 1 }} value={editPlatformForm.hostId ?? ''} onChange={(e) => setEditPlatformForm(prev => prev ? { ...prev, hostId: e.target.value || undefined } : prev)}>
+                          <option value="">选择带货人</option>
+                          {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        </select>
+                      ) : (
+                        <div style={{ flex: 1, height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
+                      )}
                     </div>
-                  ))}
+                  </Field>
+                  <Field label="联系电话"><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.contactPhone ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /></Field>
+                  <Field label="省份"><select className="filter-select" style={{ width: '100%' }} value={editPlatformForm.province ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, province: e.target.value, city: '', district: '' } : prev)}><option value="">请选择</option>{PROVINCE_NAMES.map(p => <option key={p} value={p}>{p}</option>)}</select></Field>
+                  <Field label="城市"><select className="filter-select" style={{ width: '100%' }} value={editPlatformForm.city ?? ''} disabled={!editPlatformForm.province} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, city: e.target.value, district: '' } : prev)}><option value="">请选择</option>{(editPlatformForm.province ? getCityNames(editPlatformForm.province) : []).map(c => <option key={c} value={c}>{c}</option>)}</select></Field>
+                  <Field label="区县"><select className="filter-select" style={{ width: '100%' }} value={editPlatformForm.district ?? ''} disabled={!editPlatformForm.city} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, district: e.target.value } : prev)}><option value="">请选择</option>{(editPlatformForm.province && editPlatformForm.city ? getDistricts(editPlatformForm.province, editPlatformForm.city) : []).map(d => <option key={d} value={d}>{d}</option>)}</select></Field>
+                  <Field label="具体地址" full><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.contactAddress ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /></Field>
+                  <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={editPlatformForm.cooperationDate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, cooperationDate: e.target.value } : prev)} /></Field>
+                  <Field label="平台扣点"><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.commissionRate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, commissionRate: e.target.value } : prev)} /></Field>
+                  <Field label="备注" full><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.remark ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, remark: e.target.value } : prev)} /></Field>
                 </div>
-              )}
-
-              <SectionTitle>发票信息（{detailPlatform.invoiceInfos.length}/5）</SectionTitle>
-              {detailPlatform.invoiceInfos.length === 0 ? <EmptyText>暂无发票信息</EmptyText> : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {detailPlatform.invoiceInfos.map((inv, i) => (
-                    <div key={i} style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>发票主体：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{inv.invoiceEntity}</span></div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>税号：</span><span className="mono">{inv.taxNo}</span></div>
-                        <div><span style={{ color: 'var(--color-neutral-500)' }}>税率：</span>{inv.taxRate}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="drawer-footer">
-              {editingPlatform ? (
-                <><Button variant="ghost" onClick={handleCancelEditPlatform}>取消</Button><Button onClick={handleSaveEditPlatform}>保存</Button></>
               ) : (
-                <><Button variant="ghost" onClick={() => { setShowPlatformDetail(false); setEditingPlatform(false); setEditPlatformForm(null); }}>关闭</Button><Button onClick={handleStartEditPlatform}>编辑</Button></>
+                <InfoGrid cols={3}>
+                  <InfoItem label="平台名称" emph>{detailPlatform.name}</InfoItem>
+                  <InfoItem label="平台简称" emph>{detailPlatform.shortName}</InfoItem>
+                  <InfoItem label="平台编号" emph mono>{detailPlatform.code}</InfoItem>
+                  <InfoItem label="联系人">{detailPlatform.contactPerson || '—'}</InfoItem>
+                  <InfoItem label="联系人职务">{detailPlatform.contactPosition || '—'}</InfoItem>
+                  <InfoItem label="主办人">{getHostName(detailPlatform.hostId, detailPlatform.hostType)}</InfoItem>
+                  <InfoItem label="联系电话" mono>{detailPlatform.contactPhone || '—'}</InfoItem>
+                  <InfoItem label="所在地区">{[detailPlatform.province, detailPlatform.city, detailPlatform.district].filter(Boolean).join(' / ') || '—'}</InfoItem>
+                  <InfoItem label="合作日期">{detailPlatform.cooperationDate}</InfoItem>
+                  <InfoItem label="平台扣点" mono>{detailPlatform.commissionRate || '—'}</InfoItem>
+                  <InfoItem label="具体地址" span={3}>{detailPlatform.contactAddress || '—'}</InfoItem>
+                  <InfoItem label="备注" span={3}>{detailPlatform.remark || '—'}</InfoItem>
+                </InfoGrid>
               )}
-            </div>
-          </div>
-        </div>
-      )}
+            </DrawerSection>
+
+            <DrawerSection title={`结算账户（${detailPlatform.bankAccounts.length}/5）`}>
+              {detailPlatform.bankAccounts.length === 0 ? <EmptyText>暂无结算账户</EmptyText> : (
+                <table className="detail-inline-table">
+                  <thead>
+                    <tr>
+                      <th>户名</th>
+                      <th>账号</th>
+                      <th>开户行</th>
+                      <th>行号</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailPlatform.bankAccounts.map((ba, i) => (
+                      <tr key={i}>
+                        <td style={{ fontWeight: 'var(--font-medium)' }}>{ba.accountName}</td>
+                        <td className="mono">{ba.accountNo}</td>
+                        <td>{ba.bankName}</td>
+                        <td className="mono">{ba.bankNo}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </DrawerSection>
+
+            <DrawerSection title={`发票信息（${detailPlatform.invoiceInfos.length}/5）`}>
+              {detailPlatform.invoiceInfos.length === 0 ? <EmptyText>暂无发票信息</EmptyText> : (
+                <table className="detail-inline-table">
+                  <thead>
+                    <tr>
+                      <th>发票主体</th>
+                      <th>税号</th>
+                      <th>税率</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailPlatform.invoiceInfos.map((inv, i) => (
+                      <tr key={i}>
+                        <td style={{ fontWeight: 'var(--font-medium)' }}>{inv.invoiceEntity}</td>
+                        <td className="mono">{inv.taxNo}</td>
+                        <td>{inv.taxRate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
 
       {/* 新增客户抽屉 */}
       {showAddDrawer && (

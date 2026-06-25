@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 /* ── 统计卡片 ── */
@@ -195,114 +196,59 @@ export default function SalesReturn() {
       </div>
 
       {/* 退货详情抽屉 */}
-      {showDetail && selectedRecord && (
-        <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">退货详情</span>
-              <button className="drawer-close" onClick={handleCloseDetail}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              </button>
-            </div>
+      <DetailDrawer
+        open={showDetail && !!selectedRecord}
+        onClose={handleCloseDetail}
+        badge="SR"
+        title={selectedRecord?.id}
+        statusTag={selectedRecord && <StatusTag variant={returnStatusToVariant(selectedRecord.status)} label={returnStatusLabel(selectedRecord.status)} />}
+        subtitle={selectedRecord && `${selectedRecord.customer} · ${selectedRecord.returnDate}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedRecord && (
+          <>
+            <DrawerSection title="退货信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="退货单号" emph mono>{selectedRecord.id}</InfoItem>
+                <InfoItem label="退货日期">{selectedRecord.returnDate}</InfoItem>
+                <InfoItem label="客户" emph>{selectedRecord.customer}</InfoItem>
+                <InfoItem label="联系人">{selectedRecord.contactPerson}</InfoItem>
+                <InfoItem label="退货商品" emph>{selectedRecord.product}</InfoItem>
+                <InfoItem label="退货数量" mono>{selectedRecord.quantity}</InfoItem>
+                <InfoItem label="退货金额" mono valueStyle={{ color: '#CB405D', fontWeight: 'var(--font-semibold)' }}>{selectedRecord.amount}</InfoItem>
+                <InfoItem label="状态"><StatusTag variant={returnStatusToVariant(selectedRecord.status)} label={returnStatusLabel(selectedRecord.status)} /></InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-body">
-              {/* 退货信息 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>退货信息</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                  <div>
-                    <label className="drawer-label">退货单号</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }} className="mono">{selectedRecord.id}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">退货日期</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.returnDate}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">客户</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.customer}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">联系人</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.contactPerson}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">退货商品</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.product}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">退货数量</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }} className="mono">{selectedRecord.quantity}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">退货金额</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: '#CB405D' }} className="mono">{selectedRecord.amount}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">状态</label>
-                    <StatusTag variant={returnStatusToVariant(selectedRecord.status)} label={returnStatusLabel(selectedRecord.status)} />
-                  </div>
+            <DrawerSection title="原销售订单信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="原销售单号" emph mono>{selectedRecord.originalOrder}</InfoItem>
+                <InfoItem label="下单日期">{selectedRecord.originalDate}</InfoItem>
+                <InfoItem label="原订单金额" mono>{selectedRecord.originalAmount}</InfoItem>
+                <InfoItem label="联系电话" mono>{selectedRecord.contactPhone}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+
+            <DrawerSection title="退货原因详情">
+              <div style={{ padding: 'var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                  <span style={{
+                    padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
+                    background: '#FFF3E0', color: '#E65100', border: '1px solid #FFCC80',
+                  }}>{selectedRecord.reason}</span>
                 </div>
+                <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', lineHeight: 1.6 }}>{selectedRecord.reasonDetail}</div>
+                {selectedRecord.handler && (
+                  <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>
+                    处理人：{selectedRecord.handler} · 处理日期：{selectedRecord.handleDate}
+                  </div>
+                )}
               </div>
-
-              {/* 原销售订单信息 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>原销售订单信息</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                  <div>
-                    <label className="drawer-label">原销售单号</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }} className="mono">{selectedRecord.originalOrder}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">下单日期</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.originalDate}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">原订单金额</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }} className="mono">{selectedRecord.originalAmount}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">联系电话</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.contactPhone}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 退货原因详情 */}
-              <div>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>退货原因详情</h4>
-                <div style={{ padding: 'var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-                    <span style={{
-                      padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
-                      background: '#FFF3E0', color: '#E65100', border: '1px solid #FFCC80',
-                    }}>{selectedRecord.reason}</span>
-                  </div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', lineHeight: 1.6 }}>{selectedRecord.reasonDetail}</div>
-                  {selectedRecord.handler && (
-                    <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>
-                      处理人：{selectedRecord.handler} · 处理日期：{selectedRecord.handleDate}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
-              {selectedRecord.status === 'pending' && (
-                <>
-                  <Button style={{ background: '#CB405D', borderColor: '#CB405D' }} onClick={handleCloseDetail}>驳回</Button>
-                  <Button onClick={handleCloseDetail}>审批通过</Button>
-                </>
-              )}
-              {selectedRecord.status === 'approved' && (
-                <Button onClick={handleCloseDetail}>确认退款</Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

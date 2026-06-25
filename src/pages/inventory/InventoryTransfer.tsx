@@ -7,6 +7,7 @@ import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import { TeaCategory } from '../../types';
 import type { StatCardData } from '../../types';
 
@@ -133,82 +134,31 @@ export default function InventoryTransfer() {
       </div>
 
       {/* 调拨详情抽屉 */}
-      {showDetail && selectedOrder && (
-        <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
-            <div className="drawer-header">
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 'var(--radius-lg)',
-                    background: 'var(--color-module-current-lightest)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)',
-                    color: 'var(--color-module-current-base)', flexShrink: 0,
-                  }}>
-                    DB
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                      <span className="drawer-title">{selectedOrder.code}</span>
-                      <StatusTag variant={transferStatusToVariant(selectedOrder.status)} label={transferStatusLabel(selectedOrder.status)} />
-                    </div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-                      {selectedOrder.fromWarehouse} → {selectedOrder.toWarehouse}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button className="drawer-close" onClick={handleCloseDetail}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              </button>
-            </div>
-
-            <div className="drawer-body">
-              <div className="drawer-section-title">调拨信息</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-                <div>
-                  <label className="drawer-label">调拨单号</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedOrder.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">商品</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.product}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">调拨数量</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }} className="mono">{selectedOrder.quantity}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">调拨日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.transferDate}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">调出仓库</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.fromWarehouse}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">调入仓库</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.toWarehouse}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">操作人</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.operator}</div>
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label className="drawer-label">备注</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedOrder.remark || '—'}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
-              <Button variant="primary" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DetailDrawer
+        open={showDetail && !!selectedOrder}
+        onClose={handleCloseDetail}
+        badge="TF"
+        title={selectedOrder?.code}
+        statusTag={selectedOrder && <StatusTag variant={transferStatusToVariant(selectedOrder.status)} label={transferStatusLabel(selectedOrder.status)} />}
+        subtitle={selectedOrder && `${selectedOrder.fromWarehouse} → ${selectedOrder.toWarehouse}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedOrder && (
+          <DrawerSection title="调拨信息">
+            <InfoGrid cols={3}>
+              <InfoItem label="调拨单号" emph mono>{selectedOrder.code}</InfoItem>
+              <InfoItem label="商品">{selectedOrder.product}</InfoItem>
+              <InfoItem label="调拨数量" mono>{selectedOrder.quantity}</InfoItem>
+              <InfoItem label="调拨日期">{selectedOrder.transferDate}</InfoItem>
+              <InfoItem label="调出仓库">{selectedOrder.fromWarehouse}</InfoItem>
+              <InfoItem label="调入仓库">{selectedOrder.toWarehouse}</InfoItem>
+              <InfoItem label="操作人">{selectedOrder.operator}</InfoItem>
+              <InfoItem label="备注" span={3}>{selectedOrder.remark || '—'}</InfoItem>
+            </InfoGrid>
+          </DrawerSection>
+        )}
+      </DetailDrawer>
     </>
   );
 }

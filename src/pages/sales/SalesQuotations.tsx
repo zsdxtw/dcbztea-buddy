@@ -7,6 +7,7 @@ import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import { TeaCategory, QuotationStatus } from '../../types';
 import type { StatusVariant } from '../../types';
 import { PRICE_CUSTOMERS, vipPriceRules, getVipPrice, getSalesDefaultPrice } from '../../data/prices';
@@ -351,158 +352,105 @@ export default function SalesQuotations() {
       </div>
 
       {/* 报价详情抽屉 */}
-      {showDetailDrawer && selectedQuotation && (
-        <div className="drawer-overlay" onClick={handleCloseDetailDrawer}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">报价详情</span>
-              <button className="drawer-close" onClick={handleCloseDetailDrawer}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              </button>
-            </div>
+      <DetailDrawer
+        open={showDetailDrawer && !!selectedQuotation}
+        onClose={handleCloseDetailDrawer}
+        badge="SV"
+        title={selectedQuotation?.quotationCode}
+        statusTag={selectedQuotation && <StatusTag variant={quotationStatusToVariant(selectedQuotation.status)} label={quotationStatusLabel(selectedQuotation.status)} />}
+        subtitle={selectedQuotation && `${selectedQuotation.customer} · ${selectedQuotation.validFrom} ~ ${selectedQuotation.validUntil}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedQuotation && (
+          <>
+            <DrawerSection title="客户信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="客户名称" emph>{selectedQuotation.customer}</InfoItem>
+                <InfoItem label="报价单号" emph mono>{selectedQuotation.quotationCode}</InfoItem>
+                <InfoItem label="有效期起">{selectedQuotation.validFrom}</InfoItem>
+                <InfoItem label="有效期止">{selectedQuotation.validUntil}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-body">
-              {/* 客户信息 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>客户信息</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                  <div>
-                    <label className="drawer-label">客户名称</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedQuotation.customer}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">报价单号</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }} className="mono">{selectedQuotation.quotationCode}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">有效期起</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedQuotation.validFrom}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">有效期止</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedQuotation.validUntil}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 报价详情 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>报价详情</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                  <div>
-                    <label className="drawer-label">商品名称</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedQuotation.product}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">茶类</label>
-                    <div><Tag category={selectedQuotation.teaCategory} /></div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">品级</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedQuotation.grade}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">价格来源</label>
-                    {(() => {
-                      const ps = priceSourceStyle(selectedQuotation.priceSource);
-                      return (
-                        <span style={{
-                          padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)',
-                          fontWeight: 'var(--font-medium)', background: ps.bg, color: ps.color, border: `1px solid ${ps.border}`,
-                        }}>{priceSourceLabel(selectedQuotation.priceSource)}</span>
-                      );
-                    })()}
-                  </div>
-                  <div>
-                    <label className="drawer-label">报价单价</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }} className="mono">¥{formatAmount(selectedQuotation.unitPrice)}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">数量</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }} className="mono">{selectedQuotation.quantity}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">金额</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-current-base)', fontWeight: 'var(--font-bold)' }} className="mono">¥{formatAmount(selectedQuotation.amount)}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">状态</label>
-                    <StatusTag variant={quotationStatusToVariant(selectedQuotation.status)} label={quotationStatusLabel(selectedQuotation.status)} />
-                  </div>
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <label className="drawer-label">备注</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedQuotation.remark}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 价格对比 */}
-              <div style={{ marginBottom: 'var(--space-4)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>价格对比</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <DrawerSection title="报价详情">
+              <InfoGrid cols={3}>
+                <InfoItem label="商品名称" emph>{selectedQuotation.product}</InfoItem>
+                <InfoItem label="茶类"><Tag category={selectedQuotation.teaCategory} /></InfoItem>
+                <InfoItem label="品级">{selectedQuotation.grade}</InfoItem>
+                <InfoItem label="价格来源">
                   {(() => {
-                    const rows: { label: string; price: number; isCurrent?: boolean; isQuote?: boolean }[] = [
-                      { label: '市场价', price: selectedQuotation.marketPrice },
-                      { label: '标准销售价', price: selectedQuotation.salesPrice },
-                    ];
-                    if (selectedQuotation.vipPrice !== null) {
-                      rows.push({ label: 'VIP价', price: selectedQuotation.vipPrice });
-                    }
-                    rows.push({ label: '本次报价', price: selectedQuotation.unitPrice, isQuote: true });
-                    return rows.map((row, i) => {
-                      const discount = row.label !== '市场价' && selectedQuotation.marketPrice > 0
-                        ? ((row.price - selectedQuotation.marketPrice) / selectedQuotation.marketPrice * 100).toFixed(1)
-                        : null;
-                      return (
-                        <div key={i} style={{
-                          display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
-                          padding: 'var(--space-3)',
-                          background: row.isQuote ? 'var(--color-module-current-lightest)' : 'var(--color-bg-tertiary)',
-                          borderRadius: 'var(--radius-md)',
-                          border: row.isQuote ? '1px solid var(--color-module-current-light)' : '1px solid transparent',
-                        }}>
-                          <div style={{
-                            width: 28, height: 28, borderRadius: 'var(--radius-md)',
-                            background: row.isQuote ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)',
-                            color: row.isQuote ? '#fff' : 'var(--color-text-tertiary)',
-                            flexShrink: 0,
-                          }}>{i + 1}</div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                              <span style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }}>{row.label}</span>
-                              <span className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', color: row.isQuote ? 'var(--color-module-current-base)' : 'var(--color-text-primary)' }}>¥{formatAmount(row.price)}</span>
-                              {discount !== null && (
-                                <span className="mono" style={{ fontSize: 'var(--text-xs)', color: Number(discount) > 0 ? '#CB405D' : Number(discount) < 0 ? '#01795D' : 'var(--color-text-tertiary)' }}>
-                                  {Number(discount) > 0 ? '+' : ''}{discount}%
-                                </span>
-                              )}
-                              {row.isQuote && (
-                                <span style={{ padding: '0 6px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', background: 'var(--color-module-current-lightest)', color: 'var(--color-module-current-base)', fontWeight: 'var(--font-medium)' }}>报价</span>
-                              )}
-                            </div>
+                    const ps = priceSourceStyle(selectedQuotation.priceSource);
+                    return (
+                      <span style={{
+                        padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-medium)', background: ps.bg, color: ps.color, border: `1px solid ${ps.border}`,
+                      }}>{priceSourceLabel(selectedQuotation.priceSource)}</span>
+                    );
+                  })()}
+                </InfoItem>
+                <InfoItem label="报价单价" mono>¥{formatAmount(selectedQuotation.unitPrice)}</InfoItem>
+                <InfoItem label="数量" mono>{selectedQuotation.quantity}</InfoItem>
+                <InfoItem label="金额" mono valueStyle={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-bold)' }}>¥{formatAmount(selectedQuotation.amount)}</InfoItem>
+                <InfoItem label="状态"><StatusTag variant={quotationStatusToVariant(selectedQuotation.status)} label={quotationStatusLabel(selectedQuotation.status)} /></InfoItem>
+                <InfoItem label="备注" span={3}>{selectedQuotation.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+
+            <DrawerSection title="价格对比">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                {(() => {
+                  const rows: { label: string; price: number; isCurrent?: boolean; isQuote?: boolean }[] = [
+                    { label: '市场价', price: selectedQuotation.marketPrice },
+                    { label: '标准销售价', price: selectedQuotation.salesPrice },
+                  ];
+                  if (selectedQuotation.vipPrice !== null) {
+                    rows.push({ label: 'VIP价', price: selectedQuotation.vipPrice });
+                  }
+                  rows.push({ label: '本次报价', price: selectedQuotation.unitPrice, isQuote: true });
+                  return rows.map((row, i) => {
+                    const discount = row.label !== '市场价' && selectedQuotation.marketPrice > 0
+                      ? ((row.price - selectedQuotation.marketPrice) / selectedQuotation.marketPrice * 100).toFixed(1)
+                      : null;
+                    return (
+                      <div key={i} style={{
+                        display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
+                        padding: 'var(--space-3)',
+                        background: row.isQuote ? 'var(--color-module-current-lightest)' : 'var(--color-bg-tertiary)',
+                        borderRadius: 'var(--radius-md)',
+                        border: row.isQuote ? '1px solid var(--color-module-current-light)' : '1px solid transparent',
+                      }}>
+                        <div style={{
+                          width: 28, height: 28, borderRadius: 'var(--radius-md)',
+                          background: row.isQuote ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)',
+                          color: row.isQuote ? '#fff' : 'var(--color-text-tertiary)',
+                          flexShrink: 0,
+                        }}>{i + 1}</div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                            <span style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }}>{row.label}</span>
+                            <span className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', color: row.isQuote ? 'var(--color-module-current-base)' : 'var(--color-text-primary)' }}>¥{formatAmount(row.price)}</span>
+                            {discount !== null && (
+                              <span className="mono" style={{ fontSize: 'var(--text-xs)', color: Number(discount) > 0 ? '#CB405D' : Number(discount) < 0 ? '#01795D' : 'var(--color-text-tertiary)' }}>
+                                {Number(discount) > 0 ? '+' : ''}{discount}%
+                              </span>
+                            )}
+                            {row.isQuote && (
+                              <span style={{ padding: '0 6px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', background: 'var(--color-module-current-lightest)', color: 'var(--color-module-current-base)', fontWeight: 'var(--font-medium)' }}>报价</span>
+                            )}
                           </div>
                         </div>
-                      );
-                    });
-                  })()}
-                </div>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetailDrawer}>关闭</Button>
-              {selectedQuotation.status === QuotationStatus.PENDING_REPLY && (
-                <Button onClick={() => {
-                  setQuotations(quotations.map(q => q.id === selectedQuotation.id ? { ...q, status: QuotationStatus.QUOTED } : q));
-                  handleCloseDetailDrawer();
-                }}>确认报价</Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
 
       {/* 新建报价抽屉 */}
       {showFormDrawer && (

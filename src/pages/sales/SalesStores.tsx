@@ -4,6 +4,7 @@ import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StoreItem, StatCardData } from '../../types';
 import { storeItems as initialStores, generateStoreCode } from '../../data/stores';
 import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
@@ -182,50 +183,54 @@ export default function SalesStores() {
         </div>
       )}
 
-      {/* 详情弹窗 */}
-      {detailStore && (
-        <div className="drawer-overlay" onClick={() => setDetailStore(null)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">门店详情</span>
-              <button className="drawer-close" onClick={() => setDetailStore(null)}><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
-            </div>
-            <div className="drawer-body">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-                <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: PRIMARY_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY }}>
-                  <IconStore />
-                </div>
-                <div>
-                  <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-neutral-800)' }}>{detailStore.name}</div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-neutral-500)' }}>编号：{detailStore.code} · {statusTag(detailStore.status)}</div>
-                </div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                {([
-                  ['所在地区', [detailStore.province, detailStore.city, detailStore.district].filter(Boolean).join(' / ') || '—'],
-                  ['详细地址', detailStore.address || '—'],
-                  ['店长', detailStore.manager || '—'],
-                  ['联系电话', detailStore.phone || '—'],
-                  ['营业时间', detailStore.businessHours || '—'],
-                  ['开业日期', detailStore.openingDate || '—'],
-                  ['门店面积', `${detailStore.area}㎡`],
-                  ['关联门店仓库', `${detailStore.name}仓（WH-ST）`],
-                ] as [string, string][]).map(([label, value]) => (
-                  <div key={label} style={{ fontSize: 'var(--text-sm)' }}><span style={{ color: 'var(--color-neutral-500)' }}>{label}：</span><span style={{ color: 'var(--color-neutral-800)', fontWeight: 'var(--font-medium)' }}>{value}</span></div>
-                ))}
-              </div>
-              {detailStore.remark && <div style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)' }}><span style={{ color: 'var(--color-neutral-500)' }}>备注：</span><span style={{ color: 'var(--color-neutral-800)' }}>{detailStore.remark}</span></div>}
+      {/* 详情抽屉 */}
+      <DetailDrawer
+        open={!!detailStore}
+        onClose={() => setDetailStore(null)}
+        badge="ST"
+        title={detailStore?.name}
+        statusTag={detailStore && statusTag(detailStore.status)}
+        subtitle={detailStore && `${detailStore.code} · ${[detailStore.province, detailStore.city, detailStore.district].filter(Boolean).join(' / ') || '—'}`}
+        mode="view"
+        onEdit={() => { if (detailStore) { const s = detailStore; setDetailStore(null); openEdit(s); } }}
+      >
+        {detailStore && (
+          <>
+            <DrawerSection title="基本信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="门店编号" emph mono>{detailStore.code}</InfoItem>
+                <InfoItem label="门店名称" emph>{detailStore.name}</InfoItem>
+                <InfoItem label="营业状态">{statusTag(detailStore.status)}</InfoItem>
+                <InfoItem label="店长">{detailStore.manager || '—'}</InfoItem>
+                <InfoItem label="联系电话" mono>{detailStore.phone || '—'}</InfoItem>
+                <InfoItem label="营业时间">{detailStore.businessHours || '—'}</InfoItem>
+                <InfoItem label="开业日期">{detailStore.openingDate || '—'}</InfoItem>
+                <InfoItem label="门店面积" mono>{detailStore.area}㎡</InfoItem>
+                <InfoItem label="关联门店仓库">{detailStore.name}仓（WH-ST）</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+
+            <DrawerSection title="地址信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="所在地区">{[detailStore.province, detailStore.city, detailStore.district].filter(Boolean).join(' / ') || '—'}</InfoItem>
+                <InfoItem label="详细地址" span={2}>{detailStore.address || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+
+            <DrawerSection title="备注">
+              <InfoGrid cols={3}>
+                <InfoItem label="备注" span={3}>{detailStore.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+
+            <DrawerSection title="联动说明">
               <div style={{ padding: 'var(--space-3)', background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)' }}>
                 门店地址已联动至「仓储 &gt; 仓库设置 &gt; 门店仓库」，作为门店仓库的地址来源。
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', marginTop: 'var(--space-4)' }}>
-                <Button variant="ghost" onClick={() => { openEdit(detailStore); setDetailStore(null); }}>编辑</Button>
-                <Button variant="ghost" onClick={() => setDetailStore(null)}>关闭</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
 
       {/* 新增/编辑抽屉 */}
       {showAddDrawer && (

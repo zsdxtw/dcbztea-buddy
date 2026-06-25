@@ -7,6 +7,7 @@ import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import { TeaCategory } from '../../types';
 import type { StatCardData } from '../../types';
 
@@ -145,86 +146,32 @@ export default function InventoryOtherIO() {
       </div>
 
       {/* 详情抽屉 */}
-      {showDetail && selectedRecord && (
-        <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
-            <div className="drawer-header">
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 'var(--radius-lg)',
-                    background: 'var(--color-module-current-lightest)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)',
-                    color: 'var(--color-module-current-base)', flexShrink: 0,
-                  }}>
-                    QT
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                      <span className="drawer-title">{selectedRecord.code}</span>
-                      <StatusTag variant={ioStatusToVariant(selectedRecord.status)} label={ioStatusLabel(selectedRecord.status)} />
-                    </div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-                      {selectedRecord.ioType} · {selectedRecord.product}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button className="drawer-close" onClick={handleCloseDetail}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              </button>
-            </div>
-
-            <div className="drawer-body">
-              <div className="drawer-section-title">单据信息</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-                <div>
-                  <label className="drawer-label">单号</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">出入库类型</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: selectedRecord.ioType === '其他入库' ? 'var(--color-semantic-success)' : 'var(--color-module-current-base)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.ioType}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">商品</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.product}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">数量</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }} className="mono">{selectedRecord.quantity}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">仓库</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.warehouse}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">原因</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.reason}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">操作人</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.operator}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.date}</div>
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label className="drawer-label">备注</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedRecord.remark || '—'}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
-              <Button variant="primary" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DetailDrawer
+        open={showDetail && !!selectedRecord}
+        onClose={handleCloseDetail}
+        badge="IO"
+        title={selectedRecord?.code}
+        statusTag={selectedRecord && <StatusTag variant={ioStatusToVariant(selectedRecord.status)} label={ioStatusLabel(selectedRecord.status)} />}
+        subtitle={selectedRecord && `${selectedRecord.ioType} · ${selectedRecord.product}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedRecord && (
+          <DrawerSection title="单据信息">
+            <InfoGrid cols={3}>
+              <InfoItem label="单号" emph mono>{selectedRecord.code}</InfoItem>
+              <InfoItem label="出入库类型" emph valueStyle={{ color: selectedRecord.ioType === '其他入库' ? 'var(--color-semantic-success)' : 'var(--color-module-current-base)' }}>{selectedRecord.ioType}</InfoItem>
+              <InfoItem label="商品">{selectedRecord.product}</InfoItem>
+              <InfoItem label="数量" mono>{selectedRecord.quantity}</InfoItem>
+              <InfoItem label="仓库">{selectedRecord.warehouse}</InfoItem>
+              <InfoItem label="原因">{selectedRecord.reason}</InfoItem>
+              <InfoItem label="操作人">{selectedRecord.operator}</InfoItem>
+              <InfoItem label="日期">{selectedRecord.date}</InfoItem>
+              <InfoItem label="备注" span={3}>{selectedRecord.remark || '—'}</InfoItem>
+            </InfoGrid>
+          </DrawerSection>
+        )}
+      </DetailDrawer>
     </>
   );
 }

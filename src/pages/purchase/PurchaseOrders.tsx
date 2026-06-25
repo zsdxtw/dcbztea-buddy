@@ -7,6 +7,7 @@ import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag, { orderStatusToVariant, orderStatusLabel } from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import { TeaCategory, OrderStatus } from '../../types';
 import type { StatCardData, PurchaseOrderItem } from '../../types';
 import { PRICE_SUPPLIERS, getPurchaseDefaultPrice } from '../../data/prices';
@@ -298,115 +299,66 @@ export default function PurchaseOrders() {
       )}
 
       {/* 订单详情抽屉 */}
-      {showDetail && selectedOrder && (
-        <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
-            <div className="drawer-header">
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 'var(--radius-lg)',
-                    background: 'var(--color-module-current-lightest)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)',
-                    color: 'var(--color-module-current-base)', flexShrink: 0,
-                  }}>
-                    PO
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                      <span className="drawer-title">{selectedOrder.code}</span>
-                      <StatusTag variant={orderStatusToVariant(selectedOrder.status)} label={orderStatusLabel(selectedOrder.status)} />
-                    </div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-                      {selectedOrder.supplier} · {selectedOrder.product}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button className="drawer-close" onClick={handleCloseDetail}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              </button>
-            </div>
+      <DetailDrawer
+        open={showDetail && !!selectedOrder}
+        onClose={handleCloseDetail}
+        badge="PO"
+        title={selectedOrder?.code}
+        statusTag={selectedOrder && <StatusTag variant={orderStatusToVariant(selectedOrder.status)} label={orderStatusLabel(selectedOrder.status)} />}
+        subtitle={selectedOrder && `${selectedOrder.supplier} · ${selectedOrder.product}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedOrder && (
+          <>
+            <DrawerSection title="订单信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="订单编号" emph mono>{selectedOrder.code}</InfoItem>
+                <InfoItem label="供应商" emph>{selectedOrder.supplier}</InfoItem>
+                <InfoItem label="下单日期">{selectedOrder.orderDate}</InfoItem>
+                <InfoItem label="交货日期">{selectedOrder.deliveryDate}</InfoItem>
+                <InfoItem label="联系人">{selectedOrder.contactPerson}</InfoItem>
+                <InfoItem label="联系电话">{selectedOrder.contactPhone}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedOrder.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-body">
-              {/* 订单基本信息 */}
-              <div className="drawer-section-title">订单信息</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-                <div>
-                  <label className="drawer-label">订单编号</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedOrder.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">供应商</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedOrder.supplier}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">下单日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)' }}>{selectedOrder.orderDate}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">交货日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)' }}>{selectedOrder.deliveryDate}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">联系人</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)' }}>{selectedOrder.contactPerson}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">联系电话</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)' }}>{selectedOrder.contactPhone}</div>
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label className="drawer-label">备注</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedOrder.remark || '—'}</div>
-                </div>
-              </div>
-
-              {/* 商品明细 */}
-              <div className="drawer-section-title">商品明细</div>
-              <div style={{
-                marginBottom: 'var(--space-5)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-primary)',
-                overflow: 'hidden',
-              }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                  <thead>
-                    <tr style={{ background: 'var(--color-bg-tertiary)' }}>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'left', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>商品名称</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'left', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>规格</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>数量</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>市场价</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>采购价</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>采购实价</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>金额</th>
+            <DrawerSection title="商品明细">
+              <table className="detail-inline-table">
+                <thead>
+                  <tr>
+                    <th>商品名称</th>
+                    <th>规格</th>
+                    <th style={{ textAlign: 'right' }}>数量</th>
+                    <th style={{ textAlign: 'right' }}>市场价</th>
+                    <th style={{ textAlign: 'right' }}>采购价</th>
+                    <th style={{ textAlign: 'right' }}>采购实价</th>
+                    <th style={{ textAlign: 'right' }}>金额</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedOrder.items.map((item, i) => (
+                    <tr key={i}>
+                      <td style={{ fontWeight: 'var(--font-medium)' }}>{item.name}</td>
+                      <td>{item.spec}</td>
+                      <td style={{ textAlign: 'right' }} className="mono">{item.quantity}</td>
+                      <td style={{ textAlign: 'right', color: 'var(--color-text-tertiary)' }} className="mono">{formatMoney(item.marketPrice)}</td>
+                      <td style={{ textAlign: 'right' }} className="mono">{formatMoney(item.purchasePrice)}</td>
+                      <td style={{ textAlign: 'right', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }} className="mono">{formatMoney(item.actualPurchasePrice)}</td>
+                      <td style={{ textAlign: 'right', fontWeight: 'var(--font-medium)' }} className="mono">{item.amount}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {selectedOrder.items.map((item, i) => (
-                      <tr key={i} style={{ borderTop: '1px solid var(--color-border-primary)' }}>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', fontWeight: 'var(--font-medium)' }}>{item.name}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', color: 'var(--color-text-secondary)' }}>{item.spec}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right' }} className="mono">{item.quantity}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', color: 'var(--color-text-tertiary)' }} className="mono">{formatMoney(item.marketPrice)}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right' }} className="mono">{formatMoney(item.purchasePrice)}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }} className="mono">{formatMoney(item.actualPurchasePrice)}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)' }} className="mono">{item.amount}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr style={{ background: 'var(--color-bg-tertiary)', borderTop: '1px solid var(--color-border-primary)' }}>
-                      <td colSpan={6} style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-semibold)' }}>合计</td>
-                      <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-bold)', color: 'var(--color-module-current-base)' }} className="mono">{selectedOrder.amount}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: 'right', fontWeight: 'var(--font-semibold)' }}>合计</td>
+                    <td style={{ textAlign: 'right', fontWeight: 'var(--font-bold)', color: 'var(--color-module-current-base)' }} className="mono">{selectedOrder.amount}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </DrawerSection>
 
-              {/* 订单进度 */}
-              <div className="drawer-section-title">订单进度</div>
+            <DrawerSection title="订单进度">
               <div style={{ paddingLeft: 'var(--space-2)' }}>
                 {selectedOrder.timeline.map((step, i) => {
                   const isLast = i === selectedOrder.timeline.length - 1;
@@ -421,7 +373,7 @@ export default function PurchaseOrders() {
                         }} />
                         {!isLast && <div style={{ width: 2, flex: 1, background: 'var(--color-border-primary)', minHeight: 20 }} />}
                       </div>
-                      <div style={{ paddingTop: 0 }}>
+                      <div>
                         <div style={{ fontSize: 'var(--text-sm)', fontWeight: isLast ? 'var(--font-semibold)' : 'var(--font-medium)', color: isLast ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>
                           {step.event}
                         </div>
@@ -431,15 +383,10 @@ export default function PurchaseOrders() {
                   );
                 })}
               </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
-              <Button>审核</Button>
-            </div>
-          </div>
-        </div>
-      )}
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

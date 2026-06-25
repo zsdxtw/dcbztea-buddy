@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 /* ── 统计卡片数据 ── */
@@ -232,144 +233,67 @@ export default function PurchaseReturn() {
       </div>
 
       {/* 退货详情抽屉 */}
-      {showDetail && selectedReturn && (
-        <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
-            {/* 头部 */}
-            <div className="drawer-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: 'var(--radius-lg)',
-                  background: 'var(--color-module-current-lightest)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 'var(--text-base)', fontWeight: 'var(--font-bold)',
-                  color: 'var(--color-module-current-base)', flexShrink: 0,
-                }}>
-                  <svg viewBox="0 0 18 18" fill="none" style={{ width: 20, height: 20 }}>
-                    <path d="M3 6h12l-1.2 8H4.2L3 6z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-                    <path d="M7 10l3 3M10 10l-3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <span className="drawer-title">{selectedReturn.id}</span>
-                    <StatusTag variant={returnStatusToVariant(selectedReturn.status)} label={returnStatusLabel(selectedReturn.status)} />
-                  </div>
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-                    退货日期：{selectedReturn.returnDate}
-                  </div>
-                </div>
-              </div>
-              <button className="drawer-close" onClick={handleCloseDetail}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              </button>
-            </div>
+      <DetailDrawer
+        open={showDetail && !!selectedReturn}
+        onClose={handleCloseDetail}
+        badge="RT"
+        title={selectedReturn?.id}
+        statusTag={selectedReturn && (
+          <StatusTag variant={returnStatusToVariant(selectedReturn.status)} label={returnStatusLabel(selectedReturn.status)} />
+        )}
+        subtitle={selectedReturn && `${selectedReturn.supplier} · ${selectedReturn.product} · 退货日期 ${selectedReturn.returnDate}`}
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedReturn && (
+          <>
+            {/* 退货信息 */}
+            <DrawerSection title="退货信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="退货单号" mono>{selectedReturn.id}</InfoItem>
+                <InfoItem label="退货日期">{selectedReturn.returnDate}</InfoItem>
+                <InfoItem label="供应商" emph>{selectedReturn.supplier}</InfoItem>
+                <InfoItem label="退货商品">{selectedReturn.product}</InfoItem>
+                <InfoItem label="退货数量" mono>{selectedReturn.quantity}</InfoItem>
+                <InfoItem label="退货金额" mono emph valueStyle={{ color: 'var(--color-module-current-base)' }}>{selectedReturn.amount}</InfoItem>
+                <InfoItem label="退货原因">{selectedReturn.reason}</InfoItem>
+                <InfoItem label="联系人">{selectedReturn.contactPerson} {selectedReturn.contactPhone}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-body">
-              {/* 退货信息 */}
-              <div className="drawer-section-title">退货信息</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">退货单号</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.id}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">退货日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.returnDate}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">供应商</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.supplier}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">联系人</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.contactPerson} {selectedReturn.contactPhone}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">退货商品</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.product}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">退货数量</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.quantity}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">退货金额</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)' }}>{selectedReturn.amount}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">退货原因</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.reason}</div>
-                </div>
-              </div>
+            {/* 原采购单信息 */}
+            <DrawerSection title="原采购单信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="原采购单号" mono>{selectedReturn.originalOrder}</InfoItem>
+                <InfoItem label="采购日期">{selectedReturn.originalOrderDate}</InfoItem>
+                <InfoItem label="原采购金额" mono>{selectedReturn.originalAmount}</InfoItem>
+                <InfoItem label="退货占比" emph>
+                  {(() => {
+                    const retAmt = parseFloat(selectedReturn.amount.replace(/[¥,]/g, ''));
+                    const origAmt = parseFloat(selectedReturn.originalAmount.replace(/[¥,]/g, ''));
+                    return origAmt > 0 ? `${(retAmt / origAmt * 100).toFixed(1)}%` : '—';
+                  })()}
+                </InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              {/* 原采购单信息 */}
-              <div className="drawer-section-title">原采购单信息</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">原采购单号</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.originalOrder}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">采购日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.originalOrderDate}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">原采购金额</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.originalAmount}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">退货占比</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>
-                    {(() => {
-                      const retAmt = parseFloat(selectedReturn.amount.replace(/[¥,]/g, ''));
-                      const origAmt = parseFloat(selectedReturn.originalAmount.replace(/[¥,]/g, ''));
-                      return origAmt > 0 ? `${(retAmt / origAmt * 100).toFixed(1)}%` : '—';
-                    })()}
-                  </div>
-                </div>
-              </div>
+            {/* 退货原因详情 */}
+            <DrawerSection title="退货原因详情">
+              <InfoGrid cols={3}>
+                <InfoItem label="原因说明" span={3}>{selectedReturn.reasonDetail}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              {/* 退货原因详情 */}
-              <div className="drawer-section-title">退货原因详情</div>
-              <div style={{
-                background: 'var(--color-bg-tertiary)',
-                borderRadius: 'var(--radius-md)',
-                padding: 'var(--space-4)',
-                marginBottom: 'var(--space-4)',
-              }}>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', lineHeight: 1.6 }}>
-                  {selectedReturn.reasonDetail}
-                </div>
-              </div>
-
-              {/* 处理信息 */}
-              <div className="drawer-section-title">处理信息</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">处理人</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.handler}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">处理日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.handleDate}</div>
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label className="drawer-label">备注</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-medium)' }}>{selectedReturn.remark}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
-              {selectedReturn.status === 'pending' && (
-                <Button>审批处理</Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+            {/* 处理信息 */}
+            <DrawerSection title="处理信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="处理人">{selectedReturn.handler}</InfoItem>
+                <InfoItem label="处理日期">{selectedReturn.handleDate}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedReturn.remark}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

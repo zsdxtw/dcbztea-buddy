@@ -5,6 +5,7 @@ import Button from '../../components/common/Button';
 import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import StatCard from '../../components/common/StatCard';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import FilterBar from '../../components/business/FilterBar';
 import IdCardUpload, { parseIdCardNo, type IdCardOcrResult } from '../../components/business/IdCardUpload';
 import ContractUpload from '../../components/business/ContractUpload';
@@ -940,150 +941,127 @@ function EmployeeDetailDrawer({
   onClose: () => void;
   onEdit: (emp: Employee) => void;
 }) {
-  const drawerWidth = useDrawerWidth();
-
-  const fieldStyle: CSSProperties = {
-    padding: 'var(--space-2) 0',
-    borderBottom: '1px solid var(--color-border-primary)',
-    display: 'flex',
-    gap: 'var(--space-3)',
-  };
-  const labelStyle: CSSProperties = {
-    width: 110,
-    flexShrink: 0,
-    color: 'var(--color-text-tertiary)',
-    fontSize: 'var(--text-sm)',
-  };
-  const valueStyle: CSSProperties = {
-    flex: 1,
-    color: 'var(--color-text-primary)',
-    fontSize: 'var(--text-sm)',
-    wordBreak: 'break-all',
-  };
-
-  const renderField = (label: string, value?: string | number | null) => (
-    <div style={fieldStyle}>
-      <span style={labelStyle}>{label}</span>
-      <span style={valueStyle}>{value || <span style={{ color: 'var(--color-text-tertiary)' }}>-</span>}</span>
-    </div>
-  );
-
   return (
-    <div className="drawer-overlay" onClick={onClose}>
-      <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
-        <div className="drawer-header">
-          <span className="drawer-title">员工详情</span>
-          <button className="drawer-close" onClick={onClose}>
-            <svg viewBox="0 0 16 16" fill="none">
-              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
+    <DetailDrawer
+      open
+      onClose={onClose}
+      badge={employee.name.charAt(0)}
+      title={employee.name}
+      statusTag={<StatusTag variant={empStatusVariant(employee.status)} label={EMP_STATUS_LABELS[employee.status]} />}
+      subtitle={`${getOrgNodeName(employee.departmentId) || '—'} · ${employee.position || '—'}`}
+      mode="view"
+      onEdit={() => onEdit(employee)}
+    >
+      <>
+        <DrawerSection title="基本信息">
+          <InfoGrid cols={3}>
+            <InfoItem label="工号" emph mono>{employee.empNo}</InfoItem>
+            <InfoItem label="姓名" emph>{employee.name}</InfoItem>
+            <InfoItem label="性别">{GENDER_LABELS[employee.gender]}</InfoItem>
+            <InfoItem label="手机号" mono>{employee.phone || '—'}</InfoItem>
+            <InfoItem label="邮箱">{employee.email || '—'}</InfoItem>
+            <InfoItem label="状态">{EMP_STATUS_LABELS[employee.status]}</InfoItem>
+            <InfoItem label="部门">{getOrgNodeName(employee.departmentId) || '—'}</InfoItem>
+            <InfoItem label="团队">{employee.teamId ? getOrgNodeName(employee.teamId) : '—'}</InfoItem>
+            <InfoItem label="职位">{employee.position || '—'}</InfoItem>
+            <InfoItem label="入职日期" mono>{employee.joinDate || '—'}</InfoItem>
+          </InfoGrid>
+        </DrawerSection>
 
-        <div className="drawer-body">
-          {/* 基本信息 */}
-          <div className="drawer-section-title">基本信息</div>
-          {renderField('工号', employee.empNo)}
-          {renderField('姓名', employee.name)}
-          {renderField('性别', GENDER_LABELS[employee.gender])}
-          {renderField('手机号', employee.phone)}
-          {renderField('邮箱', employee.email)}
-          {renderField('部门', getOrgNodeName(employee.departmentId))}
-          {renderField('团队', employee.teamId ? getOrgNodeName(employee.teamId) : '-')}
-          {renderField('职位', employee.position)}
-          {renderField('入职日期', employee.joinDate)}
-          {renderField('状态', EMP_STATUS_LABELS[employee.status])}
-
-          {/* 身份证信息 */}
-          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>身份证信息</div>
-          {renderField('身份证号', employee.idCardNo)}
-          {renderField('民族', employee.ethnicity)}
-          {renderField('出生日期', employee.birthDate)}
-          {renderField('籍贯', employee.nativePlace)}
-          {renderField('身份证住址', employee.idCardAddress)}
-          {employee.idCardImages && employee.idCardImages.length > 0 && (
-            <div style={{ padding: 'var(--space-2) 0' }}>
-              <div style={{ ...labelStyle, marginBottom: 'var(--space-2)' }}>身份证图片</div>
-              <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                {employee.idCardImages.map((img, i) => (
-                  <img key={i} src={img} alt={`身份证${i === 0 ? '正面' : '反面'}`} style={{ width: 120, height: 76, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-primary)' }} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 个人信息 */}
-          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>个人信息</div>
-          {renderField('身高（cm）', employee.height)}
-          {renderField('体重（kg）', employee.weight)}
-          {renderField('兴趣爱好', employee.hobbies)}
-          {renderField('本地住址', employee.localAddress)}
-
-          {/* 学历信息 */}
-          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>学历信息</div>
-          {renderField('学历', employee.education)}
-          {renderField('学位', employee.degree)}
-          {employee.educationRecords && employee.educationRecords.length > 0 ? (
-            <div style={{ padding: 'var(--space-2) 0' }}>
-              <div style={{ ...labelStyle, marginBottom: 'var(--space-2)' }}>学习经历</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                {employee.educationRecords.map((rec, i) => (
-                  <div key={i} style={{ padding: 'var(--space-2) var(--space-3)', background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)' }}>
-                    <span style={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)', marginRight: 'var(--space-2)' }}>
-                      {STAGE_LABELS[rec.stage]}
-                    </span>
-                    {rec.school}{rec.college ? ` · ${rec.college}` : ''}{rec.major ? ` · ${rec.major}` : ''}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            renderField('学习经历', '-')
-          )}
-
-          {/* 结算信息 */}
-          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>结算信息</div>
-          {renderField('户名', employee.settlement?.accountName)}
-          {renderField('卡号', employee.settlement?.accountNo)}
-          {renderField('开户银行', employee.settlement?.bankName)}
-          {renderField('开户行号', employee.settlement?.bankNo)}
-
-          {/* 合同文件 */}
-          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>合同文件</div>
-          {employee.contracts && employee.contracts.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: 'var(--space-2) 0' }}>
-              {employee.contracts.map((f, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-secondary)' }}>
-                  <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, color: '#CB405D', flexShrink: 0 }}>
-                    <path d="M4 1.5h5L13 5.5V14a.5.5 0 0 1-.5.5h-8A.5.5 0 0 1 4 14V2a.5.5 0 0 1 .5-.5z" stroke="currentColor" strokeWidth="1.2" />
-                  </svg>
-                  <a href={f.url} target="_blank" rel="noreferrer" style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--color-module-current-base)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={f.name}>
-                    {f.name}
-                  </a>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{f.uploadedAt}</span>
+        <DrawerSection title="身份证信息">
+          <InfoGrid cols={3}>
+            <InfoItem label="身份证号" mono>{employee.idCardNo || '—'}</InfoItem>
+            <InfoItem label="民族">{employee.ethnicity || '—'}</InfoItem>
+            <InfoItem label="出生日期" mono>{employee.birthDate || '—'}</InfoItem>
+            <InfoItem label="籍贯">{employee.nativePlace || '—'}</InfoItem>
+            <InfoItem label="身份证住址" span={2}>{employee.idCardAddress || '—'}</InfoItem>
+            {employee.idCardImages && employee.idCardImages.length > 0 && (
+              <InfoItem label="身份证图片" span={3}>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                  {employee.idCardImages.map((img, i) => (
+                    <img key={i} src={img} alt={`身份证${i === 0 ? '正面' : '反面'}`} style={{ width: 120, height: 76, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-primary)' }} />
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            renderField('合同文件', '-')
-          )}
+              </InfoItem>
+            )}
+          </InfoGrid>
+        </DrawerSection>
 
-          {/* 紧急联系人 */}
-          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>紧急联系人</div>
-          {renderField('联系人姓名', employee.emergencyContactName)}
-          {renderField('联系人电话', employee.emergencyContactPhone)}
+        <DrawerSection title="个人信息">
+          <InfoGrid cols={3}>
+            <InfoItem label="身高（cm）">{employee.height != null ? `${employee.height}` : '—'}</InfoItem>
+            <InfoItem label="体重（kg）">{employee.weight != null ? `${employee.weight}` : '—'}</InfoItem>
+            <InfoItem label="兴趣爱好">{employee.hobbies || '—'}</InfoItem>
+            <InfoItem label="本地住址" span={3}>{employee.localAddress || '—'}</InfoItem>
+          </InfoGrid>
+        </DrawerSection>
 
-          {/* 其他 */}
-          <div className="drawer-section-title" style={{ marginTop: 'var(--space-4)' }}>其他</div>
-          {renderField('备注', employee.remark)}
-        </div>
+        <DrawerSection title="学历信息">
+          <InfoGrid cols={3}>
+            <InfoItem label="学历">{employee.education || '—'}</InfoItem>
+            <InfoItem label="学位">{employee.degree || '—'}</InfoItem>
+            <InfoItem label="学习经历" span={3}>
+              {employee.educationRecords && employee.educationRecords.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  {employee.educationRecords.map((rec, i) => (
+                    <div key={i} style={{ padding: 'var(--space-2) var(--space-3)', background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)' }}>
+                      <span style={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)', marginRight: 'var(--space-2)' }}>
+                        {STAGE_LABELS[rec.stage]}
+                      </span>
+                      {rec.school}{rec.college ? ` · ${rec.college}` : ''}{rec.major ? ` · ${rec.major}` : ''}
+                    </div>
+                  ))}
+                </div>
+              ) : '—'}
+            </InfoItem>
+          </InfoGrid>
+        </DrawerSection>
 
-        <div className="drawer-footer">
-          <Button variant="ghost" onClick={onClose}>关闭</Button>
-          <Button onClick={() => onEdit(employee)}>编辑</Button>
-        </div>
-      </div>
-    </div>
+        <DrawerSection title="结算信息">
+          <InfoGrid cols={3}>
+            <InfoItem label="户名">{employee.settlement?.accountName || '—'}</InfoItem>
+            <InfoItem label="卡号" mono>{employee.settlement?.accountNo || '—'}</InfoItem>
+            <InfoItem label="开户银行">{employee.settlement?.bankName || '—'}</InfoItem>
+            <InfoItem label="开户行号" mono>{employee.settlement?.bankNo || '—'}</InfoItem>
+          </InfoGrid>
+        </DrawerSection>
+
+        <DrawerSection title="合同文件">
+          <InfoGrid cols={3}>
+            <InfoItem label="合同文件" span={3}>
+              {employee.contracts && employee.contracts.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  {employee.contracts.map((f, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-secondary)' }}>
+                      <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, color: '#CB405D', flexShrink: 0 }}>
+                        <path d="M4 1.5h5L13 5.5V14a.5.5 0 0 1-.5.5h-8A.5.5 0 0 1 4 14V2a.5.5 0 0 1 .5-.5z" stroke="currentColor" strokeWidth="1.2" />
+                      </svg>
+                      <a href={f.url} target="_blank" rel="noreferrer" style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--color-module-current-base)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={f.name}>
+                        {f.name}
+                      </a>
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{f.uploadedAt}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : '—'}
+            </InfoItem>
+          </InfoGrid>
+        </DrawerSection>
+
+        <DrawerSection title="紧急联系人">
+          <InfoGrid cols={3}>
+            <InfoItem label="联系人姓名">{employee.emergencyContactName || '—'}</InfoItem>
+            <InfoItem label="联系人电话" mono>{employee.emergencyContactPhone || '—'}</InfoItem>
+          </InfoGrid>
+        </DrawerSection>
+
+        <DrawerSection title="其他">
+          <InfoGrid cols={3}>
+            <InfoItem label="备注" span={3}>{employee.remark || '—'}</InfoItem>
+          </InfoGrid>
+        </DrawerSection>
+      </>
+    </DetailDrawer>
   );
 }
 

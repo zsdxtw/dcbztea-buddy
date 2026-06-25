@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 const stats: StatCardData[] = [
@@ -101,74 +102,39 @@ export default function FinanceSalesCollection() {
         </Card>
       </div>
 
-      {showDetail && selectedCollection && (
-        <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">回款详情</span>
-              <button className="drawer-close" onClick={() => setShowDetail(false)}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              </button>
-            </div>
-            <div className="drawer-body">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">回款单号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedCollection.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">客户</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedCollection.customer}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">对账单号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)' }}>{selectedCollection.reconciliationCode}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">回款金额</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{selectedCollection.amount}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">回款方式</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedCollection.method}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">回款日期</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)' }}>{selectedCollection.date}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">状态</label>
-                  <StatusTag variant={collectionStatusToVariant(selectedCollection.status)} label={collectionStatusLabel(selectedCollection.status)} />
-                </div>
-              </div>
+      <DetailDrawer
+        open={showDetail && !!selectedCollection}
+        onClose={() => setShowDetail(false)}
+        badge="SC"
+        title={selectedCollection?.code}
+        statusTag={selectedCollection && <StatusTag variant={collectionStatusToVariant(selectedCollection.status)} label={collectionStatusLabel(selectedCollection.status)} />}
+        subtitle={selectedCollection && `${selectedCollection.customer} · ${selectedCollection.amount}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedCollection && (
+          <>
+            <DrawerSection title="基本信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="回款单号" emph mono>{selectedCollection.code}</InfoItem>
+                <InfoItem label="客户" emph>{selectedCollection.customer}</InfoItem>
+                <InfoItem label="对账单号" mono>{selectedCollection.reconciliationCode}</InfoItem>
+                <InfoItem label="回款金额" mono valueStyle={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)' }}>{selectedCollection.amount}</InfoItem>
+                <InfoItem label="回款方式">{selectedCollection.method}</InfoItem>
+                <InfoItem label="回款日期" mono>{selectedCollection.date}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedCollection.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>收款账户</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">收款银行/平台</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-finance-secondary)' }}>{selectedCollection.bankName || '—'}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">收款账号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-finance-secondary)' }}>{selectedCollection.bankAccount || '—'}</div>
-                </div>
-              </div>
-
-              {selectedCollection.remark && (
-                <>
-                  <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>备注</h4>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedCollection.remark}</div>
-                </>
-              )}
-            </div>
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={() => setShowDetail(false)}>关闭</Button>
-              {selectedCollection.status === 'pending' && <Button>确认回款</Button>}
-              {selectedCollection.status === 'overdue' && <Button>催收</Button>}
-            </div>
-          </div>
-        </div>
-      )}
+            <DrawerSection title="收款账户">
+              <InfoGrid cols={3}>
+                <InfoItem label="收款银行/平台" span={2} valueStyle={{ color: 'var(--color-module-finance-secondary)' }}>{selectedCollection.bankName || '—'}</InfoItem>
+                <InfoItem label="收款账号" mono valueStyle={{ color: 'var(--color-module-finance-secondary)' }}>{selectedCollection.bankAccount || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

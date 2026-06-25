@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 const stats: StatCardData[] = [
@@ -108,84 +109,54 @@ export default function FinanceExpense() {
         </Card>
       </div>
 
-      {showDetail && selectedExpense && (
-        <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">费用详情</span>
-              <button className="drawer-close" onClick={() => setShowDetail(false)}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              </button>
-            </div>
-            <div className="drawer-body">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">费用单号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedExpense.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">费用类别</label>
-                  <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${categoryColor(selectedExpense.category)}12`, color: categoryColor(selectedExpense.category), border: `1px solid ${categoryColor(selectedExpense.category)}30` }}>{selectedExpense.category}</span>
-                </div>
-                <div>
-                  <label className="drawer-label">事由</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedExpense.reason}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">金额</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{selectedExpense.amount}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">申请人</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedExpense.applicant}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">申请日期</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)' }}>{selectedExpense.date}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">状态</label>
-                  <StatusTag variant={expenseStatusToVariant(selectedExpense.status)} label={expenseStatusLabel(selectedExpense.status)} />
-                </div>
-              </div>
+      <DetailDrawer
+        open={showDetail && !!selectedExpense}
+        onClose={() => setShowDetail(false)}
+        badge="EX"
+        title={selectedExpense?.code}
+        statusTag={selectedExpense && <StatusTag variant={expenseStatusToVariant(selectedExpense.status)} label={expenseStatusLabel(selectedExpense.status)} />}
+        subtitle={selectedExpense && `${selectedExpense.category} · ${selectedExpense.applicant}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedExpense && (
+          <>
+            <DrawerSection title="基本信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="费用单号" emph mono>{selectedExpense.code}</InfoItem>
+                <InfoItem label="费用类别">{selectedExpense.category}</InfoItem>
+                <InfoItem label="金额" mono valueStyle={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)' }}>{selectedExpense.amount}</InfoItem>
+                <InfoItem label="事由" span={3}>{selectedExpense.reason}</InfoItem>
+                <InfoItem label="申请人">{selectedExpense.applicant}</InfoItem>
+                <InfoItem label="申请日期" mono>{selectedExpense.date}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedExpense.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              {selectedExpense.approvalFlow && (
-                <>
-                  <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>审批流程</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
-                    {selectedExpense.approvalFlow.map((step, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-2) var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
-                        <div style={{ width: 28, height: 28, borderRadius: '50%', background: step.result === '已通过' ? '#E8F5E9' : step.result === '已驳回' ? '#FFEBEE' : '#FFF3E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: step.result === '已通过' ? '#2E7D32' : step.result === '已驳回' ? '#C62828' : '#E65100', flexShrink: 0 }}>
-                          {i + 1}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{step.step}</span>
-                            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{step.person}</span>
-                          </div>
-                          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{step.time}</div>
-                        </div>
-                        <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: step.result === '已通过' ? '#E8F5E9' : step.result === '已驳回' ? '#FFEBEE' : '#FFF3E0', color: step.result === '已通过' ? '#2E7D32' : step.result === '已驳回' ? '#C62828' : '#E65100' }}>{step.result}</span>
+            {selectedExpense.approvalFlow && (
+              <DrawerSection title="审批流程">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  {selectedExpense.approvalFlow.map((step, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-2) var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: step.result === '已通过' ? '#E8F5E9' : step.result === '已驳回' ? '#FFEBEE' : '#FFF3E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: step.result === '已通过' ? '#2E7D32' : step.result === '已驳回' ? '#C62828' : '#E65100', flexShrink: 0 }}>
+                        {i + 1}
                       </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {selectedExpense.remark && (
-                <>
-                  <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>备注</h4>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedExpense.remark}</div>
-                </>
-              )}
-            </div>
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={() => setShowDetail(false)}>关闭</Button>
-              {selectedExpense.status === 'pending' && <Button>审批</Button>}
-            </div>
-          </div>
-        </div>
-      )}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{step.step}</span>
+                          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{step.person}</span>
+                        </div>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{step.time}</div>
+                      </div>
+                      <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: step.result === '已通过' ? '#E8F5E9' : step.result === '已驳回' ? '#FFEBEE' : '#FFF3E0', color: step.result === '已通过' ? '#2E7D32' : step.result === '已驳回' ? '#C62828' : '#E65100' }}>{step.result}</span>
+                    </div>
+                  ))}
+                </div>
+              </DrawerSection>
+            )}
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

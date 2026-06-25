@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 /* ── 统计卡片 ── */
@@ -248,133 +249,66 @@ export default function SalesReconciliation() {
       </div>
 
       {/* 对账详情抽屉 */}
-      {showDetail && selectedRecord && (
-        <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">对账单详情</span>
-              <button className="drawer-close" onClick={handleCloseDetail}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              </button>
-            </div>
+      <DetailDrawer
+        open={showDetail && !!selectedRecord}
+        onClose={handleCloseDetail}
+        badge="RC"
+        title={selectedRecord?.code}
+        statusTag={selectedRecord && <StatusTag variant={reconciliationStatusToVariant(selectedRecord.status)} label={reconciliationStatusLabel(selectedRecord.status)} />}
+        subtitle={selectedRecord && `${selectedRecord.customer} · ${selectedRecord.period}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedRecord && (
+          <>
+            <DrawerSection title="客户信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="客户名称" emph>{selectedRecord.customer}</InfoItem>
+                <InfoItem label="客户类型">{CUSTOMER_TYPE_LABELS[selectedRecord.customerType]}</InfoItem>
+                <InfoItem label="对账单号" emph mono>{selectedRecord.code}</InfoItem>
+                <InfoItem label="对账周期" span={2}>{selectedRecord.period}</InfoItem>
+                <InfoItem label="联系人">{selectedRecord.contactPerson}</InfoItem>
+                <InfoItem label="联系电话" mono>{selectedRecord.contactPhone}</InfoItem>
+                <InfoItem label="结算方式">{selectedRecord.settlementMethod}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-body">
-              {/* 客户信息 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>客户信息</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                  <div>
-                    <label className="drawer-label">客户名称</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.customer}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">客户类型</label>
-                    <span style={{
-                      padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
-                      background: selectedRecord.customerType === 'direct' ? '#E3F2FD' : selectedRecord.customerType === 'channel' ? '#FFF3E0' : '#E8F5E9',
-                      color: selectedRecord.customerType === 'direct' ? '#1565C0' : selectedRecord.customerType === 'channel' ? '#E65100' : '#2E7D32',
-                      border: `1px solid ${selectedRecord.customerType === 'direct' ? '#90CAF9' : selectedRecord.customerType === 'channel' ? '#FFCC80' : '#A5D6A7'}`,
-                    }}>{CUSTOMER_TYPE_LABELS[selectedRecord.customerType]}</span>
-                  </div>
-                  <div>
-                    <label className="drawer-label">对账单号</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }} className="mono">{selectedRecord.code}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">对账周期</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.period}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">联系人</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.contactPerson}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">联系电话</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.contactPhone}</div>
-                  </div>
-                </div>
-              </div>
+            <DrawerSection title="订单汇总">
+              <InfoGrid cols={3}>
+                <InfoItem label="关联销售单数" mono>{selectedRecord.orderCount} 单</InfoItem>
+                <InfoItem label="发票状态">{selectedRecord.invoiceStatus}</InfoItem>
+                <InfoItem label="状态">{reconciliationStatusLabel(selectedRecord.status)}</InfoItem>
+                <InfoItem label="销售金额" mono>{selectedRecord.salesAmount}</InfoItem>
+                <InfoItem label="已收金额" mono>{selectedRecord.receivedAmount}</InfoItem>
+                <InfoItem label="应收余额" mono valueStyle={{ color: selectedRecord.balance !== '¥ 0' ? 'var(--color-module-current-base)' : 'var(--color-text-tertiary)', fontWeight: selectedRecord.balance !== '¥ 0' ? 'var(--font-semibold)' : undefined }}>{selectedRecord.balance}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              {/* 订单汇总 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>订单汇总</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                  <div>
-                    <label className="drawer-label">关联销售单数</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.orderCount} 单</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">结算方式</label>
-                    <div style={{ fontSize: 'var(--text-sm)' }}>{selectedRecord.settlementMethod}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">销售金额</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }} className="mono">{selectedRecord.salesAmount}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">已收金额</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }} className="mono">{selectedRecord.receivedAmount}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">应收余额</label>
-                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', color: selectedRecord.balance !== '¥ 0' ? 'var(--color-module-current-base)' : 'var(--color-text-tertiary)' }} className="mono">{selectedRecord.balance}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">状态</label>
-                    <StatusTag variant={reconciliationStatusToVariant(selectedRecord.status)} label={reconciliationStatusLabel(selectedRecord.status)} />
-                  </div>
-                </div>
-              </div>
-
-              {/* 收款记录 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>收款记录</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <DrawerSection title="收款记录">
+              <table className="detail-inline-table">
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th style={{ textAlign: 'right' }}>金额</th>
+                    <th>方式</th>
+                    <th>备注</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {selectedRecord.paymentRecords.map((pr, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
-                      <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)', background: 'var(--color-module-current-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>
-                        {i + 1}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-                          <span style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }} className="mono">{pr.amount}</span>
-                          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{pr.date}</span>
-                        </div>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>{pr.method} · {pr.remark}</div>
-                      </div>
-                    </div>
+                    <tr key={i}>
+                      <td className="cell-muted">{pr.date}</td>
+                      <td style={{ textAlign: 'right' }} className="mono">{pr.amount}</td>
+                      <td>{pr.method}</td>
+                      <td className="cell-muted">{pr.remark}</td>
+                    </tr>
                   ))}
-                </div>
-              </div>
-
-              {/* 发票状态 */}
-              <div>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>发票状态</h4>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: selectedRecord.invoiceStatus === '已收票' ? '#01795D' : selectedRecord.invoiceStatus === '已开票' ? '#0F64B5' : '#FD742D' }} />
-                  <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.invoiceStatus}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
-              {selectedRecord.status === 'pending' && (
-                <Button>发起对账</Button>
-              )}
-              {selectedRecord.status === 'reconciling' && (
-                <>
-                  <Button variant="ghost" style={{ color: '#CB405D', borderColor: '#CB405D' }}>提出异议</Button>
-                  <Button>确认对账</Button>
-                </>
-              )}
-              {selectedRecord.status === 'disputed' && (
-                <Button>重新对账</Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+                </tbody>
+              </table>
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

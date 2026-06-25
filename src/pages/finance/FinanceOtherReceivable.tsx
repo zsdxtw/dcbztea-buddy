@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 const stats: StatCardData[] = [
@@ -102,57 +103,29 @@ export default function FinanceOtherReceivable() {
         </Card>
       </div>
 
-      {showDetail && selectedItem && (
-        <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">应收详情</span>
-              <button className="drawer-close" onClick={() => setShowDetail(false)}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              </button>
-            </div>
-            <div className="drawer-body">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                <div>
-                  <label className="drawer-label">单号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedItem.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">往来单位</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedItem.partner}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">事由</label>
-                  <span style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${reasonColor(selectedItem.reason)}12`, color: reasonColor(selectedItem.reason), border: `1px solid ${reasonColor(selectedItem.reason)}30` }}>{selectedItem.reason}</span>
-                </div>
-                <div>
-                  <label className="drawer-label">金额</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{selectedItem.amount}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">应收日期</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)' }}>{selectedItem.dueDate}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">状态</label>
-                  <StatusTag variant={receivableStatusToVariant(selectedItem.status)} label={receivableStatusLabel(selectedItem.status)} />
-                </div>
-                {selectedItem.remark && (
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <label className="drawer-label">备注</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedItem.remark}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={() => setShowDetail(false)}>关闭</Button>
-              {selectedItem.status === 'pending' && <Button>确认收款</Button>}
-              {selectedItem.status === 'overdue' && <Button>催收</Button>}
-            </div>
-          </div>
-        </div>
-      )}
+      <DetailDrawer
+        open={showDetail && !!selectedItem}
+        onClose={() => setShowDetail(false)}
+        badge="OR"
+        title={selectedItem?.code}
+        statusTag={selectedItem && <StatusTag variant={receivableStatusToVariant(selectedItem.status)} label={receivableStatusLabel(selectedItem.status)} />}
+        subtitle={selectedItem && `${selectedItem.partner} · ${selectedItem.amount}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedItem && (
+          <DrawerSection title="基本信息">
+            <InfoGrid cols={3}>
+              <InfoItem label="单号" emph mono>{selectedItem.code}</InfoItem>
+              <InfoItem label="往来单位" emph>{selectedItem.partner}</InfoItem>
+              <InfoItem label="事由">{selectedItem.reason}</InfoItem>
+              <InfoItem label="金额" mono valueStyle={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)' }}>{selectedItem.amount}</InfoItem>
+              <InfoItem label="应收日期" mono>{selectedItem.dueDate}</InfoItem>
+              <InfoItem label="备注" span={3}>{selectedItem.remark || '—'}</InfoItem>
+            </InfoGrid>
+          </DrawerSection>
+        )}
+      </DetailDrawer>
     </>
   );
 }

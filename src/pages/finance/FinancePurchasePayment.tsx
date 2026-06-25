@@ -6,6 +6,7 @@ import Table from '../../components/common/Table';
 import StatusTag from '../../components/common/StatusTag';
 import Button from '../../components/common/Button';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import type { StatCardData } from '../../types';
 
 const stats: StatCardData[] = [
@@ -102,86 +103,46 @@ export default function FinancePurchasePayment() {
         </Card>
       </div>
 
-      {showDetail && selectedPayment && (
-        <div className="drawer-overlay" onClick={() => setShowDetail(false)}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">付款详情</span>
-              <button className="drawer-close" onClick={() => setShowDetail(false)}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              </button>
-            </div>
-            <div className="drawer-body">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">付款单号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedPayment.code}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">供应商</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedPayment.supplier}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">对账单号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)' }}>{selectedPayment.reconciliationCode}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">付款金额</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--color-module-current-base)' }}>{selectedPayment.amount}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">付款方式</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedPayment.method}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">付款日期</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)' }}>{selectedPayment.date}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">状态</label>
-                  <StatusTag variant={paymentStatusToVariant(selectedPayment.status)} label={paymentStatusLabel(selectedPayment.status)} />
-                </div>
-              </div>
+      <DetailDrawer
+        open={showDetail && !!selectedPayment}
+        onClose={() => setShowDetail(false)}
+        badge="PP"
+        title={selectedPayment?.code}
+        statusTag={selectedPayment && <StatusTag variant={paymentStatusToVariant(selectedPayment.status)} label={paymentStatusLabel(selectedPayment.status)} />}
+        subtitle={selectedPayment && `${selectedPayment.supplier} · ${selectedPayment.amount}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedPayment && (
+          <>
+            <DrawerSection title="基本信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="付款单号" emph mono>{selectedPayment.code}</InfoItem>
+                <InfoItem label="供应商" emph>{selectedPayment.supplier}</InfoItem>
+                <InfoItem label="对账单号" mono>{selectedPayment.reconciliationCode}</InfoItem>
+                <InfoItem label="付款金额" mono valueStyle={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)' }}>{selectedPayment.amount}</InfoItem>
+                <InfoItem label="付款方式">{selectedPayment.method}</InfoItem>
+                <InfoItem label="付款日期" mono>{selectedPayment.date}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedPayment.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>发票信息</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">发票编号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)' }}>{selectedPayment.invoiceCode || '—'}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">发票类型</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>增值税专用发票</div>
-                </div>
-              </div>
+            <DrawerSection title="发票信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="发票编号" mono>{selectedPayment.invoiceCode || '—'}</InfoItem>
+                <InfoItem label="发票类型">增值税专用发票</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-              <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>银行信息</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <label className="drawer-label">开户行</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-finance-secondary)' }}>{selectedPayment.bankName || '—'}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">银行账号</label>
-                  <div className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-module-finance-secondary)' }}>{selectedPayment.bankAccount || '—'}</div>
-                </div>
-              </div>
-
-              {selectedPayment.remark && (
-                <>
-                  <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-primary)', paddingBottom: 'var(--space-2)' }}>备注</h4>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedPayment.remark}</div>
-                </>
-              )}
-            </div>
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={() => setShowDetail(false)}>关闭</Button>
-              {selectedPayment.status === 'pending' && <Button>确认付款</Button>}
-              {selectedPayment.status === 'overdue' && <Button>立即处理</Button>}
-            </div>
-          </div>
-        </div>
-      )}
+            <DrawerSection title="银行信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="开户行" span={2} valueStyle={{ color: 'var(--color-module-finance-secondary)' }}>{selectedPayment.bankName || '—'}</InfoItem>
+                <InfoItem label="银行账号" mono valueStyle={{ color: 'var(--color-module-finance-secondary)' }}>{selectedPayment.bankAccount || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

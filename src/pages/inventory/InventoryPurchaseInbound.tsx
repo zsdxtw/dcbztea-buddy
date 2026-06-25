@@ -7,6 +7,7 @@ import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import { TeaCategory } from '../../types';
 import type { StatCardData } from '../../types';
 
@@ -183,124 +184,64 @@ export default function InventoryPurchaseInbound() {
       </div>
 
       {/* 入库详情抽屉 */}
-      {showDetail && selectedOrder && (
-        <div className="drawer-overlay" onClick={handleCloseDetail}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
-            <div className="drawer-header">
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 'var(--radius-lg)',
-                    background: 'var(--color-module-current-lightest)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)',
-                    color: 'var(--color-module-current-base)', flexShrink: 0,
-                  }}>
-                    RK
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                      <span className="drawer-title">{selectedOrder.inboundCode}</span>
-                      <StatusTag variant={inboundStatusToVariant(selectedOrder.status)} label={inboundStatusLabel(selectedOrder.status)} />
-                    </div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-                      {selectedOrder.supplier} · {selectedOrder.product}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button className="drawer-close" onClick={handleCloseDetail}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              </button>
-            </div>
+      <DetailDrawer
+        open={showDetail && !!selectedOrder}
+        onClose={handleCloseDetail}
+        badge="PI"
+        title={selectedOrder?.inboundCode}
+        statusTag={selectedOrder && <StatusTag variant={inboundStatusToVariant(selectedOrder.status)} label={inboundStatusLabel(selectedOrder.status)} />}
+        subtitle={selectedOrder && `${selectedOrder.supplier} · ${selectedOrder.product}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedOrder && (
+          <>
+            <DrawerSection title="入库信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="入库单号" emph mono>{selectedOrder.inboundCode}</InfoItem>
+                <InfoItem label="采购单号" mono>{selectedOrder.purchaseCode}</InfoItem>
+                <InfoItem label="供应商">{selectedOrder.supplier}</InfoItem>
+                <InfoItem label="入库仓库">{selectedOrder.warehouse}</InfoItem>
+                <InfoItem label="入库日期">{selectedOrder.inboundDate}</InfoItem>
+                <InfoItem label="联系人">{selectedOrder.contactPerson} {selectedOrder.contactPhone}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedOrder.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-body">
-              {/* 入库基本信息 */}
-              <div className="drawer-section-title">入库信息</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-                <div>
-                  <label className="drawer-label">入库单号</label>
-                  <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>{selectedOrder.inboundCode}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">采购单号</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.purchaseCode}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">供应商</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.supplier}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">入库仓库</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.warehouse}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">入库日期</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.inboundDate}</div>
-                </div>
-                <div>
-                  <label className="drawer-label">联系人</label>
-                  <div style={{ fontSize: 'var(--text-sm)' }}>{selectedOrder.contactPerson} {selectedOrder.contactPhone}</div>
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label className="drawer-label">备注</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedOrder.remark || '—'}</div>
-                </div>
-              </div>
-
-              {/* 商品明细 */}
-              <div className="drawer-section-title">商品明细</div>
-              <div style={{
-                marginBottom: 'var(--space-5)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-primary)',
-                overflow: 'hidden',
-              }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                  <thead>
-                    <tr style={{ background: 'var(--color-bg-tertiary)' }}>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'left', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>商品名称</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'left', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>规格</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>数量</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>单价</th>
-                      <th style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>金额</th>
+            <DrawerSection title="商品明细">
+              <table className="detail-inline-table">
+                <thead>
+                  <tr>
+                    <th>商品名称</th>
+                    <th>规格</th>
+                    <th style={{ textAlign: 'right' }}>数量</th>
+                    <th style={{ textAlign: 'right' }}>单价</th>
+                    <th style={{ textAlign: 'right' }}>金额</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedOrder.items.map((item, i) => (
+                    <tr key={i}>
+                      <td style={{ fontWeight: 'var(--font-medium)' }}>{item.name}</td>
+                      <td style={{ color: 'var(--color-text-secondary)' }}>{item.spec}</td>
+                      <td style={{ textAlign: 'right' }} className="mono">{item.quantity}</td>
+                      <td style={{ textAlign: 'right' }} className="mono">{item.unitPrice}</td>
+                      <td style={{ textAlign: 'right', fontWeight: 'var(--font-medium)' }} className="mono">{item.amount}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {selectedOrder.items.map((item, i) => (
-                      <tr key={i} style={{ borderTop: '1px solid var(--color-border-primary)' }}>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', fontWeight: 'var(--font-medium)' }}>{item.name}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', color: 'var(--color-text-secondary)' }}>{item.spec}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right' }} className="mono">{item.quantity}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right' }} className="mono">{item.unitPrice}</td>
-                        <td style={{ padding: 'var(--space-2) var(--space-3)', textAlign: 'right', fontWeight: 'var(--font-medium)' }} className="mono">{item.amount}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
+            </DrawerSection>
 
-              {/* 质检结果 */}
-              <div className="drawer-section-title">质检结果</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                <div>
-                  <label className="drawer-label">质检结果</label>
-                  <div><StatusTag variant={qualityResultToVariant(selectedOrder.qualityResult)} label={qualityResultLabel(selectedOrder.qualityResult)} /></div>
-                </div>
-                <div>
-                  <label className="drawer-label">质检说明</label>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{selectedOrder.qualityRemark}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDetail}>关闭</Button>
-              <Button variant="primary" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
-            </div>
-          </div>
-        </div>
-      )}
+            <DrawerSection title="质检结果">
+              <InfoGrid cols={3}>
+                <InfoItem label="质检结果">{<StatusTag variant={qualityResultToVariant(selectedOrder.qualityResult)} label={qualityResultLabel(selectedOrder.qualityResult)} />}</InfoItem>
+                <InfoItem label="质检说明" span={2}>{selectedOrder.qualityRemark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }

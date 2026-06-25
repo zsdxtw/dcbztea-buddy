@@ -7,6 +7,7 @@ import Button from '../../components/common/Button';
 import Tag from '../../components/common/Tag';
 import StatusTag from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
+import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import { TeaCategory } from '../../types';
 import type { StatCardData } from '../../types';
 
@@ -270,157 +271,104 @@ export default function SalesPricing() {
       </div>
 
       {/* 报价详情抽屉 */}
-      {showDrawer && selectedRecord && (
-        <div className="drawer-overlay" onClick={handleCloseDrawer}>
-          <div className="drawer-panel" onClick={e => e.stopPropagation()}>
-            <div className="drawer-header">
-              <span className="drawer-title">报价详情</span>
-              <button className="drawer-close" onClick={handleCloseDrawer}>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              </button>
-            </div>
+      <DetailDrawer
+        open={showDrawer && !!selectedRecord}
+        onClose={handleCloseDrawer}
+        badge="SP"
+        title={selectedRecord?.code}
+        statusTag={selectedRecord && <StatusTag variant={pricingStatusToVariant(selectedRecord.status)} label={pricingStatusLabel(selectedRecord.status)} />}
+        subtitle={selectedRecord && `${selectedRecord.customer} · ${selectedRecord.validFrom} ~ ${selectedRecord.validTo}`}
+        mode="view"
+        onEdit={() => window.alert('编辑功能（演示）')}
+      >
+        {selectedRecord && (
+          <>
+            <DrawerSection title="客户信息">
+              <InfoGrid cols={3}>
+                <InfoItem label="客户名称" emph>{selectedRecord.customer}</InfoItem>
+                <InfoItem label="报价单号" emph mono>{selectedRecord.code}</InfoItem>
+                <InfoItem label="联系人">{selectedRecord.contactPerson}</InfoItem>
+                <InfoItem label="联系电话" mono>{selectedRecord.contactPhone}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-body">
-              {/* 客户信息 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>客户信息</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                  <div>
-                    <label className="drawer-label">客户名称</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.customer}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">报价单号</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }} className="mono">{selectedRecord.code}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">联系人</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.contactPerson}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">联系电话</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.contactPhone}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 报价详情 */}
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>报价详情</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                  <div>
-                    <label className="drawer-label">商品名称</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.product}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">茶类</label>
-                    <div><Tag category={selectedRecord.teaCategory} /></div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">原价</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }} className="mono">¥{selectedRecord.originalPrice}/{selectedRecord.unit.replace('元/', '')}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">报价</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }} className="mono">¥{selectedRecord.quotedPrice}/{selectedRecord.unit.replace('元/', '')}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">调幅</label>
-                    {(() => {
-                      const adj = calcAdjustment(selectedRecord.originalPrice, selectedRecord.quotedPrice);
-                      return (
-                        <div className="mono" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', color: adj > 0 ? '#CB405D' : adj < 0 ? '#01795D' : 'var(--color-text-secondary)' }}>
-                          {adj > 0 ? '+' : ''}{adj}%
-                        </div>
-                      );
-                    })()}
-                  </div>
-                  <div>
-                    <label className="drawer-label">报价类型</label>
-                    <span style={{
-                      padding: '1px 8px',
-                      borderRadius: 'var(--radius-sm)',
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: 'var(--font-medium)',
-                      background: selectedRecord.type === 'first' ? '#E3F2FD' : selectedRecord.type === 'adjust' ? '#FFF3E0' : '#E8F5E9',
-                      color: selectedRecord.type === 'first' ? '#1565C0' : selectedRecord.type === 'adjust' ? '#E65100' : '#2E7D32',
-                      border: `1px solid ${selectedRecord.type === 'first' ? '#90CAF9' : selectedRecord.type === 'adjust' ? '#FFCC80' : '#A5D6A7'}`,
-                    }}>
-                      {PRICING_TYPE_LABELS[selectedRecord.type]}
-                    </span>
-                  </div>
-                  <div>
-                    <label className="drawer-label">有效期起</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.validFrom}</div>
-                  </div>
-                  <div>
-                    <label className="drawer-label">有效期止</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.validTo}</div>
-                  </div>
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <label className="drawer-label">备注</label>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)', fontWeight: 'var(--font-medium)' }}>{selectedRecord.remark}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 价格历史对比 */}
-              <div style={{ marginBottom: 'var(--space-4)' }}>
-                <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)', color: 'var(--color-text-secondary)' }}>价格历史对比</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {selectedRecord.history.map((h, i) => {
-                    const prevPrice = i > 0 ? selectedRecord.history[i - 1].price : null;
-                    const diff = prevPrice !== null ? ((h.price - prevPrice) / prevPrice * 100).toFixed(1) : null;
+            <DrawerSection title="报价详情">
+              <InfoGrid cols={3}>
+                <InfoItem label="商品名称" emph>{selectedRecord.product}</InfoItem>
+                <InfoItem label="茶类"><Tag category={selectedRecord.teaCategory} /></InfoItem>
+                <InfoItem label="报价类型">
+                  {(() => {
+                    const t = selectedRecord.type;
                     return (
-                      <div key={i} style={{
-                        display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
-                        padding: 'var(--space-3)', background: i === selectedRecord.history.length - 1 ? 'var(--color-module-current-lightest)' : 'var(--color-bg-tertiary)',
-                        borderRadius: 'var(--radius-md)',
-                        border: i === selectedRecord.history.length - 1 ? '1px solid var(--color-module-current-light)' : '1px solid transparent',
-                      }}>
-                        <div style={{
-                          width: 28, height: 28, borderRadius: 'var(--radius-md)',
-                          background: i === selectedRecord.history.length - 1 ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)',
-                          color: i === selectedRecord.history.length - 1 ? '#fff' : 'var(--color-text-tertiary)',
-                          flexShrink: 0,
-                        }}>
-                          {i + 1}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                            <span style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }} className="mono">¥{h.price}</span>
-                            {diff !== null && (
-                              <span className="mono" style={{ fontSize: 'var(--text-xs)', color: Number(diff) > 0 ? '#CB405D' : Number(diff) < 0 ? '#01795D' : 'var(--color-text-tertiary)' }}>
-                                {Number(diff) > 0 ? '+' : ''}{diff}%
-                              </span>
-                            )}
-                            {i === selectedRecord.history.length - 1 && (
-                              <span style={{ padding: '0 6px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', background: 'var(--color-module-current-lightest)', color: 'var(--color-module-current-base)', fontWeight: 'var(--font-medium)' }}>最新</span>
-                            )}
-                          </div>
-                          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>{h.date} · {h.note}</div>
-                        </div>
-                      </div>
+                      <span style={{
+                        padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
+                        background: t === 'first' ? '#E3F2FD' : t === 'adjust' ? '#FFF3E0' : '#E8F5E9',
+                        color: t === 'first' ? '#1565C0' : t === 'adjust' ? '#E65100' : '#2E7D32',
+                        border: `1px solid ${t === 'first' ? '#90CAF9' : t === 'adjust' ? '#FFCC80' : '#A5D6A7'}`,
+                      }}>{PRICING_TYPE_LABELS[t]}</span>
                     );
-                  })}
-                </div>
-              </div>
-            </div>
+                  })()}
+                </InfoItem>
+                <InfoItem label="原价" mono>¥{selectedRecord.originalPrice}/{selectedRecord.unit.replace('元/', '')}</InfoItem>
+                <InfoItem label="报价" mono>¥{selectedRecord.quotedPrice}/{selectedRecord.unit.replace('元/', '')}</InfoItem>
+                {(() => {
+                  const adj = calcAdjustment(selectedRecord.originalPrice, selectedRecord.quotedPrice);
+                  return (
+                    <InfoItem label="调幅" mono valueStyle={{ color: adj > 0 ? '#CB405D' : adj < 0 ? '#01795D' : 'var(--color-text-secondary)', fontWeight: 'var(--font-bold)' }}>
+                      {adj > 0 ? '+' : ''}{adj}%
+                    </InfoItem>
+                  );
+                })()}
+                <InfoItem label="有效期起">{selectedRecord.validFrom}</InfoItem>
+                <InfoItem label="有效期止">{selectedRecord.validTo}</InfoItem>
+                <InfoItem label="备注" span={3}>{selectedRecord.remark || '—'}</InfoItem>
+              </InfoGrid>
+            </DrawerSection>
 
-            <div className="drawer-footer">
-              <Button variant="ghost" onClick={handleCloseDrawer}>关闭</Button>
-              {selectedRecord.status === 'pending' && (
-                <>
-                  <Button style={{ background: '#CB405D', borderColor: '#CB405D' }} onClick={handleCloseDrawer}>驳回</Button>
-                  <Button onClick={handleCloseDrawer}>确认报价</Button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+            <DrawerSection title="价格历史对比">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                {selectedRecord.history.map((h, i) => {
+                  const prevPrice = i > 0 ? selectedRecord.history[i - 1].price : null;
+                  const diff = prevPrice !== null ? ((h.price - prevPrice) / prevPrice * 100).toFixed(1) : null;
+                  return (
+                    <div key={i} style={{
+                      display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
+                      padding: 'var(--space-3)', background: i === selectedRecord.history.length - 1 ? 'var(--color-module-current-lightest)' : 'var(--color-bg-tertiary)',
+                      borderRadius: 'var(--radius-md)',
+                      border: i === selectedRecord.history.length - 1 ? '1px solid var(--color-module-current-light)' : '1px solid transparent',
+                    }}>
+                      <div style={{
+                        width: 28, height: 28, borderRadius: 'var(--radius-md)',
+                        background: i === selectedRecord.history.length - 1 ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)',
+                        color: i === selectedRecord.history.length - 1 ? '#fff' : 'var(--color-text-tertiary)',
+                        flexShrink: 0,
+                      }}>
+                        {i + 1}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                          <span style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }} className="mono">¥{h.price}</span>
+                          {diff !== null && (
+                            <span className="mono" style={{ fontSize: 'var(--text-xs)', color: Number(diff) > 0 ? '#CB405D' : Number(diff) < 0 ? '#01795D' : 'var(--color-text-tertiary)' }}>
+                              {Number(diff) > 0 ? '+' : ''}{diff}%
+                            </span>
+                          )}
+                          {i === selectedRecord.history.length - 1 && (
+                            <span style={{ padding: '0 6px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', background: 'var(--color-module-current-lightest)', color: 'var(--color-module-current-base)', fontWeight: 'var(--font-medium)' }}>最新</span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>{h.date} · {h.note}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </DrawerSection>
+          </>
+        )}
+      </DetailDrawer>
     </>
   );
 }
