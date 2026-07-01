@@ -32,7 +32,7 @@ export default function SalesPlatforms() {
     return [
       { label: '平台总数', value: String(data.length), unit: '个', trend: { direction: 'up', value: `在册 ${active}` }, icon: <IconPlatform /> },
       { label: '在册平台', value: String(active), unit: '个', trend: { direction: 'up', value: '正常合作' }, icon: <IconActive /> },
-      { label: '平均扣点', value: data.length ? (data.reduce((s, p) => s + parseFloat(p.commissionRate) || 0, 0) / data.length).toFixed(1) : '0', unit: '%', icon: <IconPercent /> },
+      { label: '平均保证金', value: data.length ? (data.reduce((s, p) => s + (p.deposit ?? 0), 0) / data.filter(p => p.deposit).length || 0).toLocaleString('en-US') : '0', unit: '¥', icon: <IconPercent /> },
       { label: '结算账户', value: String(data.reduce((s, p) => s + p.bankAccounts.length, 0)), unit: '个', icon: <IconBank /> },
     ];
   }, [data]);
@@ -86,7 +86,7 @@ export default function SalesPlatforms() {
 
       <Card style={{ padding: 0 }}>
         <Table
-          headers={[deleteMode ? '选择' : '序号', '平台名称', '编码', '简称', '联系人', '联系人职务', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
+          headers={[deleteMode ? '选择' : '序号', '平台名称', '编码', '简称', '联系人', '联系人职务', '联系电话', '结算账户', '发票主体', '状态', '操作']}
           rows={filtered.map((p, idx) => [
             deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(p.id)} onChange={() => toggleSelect(p.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
             <span key="name" className="cell-emph">{p.name}</span>,
@@ -95,7 +95,6 @@ export default function SalesPlatforms() {
             <span key="cp">{p.contactPerson}</span>,
             <span key="cpo" style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-xs)' }}>{p.contactPosition || '—'}</span>,
             <span key="cph" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.contactPhone}</span>,
-            <span key="cr" style={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{p.commissionRate}</span>,
             <span key="ba" className="mono">{p.bankAccounts.length}个</span>,
             <span key="ii">{p.invoiceInfos.length > 0 ? p.invoiceInfos[0].invoiceEntity : '—'}</span>,
             <span key="st">{statusTag(p.status)}</span>,
@@ -128,7 +127,7 @@ export default function SalesPlatforms() {
         badge="SF"
         title={selected?.name}
         statusTag={selected && statusTag(selected.status)}
-        subtitle={selected && `${selected.code} · 扣点 ${selected.commissionRate} · ${selected.contactPerson} · ${selected.contactPhone}`}
+        subtitle={selected && `${selected.code} · ${selected.contactPerson} · ${selected.contactPhone}`}
         mode={editing ? 'edit' : 'view'}
         onEdit={handleStartEdit}
         onCancelEdit={handleCancelEdit}
@@ -147,7 +146,8 @@ export default function SalesPlatforms() {
                   <Field label="联系电话"><input className="filter-input" style={{ width: '100%' }} value={editForm.contactPhone ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactPhone: e.target.value } : prev)} /></Field>
                   <Field label="联系地址"><input className="filter-input" style={{ width: '100%' }} value={editForm.contactAddress ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /></Field>
                   <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={editForm.cooperationDate ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, cooperationDate: e.target.value } : prev)} /></Field>
-                  <Field label="平台扣点"><input className="filter-input" style={{ width: '100%' }} value={editForm.commissionRate ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, commissionRate: e.target.value } : prev)} /></Field>
+                  <Field label="支付保证金（元）"><input className="filter-input" style={{ width: '100%' }} type="number" value={editForm.deposit ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, deposit: e.target.value === '' ? undefined : Number(e.target.value) } : prev)} placeholder="平台交纳的保证金金额" /></Field>
+                  <Field label="保证金应收日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={editForm.depositDueDate ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, depositDueDate: e.target.value || undefined } : prev)} /></Field>
                   <Field label="备注" full><input className="filter-input" style={{ width: '100%' }} value={editForm.remark ?? ''} onChange={e => setEditForm(prev => prev ? { ...prev, remark: e.target.value } : prev)} /></Field>
                 </div>
               ) : (
@@ -160,7 +160,8 @@ export default function SalesPlatforms() {
                   <InfoItem label="联系电话" mono>{selected.contactPhone}</InfoItem>
                   <InfoItem label="联系地址" span={3}>{selected.contactAddress || '—'}</InfoItem>
                   <InfoItem label="合作日期">{selected.cooperationDate}</InfoItem>
-                  <InfoItem label="平台扣点" mono valueStyle={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{selected.commissionRate}</InfoItem>
+                  <InfoItem label="支付保证金（元）" mono valueStyle={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{typeof selected.deposit === 'number' ? `¥ ${selected.deposit.toLocaleString('en-US')}` : '—'}</InfoItem>
+                  <InfoItem label="保证金应收日期">{selected.depositDueDate || '—'}</InfoItem>
                   <InfoItem label="备注" span={3}>{selected.remark || '—'}</InfoItem>
                 </InfoGrid>
               )}
@@ -212,7 +213,7 @@ export default function SalesPlatforms() {
 function AddPlatformDrawer({ onCancel, onSave, existingCodes }: { onCancel: () => void; onSave: (item: PlatformItem) => void; existingCodes: string[] }) {
   const [form, setForm] = useState<Partial<PlatformItem>>({
     name: '', shortName: '', contactPerson: '', contactPosition: '', contactPhone: '', contactAddress: '',
-    cooperationDate: new Date().toISOString().slice(0, 10), commissionRate: '', status: 'active',
+    cooperationDate: new Date().toISOString().slice(0, 10), status: 'active',
     bankAccounts: [], invoiceInfos: [], remark: '',
   });
   const [bankAccounts, setBankAccounts] = useState<PlatformBankAccount[]>([]);
@@ -239,7 +240,7 @@ function AddPlatformDrawer({ onCancel, onSave, existingCodes }: { onCancel: () =
     onSave({
       id: `p_${Date.now()}`, name: form.name!, shortName: form.shortName!, code: generatePlatformCode(form.shortName!, existingCodes),
       contactPerson: form.contactPerson ?? '', contactPosition: form.contactPosition ?? '', contactPhone: form.contactPhone ?? '', contactAddress: form.contactAddress ?? '',
-      cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10), commissionRate: form.commissionRate ?? '',
+      cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10),
       bankAccounts, invoiceInfos, status: 'active', remark: form.remark,
     } as PlatformItem);
   };
@@ -261,7 +262,8 @@ function AddPlatformDrawer({ onCancel, onSave, existingCodes }: { onCancel: () =
             <Field label="联系电话"><input className="filter-input" style={{ width: '100%' }} value={form.contactPhone ?? ''} onChange={e => update('contactPhone', e.target.value)} /></Field>
             <Field label="联系地址" full><input className="filter-input" style={{ width: '100%' }} value={form.contactAddress ?? ''} onChange={e => update('contactAddress', e.target.value)} /></Field>
             <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={form.cooperationDate ?? ''} onChange={e => update('cooperationDate', e.target.value)} /></Field>
-            <Field label="平台扣点"><input className="filter-input" style={{ width: '100%' }} value={form.commissionRate ?? ''} onChange={e => update('commissionRate', e.target.value)} placeholder="如：8%" /></Field>
+            <Field label="支付保证金（元）"><input className="filter-input" style={{ width: '100%' }} type="number" value={form.deposit ?? ''} onChange={e => update('deposit', e.target.value === '' ? undefined : Number(e.target.value))} placeholder="平台交纳的保证金金额" /></Field>
+            <Field label="保证金应收日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={form.depositDueDate ?? ''} onChange={e => update('depositDueDate', e.target.value || undefined)} /></Field>
             <Field label="备注" full><input className="filter-input" style={{ width: '100%' }} value={form.remark ?? ''} onChange={e => update('remark', e.target.value)} /></Field>
           </div>
 

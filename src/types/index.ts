@@ -598,7 +598,6 @@ export interface PlatformItem {
   /** 区县 */
   district?: string;
   cooperationDate: string;
-  commissionRate: string;
   /** 支付保证金（单位：元，平台客户交纳的保证金，联动记入财务-其他应收款-暂付款项） */
   deposit?: number;
   /** 保证金应收日期 */
@@ -638,6 +637,8 @@ export interface CustomerItem {
   totalAmount: number;
   /** 直营客户关联的平台ID列表；渠道客户为空 */
   platformIds: string[];
+  /** 平台扣点（仅"带平台方"的直营客户设置，如"8%"；无平台关联的直营客户为空） */
+  commissionRate?: string;
   /** 主办人 ID（负责该客户的拓展与维护，可为员工或带货人） */
   hostId?: string;
   /** 主办人类型 */

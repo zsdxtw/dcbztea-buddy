@@ -132,7 +132,7 @@ export default function SalesCustomers() {
       id, name: shortName, shortName, code: generateCustomerCode('platform', shortName, sequence),
       contactPerson: '', contactPosition: '', contactPhone: '', contactAddress: '',
       province: '', city: '', district: '',
-      cooperationDate: new Date().toISOString().slice(0, 10), commissionRate: '',
+      cooperationDate: new Date().toISOString().slice(0, 10),
       bankAccounts: [], invoiceInfos: [], status: 'active',
     };
     setPlatforms(prev => [...prev, newPlatform]);
@@ -209,7 +209,7 @@ export default function SalesCustomers() {
 
           <Card style={{ padding: 0 }}>
             <Table
-              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '平台编号', '客户名称', '主办人', '联系人', '联系人职务', '联系电话', '扣点', '结算账户', '发票主体', '状态', '操作']}
+              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '平台编号', '客户名称', '主办人', '联系人', '联系人职务', '联系电话', '保证金', '结算账户', '发票主体', '状态', '操作']}
               rows={filteredPlatforms.map((p, idx) => [
                 deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(p.id)} onChange={() => togglePlatformSelect(p.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
                 <span key="sn" className="cell-emph">{p.shortName}</span>,
@@ -219,7 +219,7 @@ export default function SalesCustomers() {
                 <span key="cp">{p.contactPerson}</span>,
                 <span key="cpo" style={{ color: 'var(--color-neutral-500)', fontSize: 'var(--text-xs)' }}>{p.contactPosition || '—'}</span>,
                 <span key="cph" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{p.contactPhone}</span>,
-                <span key="cr" style={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{p.commissionRate}</span>,
+                <span key="dp" className="mono" style={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{typeof p.deposit === 'number' ? `¥${p.deposit.toLocaleString('en-US')}` : '—'}</span>,
                 <span key="ba" className="mono">{p.bankAccounts.length}个</span>,
                 <span key="ii">{p.invoiceInfos.length > 0 ? p.invoiceInfos[0].invoiceEntity : '—'}</span>,
                 <span key="st">{statusTag(p.status, 'platform')}</span>,
@@ -409,13 +409,15 @@ export default function SalesCustomers() {
 
             {detailCustomer.type === 'direct' && detailCustomer.platformIds.length > 0 && (
               <DrawerSection title={`平台关联（${detailCustomer.platformIds.length}）`}>
-                <table className="detail-inline-table">
+                <InfoGrid cols={3}>
+                  <InfoItem label="平台扣点" mono valueStyle={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{detailCustomer.commissionRate || '—'}</InfoItem>
+                </InfoGrid>
+                <table className="detail-inline-table" style={{ marginTop: 'var(--space-3)' }}>
                   <thead>
                     <tr>
                       <th>平台名称</th>
                       <th>编码</th>
                       <th>简称</th>
-                      <th>扣点</th>
                       <th>联系人</th>
                       <th>联系电话</th>
                     </tr>
@@ -428,7 +430,6 @@ export default function SalesCustomers() {
                           <td style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</td>
                           <td className="mono">{p.code}</td>
                           <td>{p.shortName}</td>
-                          <td style={{ color: SECONDARY }}>{p.commissionRate}</td>
                           <td>{p.contactPerson}</td>
                           <td className="mono">{p.contactPhone}</td>
                         </tr>
@@ -451,7 +452,7 @@ export default function SalesCustomers() {
         badge={detailPlatform?.shortName?.charAt(0) || 'PT'}
         title={detailPlatform?.name}
         statusTag={detailPlatform && statusTag(detailPlatform.status, 'platform')}
-        subtitle={detailPlatform && `扣点 ${detailPlatform.commissionRate} · ${detailPlatform.contactPerson} · ${detailPlatform.contactPhone}`}
+        subtitle={detailPlatform && `${detailPlatform.contactPerson} · ${detailPlatform.contactPhone}`}
         mode={editingPlatform ? 'edit' : 'view'}
         onEdit={handleStartEditPlatform}
         onCancelEdit={handleCancelEditPlatform}
@@ -492,7 +493,6 @@ export default function SalesCustomers() {
                   <Field label="区县"><select className="filter-select" style={{ width: '100%' }} value={editPlatformForm.district ?? ''} disabled={!editPlatformForm.city} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, district: e.target.value } : prev)}><option value="">请选择</option>{(editPlatformForm.province && editPlatformForm.city ? getDistricts(editPlatformForm.province, editPlatformForm.city) : []).map(d => <option key={d} value={d}>{d}</option>)}</select></Field>
                   <Field label="具体地址" full><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.contactAddress ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /></Field>
                   <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={editPlatformForm.cooperationDate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, cooperationDate: e.target.value } : prev)} /></Field>
-                  <Field label="平台扣点"><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.commissionRate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, commissionRate: e.target.value } : prev)} /></Field>
                   <Field label="支付保证金（元）"><input className="filter-input" style={{ width: '100%' }} type="number" value={editPlatformForm.deposit ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, deposit: e.target.value === '' ? undefined : Number(e.target.value) } : prev)} placeholder="平台交纳的保证金金额" /></Field>
                   <Field label="保证金应收日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={editPlatformForm.depositDueDate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, depositDueDate: e.target.value || undefined } : prev)} /></Field>
                   <Field label="备注" full><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.remark ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, remark: e.target.value } : prev)} /></Field>
@@ -508,7 +508,6 @@ export default function SalesCustomers() {
                   <InfoItem label="联系电话" mono>{detailPlatform.contactPhone || '—'}</InfoItem>
                   <InfoItem label="所在地区">{[detailPlatform.province, detailPlatform.city, detailPlatform.district].filter(Boolean).join(' / ') || '—'}</InfoItem>
                   <InfoItem label="合作日期">{detailPlatform.cooperationDate}</InfoItem>
-                  <InfoItem label="平台扣点" mono>{detailPlatform.commissionRate || '—'}</InfoItem>
                   <InfoItem label="支付保证金" mono valueStyle={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)' }}>{detailPlatform.deposit ? `¥ ${detailPlatform.deposit.toLocaleString('en-US')}` : '—'}</InfoItem>
                   <InfoItem label="保证金应收日期" mono>{detailPlatform.depositDueDate || '—'}</InfoItem>
                   <InfoItem label="具体地址" span={3}>{detailPlatform.contactAddress || '—'}</InfoItem>
@@ -586,7 +585,7 @@ export default function SalesCustomers() {
 /* ── 新增客户抽屉 ── */
 function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQuickAddPlatform }: {
   customerType: CustomerType;
-  platforms: { id: string; shortName: string; code: string; name: string; commissionRate: string; contactPerson: string; contactPhone: string }[];
+  platforms: { id: string; shortName: string; code: string; name: string; contactPerson: string; contactPhone: string }[];
   sequence: number;
   onCancel: () => void;
   onSave: (item: CustomerItem) => void;
@@ -597,7 +596,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
     id: `c_${Date.now()}`, name: '', shortName: '', customerCode: '', type: customerType, region: '', province: '', city: '', district: '',
     contactPerson: '', contactPhone: '', contactEmail: '', contactAddress: '', level: 'B级', orders: 0, totalAmount: 0, platformIds: [],
     cooperationDate: new Date().toISOString().slice(0, 10), status: 'active', settlementMethod: '月结', taxNo: '', source: '', remark: '',
-    bankAccounts: [], invoiceInfos: [],
+    bankAccounts: [], invoiceInfos: [], commissionRate: '',
   });
   const [quickPlatformName, setQuickPlatformName] = useState('');
   const [bankAccounts, setBankAccounts] = useState<CustomerBankAccount[]>([]);
@@ -764,11 +763,19 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
                   })}
                 </div>
               )}
+              {form.platformIds.length > 0 && (
+                <div className="drawer-form-row" style={{ marginBottom: 'var(--space-3)' }}>
+                  <div className="drawer-form-field" style={{ flex: 1 }}>
+                    <label className="drawer-label">平台扣点 *</label>
+                    <input className="filter-input" style={{ width: '100%' }} value={form.commissionRate ?? ''} onChange={e => update('commissionRate', e.target.value)} placeholder="如：8%（带平台方的直营客户必填）" />
+                  </div>
+                </div>
+              )}
               <div style={{ background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-                <Table headers={['选择', '平台名称', '编码', '简称', '扣点', '联系人']}
+                <Table headers={['选择', '平台名称', '编码', '简称', '联系人']}
                   rows={platforms.map(p => {
                     const checked = form.platformIds.includes(p.id);
-                    return [<input key="chk" type="checkbox" checked={checked} onChange={() => togglePlatform(p.id)} />, <span key="n" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>, <span key="c" className="mono">{p.code}</span>, <span key="s">{p.shortName}</span>, <span key="cr" style={{ color: SECONDARY }}>{p.commissionRate}</span>, <span key="cp">{p.contactPerson}</span>];
+                    return [<input key="chk" type="checkbox" checked={checked} onChange={() => togglePlatform(p.id)} />, <span key="n" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>, <span key="c" className="mono">{p.code}</span>, <span key="s">{p.shortName}</span>, <span key="cp">{p.contactPerson}</span>];
                   })}
                 />
               </div>
@@ -796,7 +803,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
   const [form, setForm] = useState<Partial<PlatformItem>>({
     name: '', shortName: '', contactPerson: '', contactPosition: '', contactPhone: '', contactAddress: '',
     province: '', city: '', district: '',
-    cooperationDate: new Date().toISOString().slice(0, 10), commissionRate: '', status: 'active',
+    cooperationDate: new Date().toISOString().slice(0, 10), status: 'active',
     bankAccounts: [], invoiceInfos: [], remark: '', deposit: undefined, depositDueDate: '',
   });
   const [bankAccounts, setBankAccounts] = useState<PlatformBankAccount[]>([]);
@@ -832,7 +839,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
       id: `p_${Date.now()}`, name: form.name!, shortName, code,
       contactPerson: form.contactPerson ?? '', contactPosition: form.contactPosition ?? '', contactPhone: form.contactPhone ?? '', contactAddress: form.contactAddress ?? '',
       province: form.province ?? '', city: form.city ?? '', district: form.district ?? '',
-      cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10), commissionRate: form.commissionRate ?? '',
+      cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10),
       deposit: form.deposit, depositDueDate: form.depositDueDate || undefined,
       bankAccounts, invoiceInfos, status: 'active', remark: form.remark, hostId: form.hostId, hostType: form.hostType,
     } as PlatformItem);
@@ -882,7 +889,6 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
             <Field label="区县"><select className="filter-select" style={{ width: '100%' }} value={form.district ?? ''} disabled={!form.city} onChange={e => handleDistrictChange(e.target.value)}><option value="">请选择</option>{(form.province && form.city ? getDistricts(form.province, form.city) : []).map(d => <option key={d} value={d}>{d}</option>)}</select></Field>
             <Field label="具体地址"><input className="filter-input" style={{ width: '100%' }} value={form.contactAddress ?? ''} onChange={e => update('contactAddress', e.target.value)} placeholder="街道、门牌号等" /></Field>
             <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={form.cooperationDate ?? ''} onChange={e => update('cooperationDate', e.target.value)} /></Field>
-            <Field label="平台扣点"><input className="filter-input" style={{ width: '100%' }} value={form.commissionRate ?? ''} onChange={e => update('commissionRate', e.target.value)} placeholder="如：8%" /></Field>
             <Field label="支付保证金（元）"><input className="filter-input" style={{ width: '100%' }} type="number" value={form.deposit ?? ''} onChange={e => update('deposit', e.target.value === '' ? (undefined as unknown as number) : Number(e.target.value))} placeholder="平台交纳的保证金金额" /></Field>
             <Field label="保证金应收日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={form.depositDueDate ?? ''} onChange={e => update('depositDueDate', e.target.value || undefined)} /></Field>
             <Field label="备注" full><input className="filter-input" style={{ width: '100%' }} value={form.remark ?? ''} onChange={e => update('remark', e.target.value)} /></Field>
