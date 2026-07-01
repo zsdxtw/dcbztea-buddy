@@ -599,6 +599,10 @@ export interface PlatformItem {
   district?: string;
   cooperationDate: string;
   commissionRate: string;
+  /** 支付保证金（单位：元，平台客户交纳的保证金，联动记入财务-其他应收款-暂付款项） */
+  deposit?: number;
+  /** 保证金应收日期 */
+  depositDueDate?: string;
   /** 主办人 ID（负责该平台客户的拓展与维护，可为员工或带货人） */
   hostId?: string;
   /** 主办人类型 */

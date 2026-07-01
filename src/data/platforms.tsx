@@ -11,6 +11,7 @@ export const platformItems: PlatformItem[] = [
     contactPerson: '王经理', contactPosition: '采购总监', contactPhone: '400-606-****', contactAddress: '亦庄经济开发区京东总部',
     province: '北京', city: '北京市', district: '大兴区',
     cooperationDate: '2022-05-10', commissionRate: '8%', hostId: 'emp-7', hostType: 'employee',
+    deposit: 50000, depositDueDate: '2025-09-10',
     bankAccounts: [
       { accountName: '北京京东世纪贸易有限公司', accountNo: '1100 **** ****', bankName: '中国工商银行北京亦庄支行', bankNo: '102100000XXX' },
     ],
@@ -24,6 +25,7 @@ export const platformItems: PlatformItem[] = [
     contactPerson: '李主管', contactPosition: '商务经理', contactPhone: '400-820-****', contactAddress: '史泰博大厦',
     province: '上海', city: '上海市', district: '长宁区',
     cooperationDate: '2022-11-20', commissionRate: '6%', hostId: 'emp-16', hostType: 'employee',
+    deposit: 30000, depositDueDate: '2025-08-20',
     bankAccounts: [
       { accountName: '史泰博（上海）有限公司', accountNo: '3100 **** ****', bankName: '中国银行上海市长宁支行', bankNo: '10429000XXX' },
     ],
@@ -37,6 +39,7 @@ export const platformItems: PlatformItem[] = [
     contactPerson: '陈经理', contactPosition: '渠道总监', contactPhone: '400-185-****', contactAddress: '得力工业园',
     province: '浙江', city: '宁波市', district: '宁海县',
     cooperationDate: '2023-03-15', commissionRate: '5%', hostId: 'emp-17', hostType: 'employee',
+    deposit: 20000, depositDueDate: '2025-07-30',
     bankAccounts: [
       { accountName: '得力集团有限公司', accountNo: '3902 **** ****', bankName: '中国建设银行宁海支行', bankNo: '10533220XXX' },
     ],

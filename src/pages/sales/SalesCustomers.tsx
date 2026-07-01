@@ -493,6 +493,8 @@ export default function SalesCustomers() {
                   <Field label="具体地址" full><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.contactAddress ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, contactAddress: e.target.value } : prev)} /></Field>
                   <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={editPlatformForm.cooperationDate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, cooperationDate: e.target.value } : prev)} /></Field>
                   <Field label="平台扣点"><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.commissionRate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, commissionRate: e.target.value } : prev)} /></Field>
+                  <Field label="支付保证金（元）"><input className="filter-input" style={{ width: '100%' }} type="number" value={editPlatformForm.deposit ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, deposit: e.target.value === '' ? undefined : Number(e.target.value) } : prev)} placeholder="平台交纳的保证金金额" /></Field>
+                  <Field label="保证金应收日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={editPlatformForm.depositDueDate ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, depositDueDate: e.target.value || undefined } : prev)} /></Field>
                   <Field label="备注" full><input className="filter-input" style={{ width: '100%' }} value={editPlatformForm.remark ?? ''} onChange={e => setEditPlatformForm(prev => prev ? { ...prev, remark: e.target.value } : prev)} /></Field>
                 </div>
               ) : (
@@ -507,6 +509,8 @@ export default function SalesCustomers() {
                   <InfoItem label="所在地区">{[detailPlatform.province, detailPlatform.city, detailPlatform.district].filter(Boolean).join(' / ') || '—'}</InfoItem>
                   <InfoItem label="合作日期">{detailPlatform.cooperationDate}</InfoItem>
                   <InfoItem label="平台扣点" mono>{detailPlatform.commissionRate || '—'}</InfoItem>
+                  <InfoItem label="支付保证金" mono valueStyle={{ color: 'var(--color-module-current-base)', fontWeight: 'var(--font-semibold)' }}>{detailPlatform.deposit ? `¥ ${detailPlatform.deposit.toLocaleString('en-US')}` : '—'}</InfoItem>
+                  <InfoItem label="保证金应收日期" mono>{detailPlatform.depositDueDate || '—'}</InfoItem>
                   <InfoItem label="具体地址" span={3}>{detailPlatform.contactAddress || '—'}</InfoItem>
                   <InfoItem label="备注" span={3}>{detailPlatform.remark || '—'}</InfoItem>
                 </InfoGrid>
@@ -793,7 +797,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
     name: '', shortName: '', contactPerson: '', contactPosition: '', contactPhone: '', contactAddress: '',
     province: '', city: '', district: '',
     cooperationDate: new Date().toISOString().slice(0, 10), commissionRate: '', status: 'active',
-    bankAccounts: [], invoiceInfos: [], remark: '',
+    bankAccounts: [], invoiceInfos: [], remark: '', deposit: undefined, depositDueDate: '',
   });
   const [bankAccounts, setBankAccounts] = useState<PlatformBankAccount[]>([]);
   const [invoiceInfos, setInvoiceInfos] = useState<PlatformInvoiceInfo[]>([]);
@@ -829,6 +833,7 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
       contactPerson: form.contactPerson ?? '', contactPosition: form.contactPosition ?? '', contactPhone: form.contactPhone ?? '', contactAddress: form.contactAddress ?? '',
       province: form.province ?? '', city: form.city ?? '', district: form.district ?? '',
       cooperationDate: form.cooperationDate ?? new Date().toISOString().slice(0, 10), commissionRate: form.commissionRate ?? '',
+      deposit: form.deposit, depositDueDate: form.depositDueDate || undefined,
       bankAccounts, invoiceInfos, status: 'active', remark: form.remark, hostId: form.hostId, hostType: form.hostType,
     } as PlatformItem);
   };
@@ -878,6 +883,8 @@ function AddPlatformDrawer({ onCancel, onSave, sequence }: { onCancel: () => voi
             <Field label="具体地址"><input className="filter-input" style={{ width: '100%' }} value={form.contactAddress ?? ''} onChange={e => update('contactAddress', e.target.value)} placeholder="街道、门牌号等" /></Field>
             <Field label="合作日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={form.cooperationDate ?? ''} onChange={e => update('cooperationDate', e.target.value)} /></Field>
             <Field label="平台扣点"><input className="filter-input" style={{ width: '100%' }} value={form.commissionRate ?? ''} onChange={e => update('commissionRate', e.target.value)} placeholder="如：8%" /></Field>
+            <Field label="支付保证金（元）"><input className="filter-input" style={{ width: '100%' }} type="number" value={form.deposit ?? ''} onChange={e => update('deposit', e.target.value === '' ? (undefined as unknown as number) : Number(e.target.value))} placeholder="平台交纳的保证金金额" /></Field>
+            <Field label="保证金应收日期"><input className="filter-input" style={{ width: '100%' }} type="date" value={form.depositDueDate ?? ''} onChange={e => update('depositDueDate', e.target.value || undefined)} /></Field>
             <Field label="备注" full><input className="filter-input" style={{ width: '100%' }} value={form.remark ?? ''} onChange={e => update('remark', e.target.value)} /></Field>
           </div>
 
