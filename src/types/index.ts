@@ -637,8 +637,8 @@ export interface CustomerItem {
   totalAmount: number;
   /** 直营客户关联的平台ID列表；渠道客户为空 */
   platformIds: string[];
-  /** 平台扣点（仅"带平台方"的直营客户设置，如"8%"；无平台关联的直营客户为空） */
-  commissionRate?: string;
+  /** 平台扣点映射（仅"带平台方"的直营客户设置，键为平台ID，值为扣点如"8%"；扣点跟随平台，同一客户不同平台可有不同扣点） */
+  platformCommissionRates?: Record<string, string>;
   /** 主办人 ID（负责该客户的拓展与维护，可为员工或带货人） */
   hostId?: string;
   /** 主办人类型 */

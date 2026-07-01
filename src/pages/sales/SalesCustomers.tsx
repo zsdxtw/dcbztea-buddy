@@ -112,12 +112,14 @@ export default function SalesCustomers() {
     </span>
   );
 
-  const platformTags = (platformIds: string[]) => {
+  const platformTags = (platformIds: string[], commissionRates?: Record<string, string>) => {
     if (platformIds.length === 0) return <span style={{ color: 'var(--color-neutral-300)' }}>-</span>;
     return (
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
         {platformIds.slice(0, 2).map(id => (
-          <span key={id} style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${SECONDARY}15`, color: SECONDARY, border: `1px solid ${SECONDARY}30` }}>{getPlatformName(id)}</span>
+          <span key={id} style={{ padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', background: `${SECONDARY}15`, color: SECONDARY, border: `1px solid ${SECONDARY}30` }}>
+            {getPlatformName(id)}{commissionRates?.[id] ? <span style={{ marginLeft: 4, color: 'var(--color-neutral-500)', fontWeight: 'normal' }}>扣{commissionRates[id]}</span> : null}
+          </span>
         ))}
         {platformIds.length > 2 && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>+{platformIds.length - 2}</span>}
       </div>
@@ -272,7 +274,7 @@ export default function SalesCustomers() {
                   <span key="name">{c.name}</span>,
                   <span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>,
                 ];
-                if (activeTab === 'direct') cells.push(<span key="pf">{platformTags(c.platformIds)}</span>);
+                if (activeTab === 'direct') cells.push(<span key="pf">{platformTags(c.platformIds, c.platformCommissionRates)}</span>);
                 cells.push(
                   <span key="region" style={{ fontSize: 'var(--text-sm)' }}>{[c.province, c.city, c.district].filter(Boolean).join(' / ') || c.region}</span>,
                   <span key="cp">{c.contactPerson}</span>,
@@ -409,15 +411,13 @@ export default function SalesCustomers() {
 
             {detailCustomer.type === 'direct' && detailCustomer.platformIds.length > 0 && (
               <DrawerSection title={`平台关联（${detailCustomer.platformIds.length}）`}>
-                <InfoGrid cols={3}>
-                  <InfoItem label="平台扣点" mono valueStyle={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{detailCustomer.commissionRate || '—'}</InfoItem>
-                </InfoGrid>
-                <table className="detail-inline-table" style={{ marginTop: 'var(--space-3)' }}>
+                <table className="detail-inline-table">
                   <thead>
                     <tr>
                       <th>平台名称</th>
                       <th>编码</th>
                       <th>简称</th>
+                      <th>扣点</th>
                       <th>联系人</th>
                       <th>联系电话</th>
                     </tr>
@@ -425,11 +425,13 @@ export default function SalesCustomers() {
                   <tbody>
                     {detailCustomer.platformIds.map(id => {
                       const p = platforms.find(x => x.id === id);
+                      const rate = detailCustomer.platformCommissionRates?.[id];
                       return p ? (
                         <tr key={id}>
                           <td style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</td>
                           <td className="mono">{p.code}</td>
                           <td>{p.shortName}</td>
+                          <td style={{ color: SECONDARY, fontWeight: 'var(--font-medium)' }}>{rate || '—'}</td>
                           <td>{p.contactPerson}</td>
                           <td className="mono">{p.contactPhone}</td>
                         </tr>
@@ -596,7 +598,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
     id: `c_${Date.now()}`, name: '', shortName: '', customerCode: '', type: customerType, region: '', province: '', city: '', district: '',
     contactPerson: '', contactPhone: '', contactEmail: '', contactAddress: '', level: 'B级', orders: 0, totalAmount: 0, platformIds: [],
     cooperationDate: new Date().toISOString().slice(0, 10), status: 'active', settlementMethod: '月结', taxNo: '', source: '', remark: '',
-    bankAccounts: [], invoiceInfos: [], commissionRate: '',
+    bankAccounts: [], invoiceInfos: [], platformCommissionRates: {},
   });
   const [quickPlatformName, setQuickPlatformName] = useState('');
   const [bankAccounts, setBankAccounts] = useState<CustomerBankAccount[]>([]);
@@ -605,7 +607,17 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
   const [newInvoice, setNewInvoice] = useState<CustomerInvoiceInfo>({ invoiceEntity: '', taxNo: '', taxRate: '' });
 
   const update = <K extends keyof CustomerItem>(k: K, v: CustomerItem[K]) => setForm(prev => ({ ...prev, [k]: v }));
-  const togglePlatform = (id: string) => setForm(prev => ({ ...prev, platformIds: prev.platformIds.includes(id) ? prev.platformIds.filter(x => x !== id) : [...prev.platformIds, id] }));
+  /** 勾选/取消勾选平台；取消勾选时同步移除该平台的扣点 */
+  const togglePlatform = (id: string) => setForm(prev => {
+    if (prev.platformIds.includes(id)) {
+      const nextRates = { ...(prev.platformCommissionRates ?? {}) };
+      delete nextRates[id];
+      return { ...prev, platformIds: prev.platformIds.filter(x => x !== id), platformCommissionRates: nextRates };
+    }
+    return { ...prev, platformIds: [...prev.platformIds, id] };
+  });
+  /** 设置某个平台的扣点 */
+  const setPlatformRate = (id: string, rate: string) => setForm(prev => ({ ...prev, platformCommissionRates: { ...(prev.platformCommissionRates ?? {}), [id]: rate } }));
   const isPersonal = customerType === 'personal';
   const canSave = form.name.trim().length > 0 && (form.shortName ?? '').trim().length > 0 && (isPersonal || form.contactPerson.trim().length > 0);
 
@@ -748,14 +760,16 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
 
           {customerType === 'direct' && (
             <>
-              <div className="drawer-section-title">关联平台（可多选，下单时选择唯一的一个）</div>
+              <div className="drawer-section-title">关联平台（可多选，每个平台单独设置扣点，下单时选择唯一的一个）</div>
               {form.platformIds.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 'var(--space-3)' }}>
                   {form.platformIds.map(id => {
                     const p = platforms.find(x => x.id === id);
+                    const rate = form.platformCommissionRates?.[id];
                     return p ? (
                       <div key={id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: `${SECONDARY}15`, color: SECONDARY, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', border: `1px solid ${SECONDARY}30`, fontWeight: 'var(--font-medium)' }}>
                         {p.shortName}
+                        {rate ? <span style={{ color: 'var(--color-neutral-500)', fontWeight: 'normal' }}>扣{rate}</span> : null}
                         <span className="mono" style={{ color: 'var(--color-neutral-500)', fontWeight: 'normal' }}>({p.code})</span>
                         <button onClick={() => togglePlatform(id)} style={{ cursor: 'pointer', border: 'none', background: 'transparent', color: SECONDARY, fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
                       </div>
@@ -763,21 +777,24 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
                   })}
                 </div>
               )}
-              {form.platformIds.length > 0 && (
-                <div className="drawer-form-row" style={{ marginBottom: 'var(--space-3)' }}>
-                  <div className="drawer-form-field" style={{ flex: 1 }}>
-                    <label className="drawer-label">平台扣点 *</label>
-                    <input className="filter-input" style={{ width: '100%' }} value={form.commissionRate ?? ''} onChange={e => update('commissionRate', e.target.value)} placeholder="如：8%（带平台方的直营客户必填）" />
-                  </div>
-                </div>
-              )}
               <div style={{ background: 'var(--color-neutral-50)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-                <Table headers={['选择', '平台名称', '编码', '简称', '联系人']}
+                <Table headers={['选择', '平台名称', '编码', '简称', '扣点', '联系人']}
                   rows={platforms.map(p => {
                     const checked = form.platformIds.includes(p.id);
-                    return [<input key="chk" type="checkbox" checked={checked} onChange={() => togglePlatform(p.id)} />, <span key="n" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>, <span key="c" className="mono">{p.code}</span>, <span key="s">{p.shortName}</span>, <span key="cp">{p.contactPerson}</span>];
+                    const rate = form.platformCommissionRates?.[p.id] ?? '';
+                    return [
+                      <input key="chk" type="checkbox" checked={checked} onChange={() => togglePlatform(p.id)} />,
+                      <span key="n" style={{ fontWeight: 'var(--font-medium)' }}>{p.name}</span>,
+                      <span key="c" className="mono">{p.code}</span>,
+                      <span key="s">{p.shortName}</span>,
+                      checked
+                        ? <input key="r" className="filter-input" style={{ width: 90, height: 30 }} value={rate} onChange={e => setPlatformRate(p.id, e.target.value)} placeholder="如8%" />
+                        : <span key="r" style={{ color: 'var(--color-neutral-300)' }}>—</span>,
+                      <span key="cp">{p.contactPerson}</span>,
+                    ];
                   })}
                 />
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginTop: 'var(--space-2)' }}>提示：勾选平台后，可在「扣点」列填写该平台对本客户的扣点（如 8%），不同平台可设置不同扣点。</div>
               </div>
               {/* 简易新增平台 */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3)', background: SECONDARY_LIGHT, borderRadius: 'var(--radius-md)', border: `1px dashed ${SECONDARY}40` }}>
