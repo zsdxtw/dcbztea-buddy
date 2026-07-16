@@ -107,7 +107,6 @@ export const router = createBrowserRouter([
       { path: 'sales/sales-pricing', element: <SalesPricing /> },
       { path: 'sales/sales-customers', element: <SalesCustomers /> },
       { path: 'sales/sales-platforms', element: <Navigate to="/sales/sales-customers" replace /> },
-      { path: 'sales/sales-stores', element: <SalesStores /> },
       { path: 'sales/sales-reconciliation', element: <SalesReconciliation /> },
       { path: 'sales/sales-return', element: <SalesReturn /> },
       /* ── 仓储 ── */
@@ -172,6 +171,7 @@ export const router = createBrowserRouter([
       { path: 'personnel/personnel-employee', element: <PersonnelEmployee /> },
       { path: 'personnel/personnel-tea-professional', element: <PersonnelTeaProfessional /> },
       { path: 'personnel/personnel-streamer', element: <PersonnelStreamer /> },
+      { path: 'personnel/personnel-stores', element: <SalesStores /> },
     ],
   },
 ]);

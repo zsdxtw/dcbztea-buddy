@@ -248,7 +248,6 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'sales-orders', label: '销售订单', icon: <OrdersIcon /> },
       { key: 'sales-pricing', label: '销售报（调）价', icon: <QuotationIcon /> },
       { key: 'sales-customers', label: '客户管理', icon: <CustomersIcon /> },
-      { key: 'sales-stores', label: '门店管理', icon: <StoreIcon /> },
       { key: 'sales-reconciliation', label: '客户对账', icon: <ReconciliationIcon /> },
       { key: 'sales-return', label: '销售退货', icon: <ReturnIcon /> },
     ],
@@ -341,6 +340,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
       { key: 'personnel-employee', label: '员工管理', icon: <EmployeeIcon /> },
       { key: 'personnel-tea-professional', label: '茶人管理', icon: <TeaProfessionalIcon /> },
       { key: 'personnel-streamer', label: '带货人管理', icon: <StreamerIcon /> },
+      { key: 'personnel-stores', label: '门店管理', icon: <StoreIcon /> },
     ],
   },
 };

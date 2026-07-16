@@ -117,7 +117,7 @@ export default function SalesStores() {
 
   return (
     <>
-      <ContentHeader title="门店管理" breadcrumbs={['销售', '门店管理']} />
+      <ContentHeader title="门店管理" breadcrumbs={['人员', '门店管理']} />
       <div className="content-body">
         <div className="stat-cards">
           {stats(data).map((s, i) => <StatCard key={i} data={s} />)}
