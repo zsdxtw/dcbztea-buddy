@@ -48,9 +48,7 @@ type DrawerMode = 'add-dept' | 'add-team' | 'edit';
 
 interface DrawerState {
   mode: DrawerMode;
-  /** 编辑模式下的原节点 */
   node?: OrgNode;
-  /** 新增模式下的父节点 ID */
   parentId?: string | null;
 }
 
@@ -65,7 +63,7 @@ const emptyForm: NodeForm = { name: '', leader: '', status: 'active', remark: ''
 
 /* ── 主组件 ── */
 
-export default function SettingsOrganization() {
+export default function PersonnelOrganization() {
   const [nodes, setNodes] = useState<OrgNode[]>(initialOrgNodes.map((n) => ({ ...n })));
   const [emps, setEmps] = useState<Employee[]>(initialEmployees.map((e) => ({ ...e })));
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -188,7 +186,6 @@ export default function SettingsOrganization() {
   };
 
   const handleDelete = (node: OrgNode) => {
-    // 计算所有后代节点 ID
     const toDelete = new Set<string>([node.id]);
     let changed = true;
     while (changed) {
@@ -264,7 +261,7 @@ export default function SettingsOrganization() {
     <>
       <ContentHeader
         title="组织架构"
-        breadcrumbs={['系统', '组织架构']}
+        breadcrumbs={['人员', '组织架构']}
         actions={<Button onClick={openAddDepartment}><PlusIcon />新增部门</Button>}
       />
       <div className="content-body">

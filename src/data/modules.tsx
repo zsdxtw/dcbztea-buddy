@@ -325,7 +325,6 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     label: '系统',
     menus: [
       { key: 'settings-system', label: '系统设置', icon: <SystemSettingsIcon /> },
-      { key: 'settings-organization', label: '组织架构', icon: <OrgChartIcon /> },
       { key: 'settings-roles', label: '角色权限', icon: <RolesIcon /> },
       { key: 'settings-logs', label: '操作日志', icon: <LogsIcon /> },
       { key: 'settings-about', label: '关于', icon: <AboutIcon /> },
@@ -338,6 +337,7 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
     key: ModuleKey.PERSONNEL,
     label: '人员',
     menus: [
+      { key: 'personnel-organization', label: '组织架构', icon: <OrgChartIcon /> },
       { key: 'personnel-employee', label: '员工管理', icon: <EmployeeIcon /> },
       { key: 'personnel-tea-professional', label: '茶人管理', icon: <TeaProfessionalIcon /> },
       { key: 'personnel-streamer', label: '带货人管理', icon: <StreamerIcon /> },

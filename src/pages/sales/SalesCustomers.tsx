@@ -691,23 +691,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
             {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>}
             <div className="drawer-form-field" style={{ flex: 2 }}>
               <label className="drawer-label">主办人</label>
-              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                <select className="filter-select" style={{ width: 100 }} value={form.hostType ?? ''} onChange={(e) => { update('hostType', (e.target.value || undefined) as 'employee' | 'streamer' | undefined); update('hostId', undefined); }}>
-                  <option value="">请选择</option>
-                  <option value="employee">员工</option>
-                  <option value="streamer">带货人</option>
-                </select>
-                {form.hostType === 'employee' ? (
-                  <DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => update('hostId', empId || undefined)} style={{ flex: 1 }} />
-                ) : form.hostType === 'streamer' ? (
-                  <select className="filter-select" style={{ flex: 1 }} value={form.hostId ?? ''} onChange={(e) => update('hostId', e.target.value || undefined)}>
-                    <option value="">选择带货人</option>
-                    {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                  </select>
-                ) : (
-                  <div style={{ flex: 1, height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
-                )}
-              </div>
+              <DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => { update('hostId', empId || undefined); update('hostType', empId ? 'employee' : undefined); }} style={{ width: '100%' }} />
             </div>
           </div>
           <div className="drawer-form-row">

@@ -114,12 +114,14 @@ interface SalesOrderRecord {
   remark: string;
   products: SalesOrderItem[];
   timeline: { time: string; event: string; operator: string }[];
-  /** 跟单人 ID */
+  /** 跟单人 ID（仅员工） */
   followerId?: string;
-  /** 跟单人类型 */
-  followerType?: 'employee' | 'streamer';
   /** 跟单人姓名 */
   followerName?: string;
+  /** 带货人 ID */
+  streamerId?: string;
+  /** 带货人姓名 */
+  streamerName?: string;
   /** 主办人 ID */
   hostId?: string;
   /** 主办人类型 */
@@ -139,7 +141,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-12', status: OrderStatus.PENDING,
     contactPerson: '王经理', contactPhone: '0571-87651234', deliveryAddress: '杭州市西湖区龙井路88号',
     remark: '需冷藏运输，指定顺丰',
-    followerId: 'emp-8', followerType: 'employee', followerName: '王强', scenario: 1,
+    followerId: 'emp-8',  followerName: '王强', scenario: 1,
     products: [
       { productId: '1', name: '明前龙井 — 特级', teaCategory: TeaCategory.GREEN, quantity: '20 kg', marketPrice: 580, defaultPrice: 452, actualSalesPrice: 452, priceSource: 'sales', amount: '¥ 23,200' },
       { productId: '2', name: '碧螺春 — 一级', teaCategory: TeaCategory.GREEN, quantity: '10 kg', marketPrice: 420, defaultPrice: 328, actualSalesPrice: 328, priceSource: 'sales', amount: '¥ 11,600' },
@@ -155,7 +157,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-11', status: OrderStatus.APPROVED,
     contactPerson: '赵总', contactPhone: '0599-51234567', deliveryAddress: '武夷山市度假区茶博园6号',
     remark: '长期合作客户，月结',
-    followerId: 'emp-9', followerType: 'employee', followerName: '张伟', scenario: 3,
+    followerId: 'emp-9',  followerName: '张伟', scenario: 3,
     products: [
       { productId: '7', name: '金骏眉 — 特级', teaCategory: TeaCategory.RED, quantity: '15 kg', marketPrice: 1280, defaultPrice: 1024, actualSalesPrice: 1024, priceSource: 'sales', amount: '¥ 36,000' },
     ],
@@ -171,7 +173,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-10', status: OrderStatus.SHIPPING,
     contactPerson: '林老板', contactPhone: '0768-2345678', deliveryAddress: '潮州市湘桥区太平路168号',
     remark: '分两批发货',
-    followerId: 'emp-8', followerType: 'employee', followerName: '王强', scenario: 1,
+    followerId: 'emp-8',  followerName: '王强', scenario: 1,
     products: [
       { productId: '12', name: '凤凰单丛 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '25 kg', marketPrice: 560, defaultPrice: 426, actualSalesPrice: 426, priceSource: 'sales', amount: '¥ 28,000' },
       { productId: '10', name: '大红袍 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '15 kg', marketPrice: 720, defaultPrice: 547, actualSalesPrice: 547, priceSource: 'sales', amount: '¥ 16,800' },
@@ -189,7 +191,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-09', status: OrderStatus.COMPLETED,
     contactPerson: '张女士', contactPhone: '0593-5678901', deliveryAddress: '福鼎市太姥山镇茶都路22号',
     remark: '已签收，客户满意',
-    followerId: undefined, followerType: undefined, followerName: undefined, scenario: 5,
+    followerId: undefined, followerName: undefined, scenario: 5,
     products: [
       { productId: '13', name: '白毫银针 — 特级', teaCategory: TeaCategory.WHITE, quantity: '20 kg', marketPrice: 960, defaultPrice: 787, actualSalesPrice: 787, priceSource: 'sales', amount: '¥ 38,400' },
     ],
@@ -207,7 +209,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-08', status: OrderStatus.COMPLETED,
     contactPerson: '周经理', contactPhone: '0774-7234567', deliveryAddress: '梧州市万秀区西江路56号',
     remark: '季度采购，常规订单',
-    followerId: 'emp-9', followerType: 'employee', followerName: '张伟', scenario: 3,
+    followerId: 'emp-9',  followerName: '张伟', scenario: 3,
     products: [
       { productId: '33', name: '六堡茶 — 二级', teaCategory: TeaCategory.DARK, quantity: '30 kg', marketPrice: 280, defaultPrice: 210, actualSalesPrice: 210, priceSource: 'sales', amount: '¥ 10,800' },
       { productId: '18', name: '熟普洱 — 三级', teaCategory: TeaCategory.DARK, quantity: '20 kg', marketPrice: 260, defaultPrice: 195, actualSalesPrice: 195, priceSource: 'sales', amount: '¥ 7,200' },
@@ -226,7 +228,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-07', status: OrderStatus.PENDING,
     contactPerson: '何老板', contactPhone: '0730-8234567', deliveryAddress: '岳阳市君山区洞庭大道99号',
     remark: '新客户首单，需提供样品检测报告',
-    followerId: undefined, followerType: undefined, followerName: undefined, scenario: 1,
+    followerId: undefined, followerName: undefined, scenario: 1,
     products: [
       { productId: '16', name: '君山银针 — 特级', teaCategory: TeaCategory.YELLOW, quantity: '10 kg', marketPrice: 880, defaultPrice: 695, actualSalesPrice: 695, priceSource: 'sales', amount: '¥ 17,600' },
     ],
@@ -240,7 +242,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-06', status: OrderStatus.APPROVED,
     contactPerson: '江总', contactPhone: '0599-5234567', deliveryAddress: '武夷山市星村镇茶场路12号',
     remark: '有机认证产品，需附证书',
-    followerId: 'emp-8', followerType: 'employee', followerName: '王强', scenario: 3,
+    followerId: 'emp-8',  followerName: '王强', scenario: 3,
     products: [
       { productId: '6', name: '正山小种 — 特级', teaCategory: TeaCategory.RED, quantity: '25 kg', marketPrice: 480, defaultPrice: 384, actualSalesPrice: 384, priceSource: 'sales', amount: '¥ 24,000' },
     ],
@@ -256,7 +258,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-05', status: OrderStatus.SHIPPING,
     contactPerson: '吴经理', contactPhone: '0595-2345678', deliveryAddress: '安溪县凤城镇茶都路188号',
     remark: '清香型，真空包装',
-    followerId: 'emp-9', followerType: 'employee', followerName: '张伟', scenario: 5,
+    followerId: 'emp-9',  followerName: '张伟', scenario: 5,
     products: [
       { productId: '11', name: '铁观音 — 一级', teaCategory: TeaCategory.OOLONG, quantity: '40 kg', marketPrice: 320, defaultPrice: 243, actualSalesPrice: 243, priceSource: 'sales', amount: '¥ 25,600' },
       { productId: '11', name: '铁观音 — 二级', teaCategory: TeaCategory.OOLONG, quantity: '20 kg', marketPrice: 320, defaultPrice: 243, actualSalesPrice: 243, priceSource: 'sales', amount: '¥ 12,800' },
@@ -274,7 +276,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-04', status: OrderStatus.COMPLETED,
     contactPerson: '王经理', contactPhone: '0571-87651234', deliveryAddress: '杭州市西湖区龙井路88号',
     remark: '月度补货订单',
-    followerId: 'emp-8', followerType: 'employee', followerName: '王强', scenario: 1,
+    followerId: 'emp-8',  followerName: '王强', scenario: 1,
     products: [
       { productId: '9', name: '祁门红茶 — 特级', teaCategory: TeaCategory.RED, quantity: '35 kg', marketPrice: 520, defaultPrice: 416, actualSalesPrice: 416, priceSource: 'sales', amount: '¥ 36,400' },
     ],
@@ -292,7 +294,7 @@ const orderData: SalesOrderRecord[] = [
     date: '2025-07-03', status: OrderStatus.CANCELLED,
     contactPerson: '赵总', contactPhone: '0599-51234567', deliveryAddress: '武夷山市度假区茶博园6号',
     remark: '客户取消，改订茉莉花茶',
-    followerId: undefined, followerType: undefined, followerName: undefined, scenario: 3,
+    followerId: undefined, followerName: undefined, scenario: 3,
     products: [
       { productId: '24', name: '玫瑰花茶 — 一级', teaCategory: TeaCategory.FLOWER, quantity: '20 kg', marketPrice: 158, defaultPrice: 122, actualSalesPrice: 122, priceSource: 'sales', amount: '¥ 5,120' },
     ],
@@ -348,7 +350,7 @@ export default function SalesOrders() {
 
         <Card>
           <Table
-            headers={['订单编号', '客户', '客户类型', '跟单人', '主办人', '商品', '茶类', '数量', '单价', '金额', '下单日期', '状态', '操作']}
+            headers={['订单编号', '客户', '客户类型', '跟单人', '带货人', '主办人', '商品', '茶类', '数量', '单价', '金额', '下单日期', '状态', '操作']}
             rows={orders.map((o) => {
               const ctColor = customerTypeColors[o.customerType];
               return [
@@ -359,6 +361,7 @@ export default function SalesOrders() {
                 background: ctColor.bg, color: ctColor.color, border: `1px solid ${ctColor.border}`,
               }}>{CUSTOMER_TYPE_LABELS[o.customerType]}</span>,
               <span key="follower" style={{ fontSize: 'var(--text-sm)', color: o.followerName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.followerName ?? '—'}</span>,
+              <span key="streamer" style={{ fontSize: 'var(--text-sm)', color: o.streamerName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.streamerName ?? '—'}</span>,
               <span key="host" style={{ fontSize: 'var(--text-sm)', color: o.hostName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.hostName ?? '—'}</span>,
               o.product,
               <Tag category={o.teaCategory} />,
@@ -410,6 +413,7 @@ export default function SalesOrders() {
                   }}>{CUSTOMER_TYPE_LABELS[selectedOrder.customerType]}</span>); })()}
                 </InfoItem>
                 <InfoItem label="跟单人">{selectedOrder.followerName ?? '—'}</InfoItem>
+                <InfoItem label="带货人">{selectedOrder.streamerName ?? '—'}</InfoItem>
                 <InfoItem label="主办人">{selectedOrder.hostName ?? '—'}</InfoItem>
                 <InfoItem label="下单日期">{selectedOrder.date}</InfoItem>
                 <InfoItem label="联系人">{selectedOrder.contactPerson}</InfoItem>
@@ -515,9 +519,10 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
   const [customerType, setCustomerType] = useState<CustomerType | ''>('');
   const [newCustomerShortName, setNewCustomerShortName] = useState('');
 
-  // 跟单人
+  // 跟单人（仅员工）
   const [followerId, setFollowerId] = useState('');
-  const [followerType, setFollowerType] = useState<'employee' | 'streamer' | ''>('');
+  // 带货人（独立字段）
+  const [streamerId, setStreamerId] = useState('');
 
   // 构建客户选项列表（所有客户 + 平台客户）
   const allCustomerOptions = useMemo(() => {
@@ -628,7 +633,8 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
     const customerName = isNewCustomer
       ? newCustomerShortName.trim()
       : (allCustomerOptions.find(c => c.id === customerId)?.name ?? '新客户');
-    const followerName = followerId && followerType ? getPersonName(followerId, followerType) : undefined;
+    const followerName = followerId ? getEmployeeName(followerId) : undefined;
+    const streamerName = streamerId ? streamers.find(s => s.id === streamerId)?.name : undefined;
 
     // 新客户联动添加到客户管理列表
     let orderHostId: string | undefined;
@@ -688,8 +694,9 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
       deliveryAddress: deliveryAddress || '—',
       remark,
       followerId: followerId || undefined,
-      followerType: (followerType || undefined) as 'employee' | 'streamer' | undefined,
       followerName,
+      streamerId: streamerId || undefined,
+      streamerName,
       hostId: orderHostId,
       hostType: orderHostType,
       hostName: orderHostName,
@@ -884,29 +891,18 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
               <input className="filter-input" style={{ width: '100%' }} value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} placeholder="请输入联系人" />
             </div>
           </div>
-          {/* 跟单人 */}
+          {/* 跟单人 + 带货人 */}
           <div className="drawer-form-row">
-            <div className="drawer-form-field" style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-end' }}>
-              <div style={{ width: 100 }}>
-                <label className="drawer-label">跟单人</label>
-                <select className="filter-select" style={{ width: '100%' }} value={followerType} onChange={(e) => { setFollowerType(e.target.value as 'employee' | 'streamer' | ''); setFollowerId(''); }}>
-                  <option value="">请选择</option>
-                  <option value="employee">员工</option>
-                  <option value="streamer">带货人</option>
-                </select>
-              </div>
-              <div style={{ flex: 1 }}>
-                {followerType === 'employee' ? (
-                  <DeptEmployeeSelect value={followerId} onChange={setFollowerId} placeholder="选择员工" style={{ width: '100%' }} />
-                ) : followerType === 'streamer' ? (
-                  <select className="filter-select" style={{ width: '100%' }} value={followerId} onChange={(e) => setFollowerId(e.target.value)}>
-                    <option value="">选择带货人</option>
-                    {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                  </select>
-                ) : (
-                  <div style={{ height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
-                )}
-              </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">跟单人</label>
+              <DeptEmployeeSelect value={followerId} onChange={setFollowerId} placeholder="选择员工" style={{ width: '100%' }} />
+            </div>
+            <div className="drawer-form-field">
+              <label className="drawer-label">带货人</label>
+              <select className="filter-select" style={{ width: '100%' }} value={streamerId} onChange={(e) => setStreamerId(e.target.value)}>
+                <option value="">请选择带货人</option>
+                {streamers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
             </div>
           </div>
           <div className="drawer-form-row">

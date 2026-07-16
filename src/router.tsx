@@ -72,8 +72,8 @@ import SettingsAbout from './pages/settings/SettingsAbout';
 import SettingsUserManagement from './pages/settings/SettingsUserManagement';
 import SettingsDataBackup from './pages/settings/SettingsDataBackup';
 import SettingsUnit from './pages/settings/SettingsUnit';
-import SettingsOrganization from './pages/settings/SettingsOrganization';
 
+import PersonnelOrganization from './pages/personnel/PersonnelOrganization';
 import PersonnelTeaProfessional from './pages/personnel/PersonnelTeaProfessional';
 import PersonnelEmployee from './pages/personnel/PersonnelEmployee';
 import PersonnelStreamer from './pages/personnel/PersonnelStreamer';
@@ -160,7 +160,6 @@ export const router = createBrowserRouter([
       /* ── 系统 ── */
       { path: 'settings', element: <SettingsSystem /> },
       { path: 'settings/settings-system', element: <SettingsSystem /> },
-      { path: 'settings/settings-organization', element: <SettingsOrganization /> },
       { path: 'settings/settings-roles', element: <SettingsRoles /> },
       { path: 'settings/settings-logs', element: <SettingsLogs /> },
       { path: 'settings/settings-about', element: <SettingsAbout /> },
@@ -168,7 +167,8 @@ export const router = createBrowserRouter([
       { path: 'settings/settings-data-backup', element: <SettingsDataBackup /> },
       { path: 'settings/settings-unit', element: <SettingsUnit /> },
       /* ── 人员 ── */
-      { path: 'personnel', element: <PersonnelEmployee /> },
+      { path: 'personnel', element: <PersonnelOrganization /> },
+      { path: 'personnel/personnel-organization', element: <PersonnelOrganization /> },
       { path: 'personnel/personnel-employee', element: <PersonnelEmployee /> },
       { path: 'personnel/personnel-tea-professional', element: <PersonnelTeaProfessional /> },
       { path: 'personnel/personnel-streamer', element: <PersonnelStreamer /> },
