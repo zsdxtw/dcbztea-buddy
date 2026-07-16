@@ -5,7 +5,7 @@ import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import type { StatCardData, CustomerItem, CustomerType, PlatformItem, PlatformBankAccount, PlatformInvoiceInfo, CustomerBankAccount, CustomerInvoiceInfo } from '../../types';
-import { customerItems as initialCustomers, CUSTOMER_TYPE_LABELS, CUSTOMER_TYPE_DESC, LEVEL_COLORS } from '../../data/customers';
+import { customerItems as initialCustomers, CUSTOMER_TYPE_LABELS, CUSTOMER_TYPE_DESC, LEVEL_COLORS, DIRECT_SUBTYPE_LABELS } from '../../data/customers';
 import { platformItems as globalPlatforms } from '../../data/platforms';
 import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 import { generateCustomerCode } from '../../utils/customerCode';
@@ -23,12 +23,20 @@ const SECONDARY_LIGHT = '#FEF2F4';
 const TABS: { key: CustomerType; label: string; desc: string; icon: React.ReactNode }[] = [
   { key: 'direct', label: '直营客户', desc: CUSTOMER_TYPE_DESC.direct, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg> },
   { key: 'channel', label: '渠道客户', desc: CUSTOMER_TYPE_DESC.channel, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M2 10l3 2 3-4 3 5 3-3 2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><circle cx="4" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.3" /></svg> },
-  { key: 'personal', label: '个人客户', desc: CUSTOMER_TYPE_DESC.personal, icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" strokeWidth="1.3" /><path d="M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg> },
   { key: 'platform', label: '平台客户', desc: CUSTOMER_TYPE_DESC.platform, icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" /><path d="M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5" stroke="currentColor" strokeWidth="1.3" /><path d="M9 8v2M8 9h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg> },
+];
+
+/** 直营客户子类型筛选选项 */
+const DIRECT_SUBTYPE_FILTERS: { key: 'all' | 'enterprise' | 'individual' | 'platform'; label: string }[] = [
+  { key: 'all', label: '全部' },
+  { key: 'enterprise', label: '企业' },
+  { key: 'individual', label: '个人' },
+  { key: 'platform', label: '经平台' },
 ];
 
 export default function SalesCustomers() {
   const [activeTab, setActiveTab] = useState<CustomerType>('direct');
+  const [directSubFilter, setDirectSubFilter] = useState<'all' | 'enterprise' | 'individual' | 'platform'>('all');
   const [keyword, setKeyword] = useState('');
   const [data, setData] = useState<CustomerItem[]>(initialCustomers);
   const [platforms, setPlatforms] = useState<PlatformItem[]>(globalPlatforms);
@@ -47,14 +55,20 @@ export default function SalesCustomers() {
   const [editPlatformForm, setEditPlatformForm] = useState<PlatformItem | null>(null);
   const [showAddPlatformDrawer, setShowAddPlatformDrawer] = useState(false);
 
-  const tabCustomers = useMemo(() => data.filter(c => c.type === activeTab), [data, activeTab]);
+  const tabCustomers = useMemo(() => {
+    let result = data.filter(c => c.type === activeTab);
+    if (activeTab === 'direct' && directSubFilter !== 'all') {
+      result = result.filter(c => c.directSubType === directSubFilter);
+    }
+    return result;
+  }, [data, activeTab, directSubFilter]);
   const filtered = useMemo(() => {
     let result = tabCustomers;
     if (showPendingMaintain) {
       // 待维护：缺少联系人、联系电话、地址、结算账户等关键信息的客户
       result = result.filter(c =>
         !c.contactPerson || !c.contactPhone || !c.contactAddress ||
-        (c.type !== 'personal' && (c.bankAccounts ?? []).length === 0) ||
+        (c.directSubType !== 'individual' && (c.bankAccounts ?? []).length === 0) ||
         !c.province || !c.city
       );
     }
@@ -74,15 +88,12 @@ export default function SalesCustomers() {
   const stats: StatCardData[] = useMemo(() => {
     const direct = data.filter(c => c.type === 'direct');
     const channel = data.filter(c => c.type === 'channel');
-    const personal = data.filter(c => c.type === 'personal');
-    const withPlatform = direct.filter(c => c.platformIds.length > 0).length;
     const activeCount = data.filter(c => c.status === 'active').length;
     const platformActive = platforms.filter(p => p.status === 'active').length;
     return [
       { label: '客户总数', value: String(data.length + platforms.length), unit: '家', trend: { direction: 'up', value: `合作中 ${activeCount + platformActive}` }, icon: <IconUsers /> },
       { label: '直营客户', value: String(direct.length), unit: '家', trend: { direction: 'up', value: `合作中 ${direct.filter(c => c.status === 'active').length}` }, icon: <IconHome /> },
       { label: '渠道客户', value: String(channel.length), unit: '家', trend: { direction: 'up', value: `合作中 ${channel.filter(c => c.status === 'active').length}` }, icon: <IconChannel /> },
-      { label: '个人客户', value: String(personal.length), unit: '人', trend: { direction: 'up', value: `合作中 ${personal.filter(c => c.status === 'active').length}` }, icon: <IconPersonal /> },
       { label: '平台客户', value: String(platforms.length), unit: '家', trend: { direction: 'up', value: `在册 ${platformActive}` }, icon: <IconPlatform /> },
     ];
   }, [data, platforms]);
@@ -161,13 +172,12 @@ export default function SalesCustomers() {
       <ContentHeader title="客户管理" breadcrumbs={['销售', '客户管理']} />
 
       <div className="content-body">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
         {TABS.map(t => {
           const count = t.key === 'platform' ? platforms.length : data.filter(c => c.type === t.key).length;
           const isActive = activeTab === t.key;
-          const withPlatform = t.key === 'direct' ? data.filter(c => c.type === 'direct' && c.platformIds.length > 0).length : 0;
           return (
-            <div key={t.key} onClick={() => { setActiveTab(t.key); setKeyword(''); }} style={{ cursor: 'pointer', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', border: isActive ? `2px solid ${PRIMARY}` : '1px solid var(--color-neutral-200)', background: isActive ? `${PRIMARY}08` : 'var(--color-neutral-0)', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition-fast)' }}>
+            <div key={t.key} onClick={() => { setActiveTab(t.key); setKeyword(''); setDirectSubFilter('all'); }} style={{ cursor: 'pointer', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', border: isActive ? `2px solid ${PRIMARY}` : '1px solid var(--color-neutral-200)', background: isActive ? `${PRIMARY}08` : 'var(--color-neutral-0)', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition-fast)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                   <span style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)', background: isActive ? PRIMARY_LIGHT : 'var(--color-neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isActive ? PRIMARY : 'var(--color-neutral-500)', transition: 'var(--transition-fast)' }}>{t.icon}</span>
@@ -238,6 +248,13 @@ export default function SalesCustomers() {
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
             <input className="filter-input" placeholder={`搜索${CUSTOMER_TYPE_LABELS[activeTab]}名称、简称、编号、联系人、地区...`} value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
+            {activeTab === 'direct' && (
+              <div style={{ display: 'flex', gap: 4, padding: 2, background: 'var(--color-neutral-100)', borderRadius: 'var(--radius-md)' }}>
+                {DIRECT_SUBTYPE_FILTERS.map(f => (
+                  <button key={f.key} onClick={() => setDirectSubFilter(f.key)} style={{ padding: '4px 12px', borderRadius: 'var(--radius-sm)', border: 'none', background: directSubFilter === f.key ? 'var(--color-neutral-0)' : 'transparent', fontSize: 'var(--text-sm)', fontWeight: directSubFilter === f.key ? 'var(--font-medium)' : 'normal', color: directSubFilter === f.key ? PRIMARY : 'var(--color-neutral-500)', cursor: 'pointer', boxShadow: directSubFilter === f.key ? 'var(--shadow-sm)' : 'none', transition: 'var(--transition-fast)' }}>{f.label}</button>
+                ))}
+              </div>
+            )}
             <Button variant={showPendingMaintain ? 'primary' : 'ghost'} onClick={() => setShowPendingMaintain(!showPendingMaintain)}>
               <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 2v6M8 14v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.2"/></svg>
               待维护
@@ -265,16 +282,18 @@ export default function SalesCustomers() {
 
           <Card style={{ padding: 0 }}>
             <Table
-              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '客户编号', '客户名称', '主办人', ...(activeTab === 'direct' ? ['平台方'] : []), '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
+              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '客户编号', '客户名称', ...(activeTab === 'direct' ? ['客户类型'] : []), '主办人', ...(activeTab === 'direct' ? ['平台方'] : []), '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
               rows={filtered.map((c, idx) => {
                 const cells: React.ReactNode[] = [
                   deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(c.id)} onChange={() => toggleSelect(c.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
                   <span key="sn" className="cell-emph">{c.shortName || c.name}</span>,
                   <span key="cc" className="mono" style={{ color: 'var(--color-neutral-600)' }}>{c.customerCode || '—'}</span>,
                   <span key="name">{c.name}</span>,
-                  <span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>,
                 ];
+                if (activeTab === 'direct') cells.push(<span key="sub" style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', padding: '1px 8px', borderRadius: 'var(--radius-sm)', background: c.directSubType === 'individual' ? '#F3E5F5' : c.directSubType === 'platform' ? `${SECONDARY}15` : `${PRIMARY}15`, color: c.directSubType === 'individual' ? '#7B1FA2' : c.directSubType === 'platform' ? SECONDARY : PRIMARY, border: `1px solid ${c.directSubType === 'individual' ? '#CE93D8' : c.directSubType === 'platform' ? `${SECONDARY}30` : `${PRIMARY}30`}` }}>{c.directSubType ? DIRECT_SUBTYPE_LABELS[c.directSubType] : '企业'}</span>);
+                if (activeTab === 'direct') cells.push(<span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>);
                 if (activeTab === 'direct') cells.push(<span key="pf">{platformTags(c.platformIds, c.platformCommissionRates)}</span>);
+                if (activeTab !== 'direct') cells.push(<span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>);
                 cells.push(
                   <span key="region" style={{ fontSize: 'var(--text-sm)' }}>{[c.province, c.city, c.district].filter(Boolean).join(' / ') || c.region}</span>,
                   <span key="cp">{c.contactPerson}</span>,
@@ -317,7 +336,7 @@ export default function SalesCustomers() {
         badge="CU"
         title={detailCustomer?.name}
         statusTag={detailCustomer && <>{levelTag(detailCustomer.level)}{statusTag(detailCustomer.status)}</>}
-        subtitle={detailCustomer && `${CUSTOMER_TYPE_LABELS[detailCustomer.type]} · ${detailCustomer.region} · ${detailCustomer.contactPerson} ${detailCustomer.contactPhone}`}
+        subtitle={detailCustomer && `${CUSTOMER_TYPE_LABELS[detailCustomer.type]}${detailCustomer.directSubType ? ` · ${DIRECT_SUBTYPE_LABELS[detailCustomer.directSubType]}` : ''} · ${detailCustomer.region} · ${detailCustomer.contactPerson} ${detailCustomer.contactPhone}`}
         mode="view"
         onEdit={() => window.alert('编辑功能（演示）')}
       >
@@ -328,7 +347,7 @@ export default function SalesCustomers() {
                 <InfoItem label="客户编号" emph mono>{detailCustomer.customerCode || '—'}</InfoItem>
                 <InfoItem label="客户简称" emph>{detailCustomer.shortName || '—'}</InfoItem>
                 <InfoItem label="客户名称" emph>{detailCustomer.name}</InfoItem>
-                <InfoItem label="客户类型">{CUSTOMER_TYPE_LABELS[detailCustomer.type]}</InfoItem>
+                <InfoItem label="客户类型">{CUSTOMER_TYPE_LABELS[detailCustomer.type]}{detailCustomer.directSubType ? ` · ${DIRECT_SUBTYPE_LABELS[detailCustomer.directSubType]}` : ''}</InfoItem>
                 <InfoItem label="客户等级">{detailCustomer.level}</InfoItem>
                 <InfoItem label="客户来源">{detailCustomer.source || '—'}</InfoItem>
                 <InfoItem label="合作日期">{detailCustomer.cooperationDate}</InfoItem>
@@ -348,7 +367,7 @@ export default function SalesCustomers() {
               </InfoGrid>
             </DrawerSection>
 
-            {detailCustomer.type !== 'personal' && (
+            {detailCustomer.directSubType !== 'individual' && (
               <DrawerSection title="财务信息">
                 <InfoGrid cols={3}>
                   <InfoItem label="结算方式">{detailCustomer.settlementMethod || '—'}</InfoItem>
@@ -382,7 +401,7 @@ export default function SalesCustomers() {
               </DrawerSection>
             )}
 
-            {detailCustomer.type !== 'personal' && (
+            {detailCustomer.directSubType !== 'individual' && (
               <DrawerSection title="开票信息">
                 {(detailCustomer.invoiceInfos ?? []).length === 0 ? (
                   <EmptyText>暂无发票信息</EmptyText>
@@ -595,7 +614,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
 }) {
   const drawerWidth = useDrawerWidth();
   const [form, setForm] = useState<CustomerItem>({
-    id: `c_${Date.now()}`, name: '', shortName: '', customerCode: '', type: customerType, region: '', province: '', city: '', district: '',
+    id: `c_${Date.now()}`, name: '', shortName: '', customerCode: '', type: customerType, directSubType: customerType === 'direct' ? 'enterprise' : undefined, region: '', province: '', city: '', district: '',
     contactPerson: '', contactPhone: '', contactEmail: '', contactAddress: '', level: 'B级', orders: 0, totalAmount: 0, platformIds: [],
     cooperationDate: new Date().toISOString().slice(0, 10), status: 'active', settlementMethod: '月结', taxNo: '', source: '', remark: '',
     bankAccounts: [], invoiceInfos: [], platformCommissionRates: {},
@@ -618,8 +637,8 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
   });
   /** 设置某个平台的扣点 */
   const setPlatformRate = (id: string, rate: string) => setForm(prev => ({ ...prev, platformCommissionRates: { ...(prev.platformCommissionRates ?? {}), [id]: rate } }));
-  const isPersonal = customerType === 'personal';
-  const canSave = form.name.trim().length > 0 && (form.shortName ?? '').trim().length > 0 && (isPersonal || form.contactPerson.trim().length > 0);
+  const isIndividual = form.directSubType === 'individual';
+  const canSave = form.name.trim().length > 0 && (form.shortName ?? '').trim().length > 0 && (isIndividual || form.contactPerson.trim().length > 0);
 
   const previewCode = (form.shortName ?? '').trim() ? generateCustomerCode(customerType, form.shortName!.trim(), sequence) : '—';
 
@@ -650,7 +669,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
     const shortName = form.shortName!.trim();
     const customerCode = generateCustomerCode(customerType, shortName, sequence);
     const region = form.city ? form.city.replace(/市$/, '') : (form.province || '');
-    onSave({ ...form, shortName, customerCode, region, contactPerson: isPersonal ? shortName : form.contactPerson, bankAccounts: isPersonal ? [] : bankAccounts, invoiceInfos: isPersonal ? [] : invoiceInfos });
+    onSave({ ...form, shortName, customerCode, region, contactPerson: isIndividual ? shortName : form.contactPerson, bankAccounts: isIndividual ? [] : bankAccounts, invoiceInfos: isIndividual ? [] : invoiceInfos });
   };
 
   return (
@@ -669,9 +688,12 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
           </div>
           <div className="drawer-form-row">
             <div className="drawer-form-field" style={{ flex: 1 }}><label className="drawer-label">客户编号（自动生成）</label><input className="filter-input" style={{ width: '100%' }} value={previewCode} readOnly placeholder="输入客户简称后自动生成" /></div>
+            {customerType === 'direct' && (
+              <div className="drawer-form-field"><label className="drawer-label">客户类型 *</label><select className="filter-select" style={{ width: '100%' }} value={form.directSubType ?? 'enterprise'} onChange={(e) => { update('directSubType', e.target.value as 'enterprise' | 'individual' | 'platform'); if (e.target.value !== 'platform') { update('platformIds', []); update('platformCommissionRates', {}); } }}><option value="enterprise">企业</option><option value="individual">个人</option><option value="platform">经平台</option></select></div>
+            )}
           </div>
           <div className="drawer-form-row">
-            {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">联系人 *</label><input className="filter-input" style={{ width: '100%' }} value={form.contactPerson} onChange={e => update('contactPerson', e.target.value)} /></div>}
+            {!isIndividual && <div className="drawer-form-field"><label className="drawer-label">联系人 *</label><input className="filter-input" style={{ width: '100%' }} value={form.contactPerson} onChange={e => update('contactPerson', e.target.value)} /></div>}
             <div className="drawer-form-field"><label className="drawer-label">联系电话</label><input className="filter-input" style={{ width: '100%' }} value={form.contactPhone} onChange={e => update('contactPhone', e.target.value)} /></div>
             <div className="drawer-form-field"><label className="drawer-label">联系邮箱</label><input className="filter-input" style={{ width: '100%' }} value={form.contactEmail || ''} onChange={e => update('contactEmail', e.target.value)} /></div>
           </div>
@@ -686,9 +708,9 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
           </div>
           <div className="drawer-section-title">合作信息</div>
           <div className="drawer-form-row">
-            {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }} value={form.settlementMethod || ''} onChange={e => update('settlementMethod', e.target.value)}><option value="月结">月结</option><option value="预付">预付</option><option value="季度">季度结算</option><option value="现款">现款</option></select></div>}
+            {!isIndividual && <div className="drawer-form-field"><label className="drawer-label">结算方式</label><select className="filter-select" style={{ width: '100%' }} value={form.settlementMethod || ''} onChange={e => update('settlementMethod', e.target.value)}><option value="月结">月结</option><option value="预付">预付</option><option value="季度">季度结算</option><option value="现款">现款</option></select></div>}
             <div className="drawer-form-field"><label className="drawer-label">客户来源</label><select className="filter-select" style={{ width: '100%' }} value={form.source || ''} onChange={e => update('source', e.target.value)}><option value="">请选择</option><option value="主动开发">主动开发</option><option value="展会拓客">展会拓客</option><option value="老客户转介">老客户转介</option><option value="平台引流">平台引流</option><option value="线上咨询">线上咨询</option><option value="其他">其他</option></select></div>
-            {!isPersonal && <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>}
+            {!isIndividual && <div className="drawer-form-field"><label className="drawer-label">税号</label><input className="filter-input" style={{ width: '100%' }} value={form.taxNo || ''} onChange={e => update('taxNo', e.target.value)} /></div>}
             <div className="drawer-form-field" style={{ flex: 2 }}>
               <label className="drawer-label">主办人</label>
               <DeptEmployeeSelect value={form.hostId ?? ''} onChange={(empId) => { update('hostId', empId || undefined); update('hostType', empId ? 'employee' : undefined); }} style={{ width: '100%' }} />
@@ -700,7 +722,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
           </div>
 
           {/* 结算账户 */}
-          {!isPersonal && (
+          {!isIndividual && (
             <>
           <div className="drawer-section-title">结算账户（{bankAccounts.length}/5）</div>
           {bankAccounts.map((ba, i) => (
@@ -742,7 +764,7 @@ function CreateDrawer({ customerType, platforms, sequence, onCancel, onSave, onQ
             </>
           )}
 
-          {customerType === 'direct' && (
+          {customerType === 'direct' && form.directSubType === 'platform' && (
             <>
               <div className="drawer-section-title">关联平台（可多选，每个平台单独设置扣点，下单时选择唯一的一个）</div>
               {form.platformIds.length > 0 && (

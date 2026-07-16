@@ -621,6 +621,8 @@ export interface CustomerItem {
   /** 客户编号（直营VZY/渠道VQD-简称首字母-XXXXX） */
   customerCode?: string;
   type: CustomerType;
+  /** 直营客户子类型（仅 type='direct' 时有效）：企业/个人/经平台 */
+  directSubType?: 'enterprise' | 'individual' | 'platform';
   region: string;
   /** 省份 */
   province?: string;
