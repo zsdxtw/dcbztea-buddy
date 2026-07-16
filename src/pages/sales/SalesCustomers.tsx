@@ -282,7 +282,7 @@ export default function SalesCustomers() {
 
           <Card style={{ padding: 0 }}>
             <Table
-              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '客户编号', '客户名称', ...(activeTab === 'direct' ? ['客户类型'] : []), '主办人', ...(activeTab === 'direct' ? ['平台方'] : []), '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
+              headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '客户编号', '客户名称', ...(activeTab === 'direct' ? ['客户类型'] : []), '主办人', '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
               rows={filtered.map((c, idx) => {
                 const cells: React.ReactNode[] = [
                   deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(c.id)} onChange={() => toggleSelect(c.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
@@ -291,9 +291,7 @@ export default function SalesCustomers() {
                   <span key="name">{c.name}</span>,
                 ];
                 if (activeTab === 'direct') cells.push(<span key="sub" style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)', padding: '1px 8px', borderRadius: 'var(--radius-sm)', background: c.directSubType === 'individual' ? '#F3E5F5' : c.directSubType === 'platform' ? `${SECONDARY}15` : `${PRIMARY}15`, color: c.directSubType === 'individual' ? '#7B1FA2' : c.directSubType === 'platform' ? SECONDARY : PRIMARY, border: `1px solid ${c.directSubType === 'individual' ? '#CE93D8' : c.directSubType === 'platform' ? `${SECONDARY}30` : `${PRIMARY}30`}` }}>{c.directSubType ? DIRECT_SUBTYPE_LABELS[c.directSubType] : '企业'}</span>);
-                if (activeTab === 'direct') cells.push(<span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>);
-                if (activeTab === 'direct') cells.push(<span key="pf">{platformTags(c.platformIds, c.platformCommissionRates)}</span>);
-                if (activeTab !== 'direct') cells.push(<span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>);
+                cells.push(<span key="liaison" style={{ fontSize: 'var(--text-sm)' }}>{c.hostId ? (c.hostType === 'streamer' ? (streamers.find(s => s.id === c.hostId)?.name ?? '—') : getEmployeeName(c.hostId)) : '—'}</span>);
                 cells.push(
                   <span key="region" style={{ fontSize: 'var(--text-sm)' }}>{[c.province, c.city, c.district].filter(Boolean).join(' / ') || c.region}</span>,
                   <span key="cp">{c.contactPerson}</span>,
