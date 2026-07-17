@@ -585,7 +585,7 @@ export interface PlatformItem {
   id: string;
   name: string;
   shortName: string;
-  /** 平台编号（原 code 字段，规则：VPT-简称首字母-XXXXX） */
+  /** 平台编号（规则：KHPT-0001） */
   code: string;
   contactPerson: string;
   contactPosition: string;
@@ -618,7 +618,7 @@ export interface CustomerItem {
   name: string;
   /** 客户简称 */
   shortName?: string;
-  /** 客户编号（直营VZY/渠道VQD-简称首字母-XXXXX） */
+  /** 客户编号（直营KHZY/渠道KHQD-XXXXX） */
   customerCode?: string;
   type: CustomerType;
   /** 直营客户子类型（仅 type='direct' 时有效）：企业/个人/经平台 */
