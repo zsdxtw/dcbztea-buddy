@@ -1,378 +1,362 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import ContentHeader from '../../components/layout/ContentHeader';
-import StatCard from '../../components/common/StatCard';
 import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
-import Tag from '../../components/common/Tag';
-import StatusTag from '../../components/common/StatusTag';
-import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
-import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
-import { TeaCategory } from '../../types';
-import type { StatCardData } from '../../types';
+import { platformItems } from '../../data/platforms';
+import {
+  salesQuotationRules,
+  calcPlatformNetPrice,
+  type SalesQuotationRule,
+} from '../../data/prices';
 
-/* ── 报价状态映射 ── */
-type PricingStatus = 'pending' | 'confirmed' | 'rejected' | 'expired';
-
-function pricingStatusToVariant(status: PricingStatus) {
-  switch (status) {
-    case 'confirmed': return 'success' as const;
-    case 'pending': return 'warning' as const;
-    case 'rejected': return 'error' as const;
-    case 'expired': return 'default' as const;
-  }
+/* ── 工具函数 ── */
+function formatMoney(n: number): string {
+  return `¥${n.toLocaleString('en-US')}`;
 }
 
-function pricingStatusLabel(status: PricingStatus) {
-  switch (status) {
-    case 'pending': return '待确认';
-    case 'confirmed': return '已确认';
-    case 'rejected': return '已驳回';
-    case 'expired': return '已过期';
-  }
-}
+/** 报价 Tab 类型 */
+type QuotationTab = 'direct' | 'platform' | 'channel' | 'personal';
 
-/* ── 报价类型 ── */
-type PricingType = 'first' | 'adjust' | 'renew';
-
-const PRICING_TYPE_LABELS: Record<PricingType, string> = {
-  first: '首次报价',
-  adjust: '价格调整',
-  renew: '到期续价',
-};
-
-/* ── Mock 数据 ── */
-interface PricingRecord {
-  id: string;
-  code: string;
-  customer: string;
-  product: string;
-  teaCategory: TeaCategory;
-  originalPrice: number;
-  quotedPrice: number;
-  unit: string;
-  type: PricingType;
-  validFrom: string;
-  validTo: string;
-  status: PricingStatus;
-  contactPerson: string;
-  contactPhone: string;
-  remark: string;
-  history: { date: string; price: number; note: string }[];
-}
-
-const pricingRecords: PricingRecord[] = [
-  {
-    id: '1', code: 'SP202606001', customer: '华茗堂茶庄', product: '明前龙井', teaCategory: TeaCategory.GREEN,
-    originalPrice: 580, quotedPrice: 620, unit: '元/50g', type: 'adjust',
-    validFrom: '2026-06-01', validTo: '2026-08-31', status: 'pending',
-    contactPerson: '王经理', contactPhone: '0571-87651234', remark: '春茶产量减少，价格上调',
-    history: [
-      { date: '2025-09-01', price: 560, note: '秋茶报价' },
-      { date: '2026-03-15', price: 580, note: '春茶首报' },
-      { date: '2026-06-01', price: 620, note: '夏茶调价' },
-    ],
-  },
-  {
-    id: '2', code: 'SP202606002', customer: '雅韵茶社', product: '金骏眉', teaCategory: TeaCategory.RED,
-    originalPrice: 1200, quotedPrice: 1150, unit: '元/50g', type: 'adjust',
-    validFrom: '2026-06-01', validTo: '2026-12-31', status: 'confirmed',
-    contactPerson: '赵总', contactPhone: '0599-51234567', remark: '长期合作优惠下调',
-    history: [
-      { date: '2025-06-01', price: 1200, note: '年度报价' },
-      { date: '2026-06-01', price: 1150, note: '合作优惠' },
-    ],
-  },
-  {
-    id: '3', code: 'SP202606003', customer: '清心茶坊', product: '铁观音', teaCategory: TeaCategory.OOLONG,
-    originalPrice: 320, quotedPrice: 320, unit: '元/50g', type: 'renew',
-    validFrom: '2026-07-01', validTo: '2027-06-30', status: 'pending',
-    contactPerson: '林老板', contactPhone: '0768-2345678', remark: '到期续价，维持原价',
-    history: [
-      { date: '2025-07-01', price: 320, note: '年度报价' },
-      { date: '2026-07-01', price: 320, note: '续价不变' },
-    ],
-  },
-  {
-    id: '4', code: 'SP202606004', customer: '品茗轩', product: '白毫银针', teaCategory: TeaCategory.WHITE,
-    originalPrice: 960, quotedPrice: 1020, unit: '元/50g', type: 'adjust',
-    validFrom: '2026-06-15', validTo: '2026-12-15', status: 'pending',
-    contactPerson: '张女士', contactPhone: '0593-5678901', remark: '白茶原料成本上涨',
-    history: [
-      { date: '2025-06-01', price: 960, note: '年度报价' },
-      { date: '2026-06-15', price: 1020, note: '成本上调' },
-    ],
-  },
-  {
-    id: '5', code: 'SP202606005', customer: '翠竹茶行', product: '君山银针', teaCategory: TeaCategory.YELLOW,
-    originalPrice: 880, quotedPrice: 880, unit: '元/50g', type: 'first',
-    validFrom: '2026-06-10', validTo: '2026-09-10', status: 'confirmed',
-    contactPerson: '周经理', contactPhone: '0774-7234567', remark: '新客户首次报价',
-    history: [
-      { date: '2026-06-10', price: 880, note: '首次报价' },
-    ],
-  },
-  {
-    id: '6', code: 'SP202606006', customer: '和风茶屋', product: '六堡茶', teaCategory: TeaCategory.DARK,
-    originalPrice: 180, quotedPrice: 168, unit: '元/50g', type: 'adjust',
-    validFrom: '2026-05-01', validTo: '2026-10-31', status: 'confirmed',
-    contactPerson: '何老板', contactPhone: '0730-8234567', remark: '批量采购优惠',
-    history: [
-      { date: '2025-05-01', price: 180, note: '年度报价' },
-      { date: '2026-05-01', price: 168, note: '批量调价' },
-    ],
-  },
-  {
-    id: '7', code: 'SP202606007', customer: '云隐茶庄', product: '玫瑰花茶', teaCategory: TeaCategory.FLOWER,
-    originalPrice: 128, quotedPrice: 145, unit: '元/50g', type: 'adjust',
-    validFrom: '2026-06-01', validTo: '2026-11-30', status: 'rejected',
-    contactPerson: '江总', contactPhone: '0599-5234567', remark: '花材成本上涨，客户认为调价过高',
-    history: [
-      { date: '2025-06-01', price: 128, note: '年度报价' },
-      { date: '2026-06-01', price: 145, note: '成本上调' },
-    ],
-  },
-  {
-    id: '8', code: 'SP202606008', customer: '茗香斋', product: '碧螺春', teaCategory: TeaCategory.GREEN,
-    originalPrice: 420, quotedPrice: 398, unit: '元/50g', type: 'renew',
-    validFrom: '2026-07-01', validTo: '2027-06-30', status: 'pending',
-    contactPerson: '吴经理', contactPhone: '0595-2345678', remark: '到期续价，小幅下调',
-    history: [
-      { date: '2025-07-01', price: 420, note: '年度报价' },
-      { date: '2026-07-01', price: 398, note: '续价下调' },
-    ],
-  },
-  {
-    id: '9', code: 'SP202606009', customer: '华茗堂茶庄', product: '凤凰单丛', teaCategory: TeaCategory.OOLONG,
-    originalPrice: 560, quotedPrice: 560, unit: '元/50g', type: 'first',
-    validFrom: '2026-01-15', validTo: '2026-06-15', status: 'expired',
-    contactPerson: '王经理', contactPhone: '0571-87651234', remark: '报价已过期未确认',
-    history: [
-      { date: '2026-01-15', price: 560, note: '首次报价' },
-    ],
-  },
-  {
-    id: '10', code: 'SP202606010', customer: '雅韵茶社', product: '正山小种', teaCategory: TeaCategory.RED,
-    originalPrice: 480, quotedPrice: 458, unit: '元/50g', type: 'adjust',
-    validFrom: '2026-06-01', validTo: '2026-12-31', status: 'pending',
-    contactPerson: '赵总', contactPhone: '0599-51234567', remark: '长期合作下调',
-    history: [
-      { date: '2025-06-01', price: 480, note: '年度报价' },
-      { date: '2026-06-01', price: 458, note: '合作优惠' },
-    ],
-  },
+const TAB_CONFIG: { key: QuotationTab; label: string; desc: string }[] = [
+  { key: 'direct', label: '直营客户报价', desc: '不经平台客户设唯一报价，经平台客户设报价并自动计算平台实得价' },
+  { key: 'platform', label: '平台客户报价', desc: '按平台查看经平台直营客户的报价汇总（平台实得价）' },
+  { key: 'channel', label: '渠道客户报价', desc: '为每个渠道客户设置唯一报价' },
+  { key: 'personal', label: '个人客户报价', desc: '按客户等级设置最低销售价，下单时不可低于此价' },
 ];
 
-/* ── 统计数据 ── */
-const stats: StatCardData[] = [
-  {
-    label: '报价单数', value: '42', unit: '单',
-    trend: { direction: 'up', value: '+5 单' },
-    icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M3 9h12M7 5V3h4v2" stroke="currentColor" strokeWidth="1.3"/></svg>,
-  },
-  {
-    label: '待确认', value: '9', unit: '单',
-    trend: { direction: 'up', value: '需及时处理' },
-    icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.3"/><path d="M9 6v3l2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>,
-  },
-  {
-    label: '本月调价', value: '15', unit: '项',
-    trend: { direction: 'down', value: '3 项' },
-    icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 14l3-4 3 2 3-5 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-  },
-  {
-    label: '转化率', value: '68.5', unit: '%',
-    trend: { direction: 'up', value: '2.1%' },
-    icon: <svg viewBox="0 0 18 18" fill="none"><path d="M9 2l2.5 5 5.5.8-4 3.9.9 5.5L9 14.7 5.1 17.2l.9-5.5-4-3.9L7.5 7z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>,
-  },
-];
+/** 直营客户报价子 Tab */
+type DirectSubTab = 'no_platform' | 'with_platform';
 
-/* ── 客户列表（用于筛选） ── */
-const customers = ['全部客户', ...Array.from(new Set(pricingRecords.map(r => r.customer)))];
+const PRIMARY = '#0F64B5';
+const PRIMARY_LIGHT = '#EBF3FC';
 
-/** 计算调幅 */
-const calcAdjustment = (original: number, quoted: number) => {
-  const diff = ((quoted - original) / original * 100).toFixed(1);
-  return Number(diff);
-};
-
-/** 销售报（调）价页面 */
 export default function SalesPricing() {
-  const [showDrawer, setShowDrawer] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<PricingRecord | null>(null);
+  const [activeTab, setActiveTab] = useState<QuotationTab>('direct');
+  const [directSubTab, setDirectSubTab] = useState<DirectSubTab>('no_platform');
+  const [selectedPlatformId, setSelectedPlatformId] = useState<string>('p1');
+  // 编辑状态
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editPrice, setEditPrice] = useState<string>('');
+  // 数据副本（可编辑）
+  const [rules, setRules] = useState<SalesQuotationRule[]>([...salesQuotationRules]);
 
-  const handleView = (record: PricingRecord) => {
-    setSelectedRecord(record);
-    setShowDrawer(true);
+  /* ── 直营客户报价数据 ── */
+  const directNoPlatformRules = useMemo(
+    () => rules.filter(r => r.quotationType === 'direct_no_platform'),
+    [rules]
+  );
+  const directWithPlatformRules = useMemo(
+    () => rules.filter(r => r.quotationType === 'direct_with_platform'),
+    [rules]
+  );
+
+  /* ── 平台客户报价数据：按平台分组展示经平台直营客户的报价 ── */
+  const platformRules = useMemo(() => {
+    if (!selectedPlatformId) return [];
+    return rules.filter(r => r.quotationType === 'direct_with_platform' && r.platformId === selectedPlatformId);
+  }, [rules, selectedPlatformId]);
+
+  /* ── 渠道客户报价数据 ── */
+  const channelRules = useMemo(
+    () => rules.filter(r => r.quotationType === 'channel'),
+    [rules]
+  );
+
+  /* ── 个人客户报价数据 ── */
+  const personalRules = useMemo(
+    () => rules.filter(r => r.quotationType === 'personal_by_level'),
+    [rules]
+  );
+
+  /* ── 编辑报价 ── */
+  const handleStartEdit = (rule: SalesQuotationRule) => {
+    setEditingId(rule.id);
+    setEditPrice(String(rule.quotedPrice));
   };
 
-  const handleCloseDrawer = () => {
-    setShowDrawer(false);
-    setSelectedRecord(null);
+  const handleSaveEdit = (ruleId: string) => {
+    const newPrice = Number(editPrice) || 0;
+    setRules(prev => prev.map(r => {
+      if (r.id === ruleId) {
+        const updated = { ...r, quotedPrice: newPrice };
+        // 经平台直营客户：自动重新计算平台实得价
+        if (r.quotationType === 'direct_with_platform' && r.platformCommissionRate) {
+          updated.platformNetPrice = calcPlatformNetPrice(newPrice, r.platformCommissionRate);
+        }
+        return updated;
+      }
+      return r;
+    }));
+    setEditingId(null);
+    setEditPrice('');
   };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditPrice('');
+  };
+
+  /* ── 统计卡片数据 ── */
+  const stats = useMemo(() => {
+    const directCount = directNoPlatformRules.length + directWithPlatformRules.length;
+    const platformCount = new Set(directWithPlatformRules.map(r => r.platformId)).size;
+    const channelCount = channelRules.length;
+    const personalCount = personalRules.length;
+    return { directCount, platformCount, channelCount, personalCount };
+  }, [directNoPlatformRules, directWithPlatformRules, channelRules, personalRules]);
 
   return (
     <>
-      <ContentHeader
-        title="销售报（调）价"
-        breadcrumbs={['销售', '销售报（调）价']}
-        actions={<Button><PlusIcon />新增报价</Button>}
-      />
+      <ContentHeader title="销售报价" breadcrumbs={['销售', '销售报价']} />
       <div className="content-body">
-        <div className="stat-cards">
-          {stats.map((s, i) => <StatCard key={i} data={s} />)}
+        {/* Tab 切换 */}
+        <div style={{ display: 'flex', gap: 4, padding: 2, background: 'var(--color-neutral-100)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-5)', width: 'fit-content' }}>
+          {TAB_CONFIG.map(t => {
+            const isActive = activeTab === t.key;
+            const count = t.key === 'direct' ? stats.directCount
+              : t.key === 'platform' ? stats.platformCount
+              : t.key === 'channel' ? stats.channelCount
+              : stats.personalCount;
+            return (
+              <button key={t.key} onClick={() => { setActiveTab(t.key); setEditingId(null); }}
+                style={{
+                  padding: '6px 16px', borderRadius: 'var(--radius-sm)', border: 'none',
+                  background: isActive ? 'var(--color-neutral-0)' : 'transparent',
+                  fontSize: 'var(--text-sm)', fontWeight: isActive ? 'var(--font-medium)' : 'normal',
+                  color: isActive ? PRIMARY : 'var(--color-neutral-500)', cursor: 'pointer',
+                  boxShadow: isActive ? 'var(--shadow-sm)' : 'none', transition: 'var(--transition-fast)',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>
+                {t.label}
+                <span style={{ fontSize: 'var(--text-xs)', background: isActive ? PRIMARY_LIGHT : 'var(--color-neutral-200)', padding: '1px 6px', borderRadius: 'var(--radius-sm)' }}>{count}</span>
+              </button>
+            );
+          })}
         </div>
 
-        <FilterBar>
-          <FilterInput placeholder="搜索报价单号、客户、商品..." />
-          <FilterSelect options={['全部类型', '首次报价', '价格调整', '到期续价']} />
-          <FilterSelect options={['全部状态', '待确认', '已确认', '已驳回', '已过期']} />
-          <FilterSelect options={customers} />
-        </FilterBar>
+        {/* 当前 Tab 描述 */}
+        <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)', marginBottom: 'var(--space-4)' }}>
+          {TAB_CONFIG.find(t => t.key === activeTab)?.desc}
+        </div>
 
-        <Card>
-          <Table
-            headers={['报价单号', '客户', '商品', '茶类', '原价', '报价', '调幅', '报价类型', '有效期', '状态', '操作']}
-            rows={pricingRecords.map((r) => {
-              const adj = calcAdjustment(r.originalPrice, r.quotedPrice);
-              return [
-                <span className="mono">{r.code}</span>,
-                r.customer,
-                r.product,
-                <Tag category={r.teaCategory} />,
-                <span className="mono">¥{r.originalPrice}</span>,
-                <span className="mono">¥{r.quotedPrice}</span>,
-                <span className="mono" style={{ color: adj > 0 ? '#CB405D' : adj < 0 ? '#01795D' : 'var(--color-text-secondary)' }}>
-                  {adj > 0 ? '+' : ''}{adj}%
-                </span>,
-                <span style={{
-                  padding: '1px 8px',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 'var(--font-medium)',
-                  background: r.type === 'first' ? '#E3F2FD' : r.type === 'adjust' ? '#FFF3E0' : '#E8F5E9',
-                  color: r.type === 'first' ? '#1565C0' : r.type === 'adjust' ? '#E65100' : '#2E7D32',
-                  border: `1px solid ${r.type === 'first' ? '#90CAF9' : r.type === 'adjust' ? '#FFCC80' : '#A5D6A7'}`,
+        {/* ══════ 直营客户报价 ══════ */}
+        {activeTab === 'direct' && (
+          <Card style={{ padding: 'var(--space-5)' }}>
+            {/* 子 Tab：不经平台 / 经平台 */}
+            <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+              <button onClick={() => setDirectSubTab('no_platform')}
+                style={{
+                  padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: 'var(--text-sm)',
+                  border: directSubTab === 'no_platform' ? `2px solid ${PRIMARY}` : '1px solid var(--color-neutral-200)',
+                  background: directSubTab === 'no_platform' ? `${PRIMARY}08` : 'var(--color-neutral-0)',
+                  color: directSubTab === 'no_platform' ? PRIMARY : 'var(--color-neutral-600)',
+                  fontWeight: directSubTab === 'no_platform' ? 'var(--font-medium)' : 'normal',
                 }}>
-                  {PRICING_TYPE_LABELS[r.type]}
-                </span>,
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>
-                  {r.validFrom} ~ {r.validTo}
-                </span>,
-                <StatusTag variant={pricingStatusToVariant(r.status)} label={pricingStatusLabel(r.status)} />,
-                <div className="row-actions">
-                  <Button size="sm" variant="ghost" onClick={() => handleView(r)}>查看</Button>
-                  <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
-                </div>,
-              ];
-            })}
-          />
-        </Card>
-      </div>
+                不经平台直营客户（{directNoPlatformRules.length}）
+              </button>
+              <button onClick={() => setDirectSubTab('with_platform')}
+                style={{
+                  padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: 'var(--text-sm)',
+                  border: directSubTab === 'with_platform' ? `2px solid ${PRIMARY}` : '1px solid var(--color-neutral-200)',
+                  background: directSubTab === 'with_platform' ? `${PRIMARY}08` : 'var(--color-neutral-0)',
+                  color: directSubTab === 'with_platform' ? PRIMARY : 'var(--color-neutral-600)',
+                  fontWeight: directSubTab === 'with_platform' ? 'var(--font-medium)' : 'normal',
+                }}>
+                经平台直营客户（{directWithPlatformRules.length}）
+              </button>
+            </div>
 
-      {/* 报价详情抽屉 */}
-      <DetailDrawer
-        open={showDrawer && !!selectedRecord}
-        onClose={handleCloseDrawer}
-        badge="SP"
-        title={selectedRecord?.code}
-        statusTag={selectedRecord && <StatusTag variant={pricingStatusToVariant(selectedRecord.status)} label={pricingStatusLabel(selectedRecord.status)} />}
-        subtitle={selectedRecord && `${selectedRecord.customer} · ${selectedRecord.validFrom} ~ ${selectedRecord.validTo}`}
-        mode="view"
-        onEdit={() => window.alert('编辑功能（演示）')}
-      >
-        {selectedRecord && (
-          <>
-            <DrawerSection title="客户信息">
-              <InfoGrid cols={3}>
-                <InfoItem label="客户名称" emph>{selectedRecord.customer}</InfoItem>
-                <InfoItem label="报价单号" emph mono>{selectedRecord.code}</InfoItem>
-                <InfoItem label="联系人">{selectedRecord.contactPerson}</InfoItem>
-                <InfoItem label="联系电话" mono>{selectedRecord.contactPhone}</InfoItem>
-              </InfoGrid>
-            </DrawerSection>
-
-            <DrawerSection title="报价详情">
-              <InfoGrid cols={3}>
-                <InfoItem label="商品名称" emph>{selectedRecord.product}</InfoItem>
-                <InfoItem label="茶类"><Tag category={selectedRecord.teaCategory} /></InfoItem>
-                <InfoItem label="报价类型">
-                  {(() => {
-                    const t = selectedRecord.type;
-                    return (
-                      <span style={{
-                        padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
-                        background: t === 'first' ? '#E3F2FD' : t === 'adjust' ? '#FFF3E0' : '#E8F5E9',
-                        color: t === 'first' ? '#1565C0' : t === 'adjust' ? '#E65100' : '#2E7D32',
-                        border: `1px solid ${t === 'first' ? '#90CAF9' : t === 'adjust' ? '#FFCC80' : '#A5D6A7'}`,
-                      }}>{PRICING_TYPE_LABELS[t]}</span>
-                    );
-                  })()}
-                </InfoItem>
-                <InfoItem label="原价" mono>¥{selectedRecord.originalPrice}/{selectedRecord.unit.replace('元/', '')}</InfoItem>
-                <InfoItem label="报价" mono>¥{selectedRecord.quotedPrice}/{selectedRecord.unit.replace('元/', '')}</InfoItem>
-                {(() => {
-                  const adj = calcAdjustment(selectedRecord.originalPrice, selectedRecord.quotedPrice);
-                  return (
-                    <InfoItem label="调幅" mono valueStyle={{ color: adj > 0 ? '#CB405D' : adj < 0 ? '#01795D' : 'var(--color-text-secondary)', fontWeight: 'var(--font-bold)' }}>
-                      {adj > 0 ? '+' : ''}{adj}%
-                    </InfoItem>
-                  );
-                })()}
-                <InfoItem label="有效期起">{selectedRecord.validFrom}</InfoItem>
-                <InfoItem label="有效期止">{selectedRecord.validTo}</InfoItem>
-                <InfoItem label="备注" span={3}>{selectedRecord.remark || '—'}</InfoItem>
-              </InfoGrid>
-            </DrawerSection>
-
-            <DrawerSection title="价格历史对比">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                {selectedRecord.history.map((h, i) => {
-                  const prevPrice = i > 0 ? selectedRecord.history[i - 1].price : null;
-                  const diff = prevPrice !== null ? ((h.price - prevPrice) / prevPrice * 100).toFixed(1) : null;
-                  return (
-                    <div key={i} style={{
-                      display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
-                      padding: 'var(--space-3)', background: i === selectedRecord.history.length - 1 ? 'var(--color-module-current-lightest)' : 'var(--color-bg-tertiary)',
-                      borderRadius: 'var(--radius-md)',
-                      border: i === selectedRecord.history.length - 1 ? '1px solid var(--color-module-current-light)' : '1px solid transparent',
-                    }}>
-                      <div style={{
-                        width: 28, height: 28, borderRadius: 'var(--radius-md)',
-                        background: i === selectedRecord.history.length - 1 ? 'var(--color-module-current-base)' : 'var(--color-neutral-200)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)',
-                        color: i === selectedRecord.history.length - 1 ? '#fff' : 'var(--color-text-tertiary)',
-                        flexShrink: 0,
-                      }}>
-                        {i + 1}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                          <span style={{ fontWeight: 'var(--font-medium)', fontSize: 'var(--text-sm)' }} className="mono">¥{h.price}</span>
-                          {diff !== null && (
-                            <span className="mono" style={{ fontSize: 'var(--text-xs)', color: Number(diff) > 0 ? '#CB405D' : Number(diff) < 0 ? '#01795D' : 'var(--color-text-tertiary)' }}>
-                              {Number(diff) > 0 ? '+' : ''}{diff}%
-                            </span>
-                          )}
-                          {i === selectedRecord.history.length - 1 && (
-                            <span style={{ padding: '0 6px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', background: 'var(--color-module-current-lightest)', color: 'var(--color-module-current-base)', fontWeight: 'var(--font-medium)' }}>最新</span>
-                          )}
-                        </div>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>{h.date} · {h.note}</div>
-                      </div>
-                    </div>
-                  );
-                })}
+            {directSubTab === 'no_platform' ? (
+              /* 不经平台直营客户报价表 */
+              <Table
+                headers={['序号', '商品名称', '品牌', '客户名称', '市场价', '销售价', '报价', '折扣率', '有效期', '状态', '操作']}
+                rows={directNoPlatformRules.map((r, idx) => [
+                  <span className="cell-muted">{idx + 1}</span>,
+                  <span className="cell-emph">{r.productName}</span>,
+                  <span>{r.brand}</span>,
+                  <span className="cell-emph">{r.customerName}</span>,
+                  <span className="mono">{formatMoney(r.marketPrice)}</span>,
+                  <span className="mono">{formatMoney(r.salesPrice)}</span>,
+                  editingId === r.id ? (
+                    <input type="number" className="filter-input" style={{ width: 90, height: 30, borderColor: PRIMARY, fontWeight: 'var(--font-semibold)', color: PRIMARY }}
+                      value={editPrice} onChange={e => setEditPrice(e.target.value)} autoFocus />
+                  ) : (
+                    <span className="mono cell-emph" style={{ color: PRIMARY }}>{formatMoney(r.quotedPrice)}</span>
+                  ),
+                  <span className="mono">{Math.round((r.quotedPrice / r.marketPrice) * 100)}%</span>,
+                  <span className="cell-muted">{r.validFrom} ~ {r.validTo}</span>,
+                  <span style={{ fontSize: 'var(--text-xs)', padding: '2px 8px', borderRadius: 'var(--radius-sm)', background: '#E8F5E9', color: '#2E7D32' }}>生效中</span>,
+                  <div className="row-actions">
+                    {editingId === r.id ? (
+                      <>
+                        <Button size="sm" onClick={() => handleSaveEdit(r.id)}>保存</Button>
+                        <Button size="sm" variant="ghost" onClick={handleCancelEdit}>取消</Button>
+                      </>
+                    ) : (
+                      <Button size="sm" variant="ghost" onClick={() => handleStartEdit(r)}>调价</Button>
+                    )}
+                  </div>,
+                ])}
+              />
+            ) : (
+              /* 经平台直营客户报价表 */
+              <div>
+                <div style={{ padding: 'var(--space-3) var(--space-4)', background: PRIMARY_LIGHT, borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: PRIMARY }}>
+                  <strong>经平台报价逻辑：</strong>给直营客户的报价 × (1 - 平台扣点) = 平台实得价（即给该平台的报价），平台实得价自动关联到对应平台客户报价中。
+                </div>
+                <Table
+                  headers={['序号', '商品名称', '客户名称', '所属平台', '扣点', '市场价', '给客户报价', '平台实得价', '折扣率', '操作']}
+                  rows={directWithPlatformRules.map((r, idx) => [
+                    <span className="cell-muted">{idx + 1}</span>,
+                    <span className="cell-emph">{r.productName}</span>,
+                    <span className="cell-emph">{r.customerName}</span>,
+                    <span>{r.platformName}</span>,
+                    <span style={{ fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 'var(--radius-sm)', background: '#FFF3E0', color: '#E65100', fontWeight: 'var(--font-medium)' }}>{r.platformCommissionRate}</span>,
+                    <span className="mono">{formatMoney(r.marketPrice)}</span>,
+                    editingId === r.id ? (
+                      <input type="number" className="filter-input" style={{ width: 90, height: 30, borderColor: PRIMARY, fontWeight: 'var(--font-semibold)', color: PRIMARY }}
+                        value={editPrice} onChange={e => setEditPrice(e.target.value)} autoFocus />
+                    ) : (
+                      <span className="mono cell-emph" style={{ color: PRIMARY }}>{formatMoney(r.quotedPrice)}</span>
+                    ),
+                    <span className="mono" style={{ color: '#CB405D', fontWeight: 'var(--font-semibold)' }}>
+                      {formatMoney(editingId === r.id ? calcPlatformNetPrice(Number(editPrice) || 0, r.platformCommissionRate || '0') : (r.platformNetPrice || 0))}
+                    </span>,
+                    <span className="mono">{Math.round((r.quotedPrice / r.marketPrice) * 100)}%</span>,
+                    <div className="row-actions">
+                      {editingId === r.id ? (
+                        <>
+                          <Button size="sm" onClick={() => handleSaveEdit(r.id)}>保存</Button>
+                          <Button size="sm" variant="ghost" onClick={handleCancelEdit}>取消</Button>
+                        </>
+                      ) : (
+                        <Button size="sm" variant="ghost" onClick={() => handleStartEdit(r)}>调价</Button>
+                      )}
+                    </div>,
+                  ])}
+                />
               </div>
-            </DrawerSection>
-          </>
+            )}
+          </Card>
         )}
-      </DetailDrawer>
+
+        {/* ══════ 平台客户报价 ══════ */}
+        {activeTab === 'platform' && (
+          <Card style={{ padding: 'var(--space-5)' }}>
+            {/* 平台选择器 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+              <label style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--color-text-secondary)' }}>选择平台：</label>
+              <select className="filter-select" style={{ width: 200 }} value={selectedPlatformId} onChange={e => setSelectedPlatformId(e.target.value)}>
+                {platformItems.map(p => (
+                  <option key={p.id} value={p.id}>{p.shortName}</option>
+                ))}
+              </select>
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>
+                共 {platformRules.length} 条报价（来自经该平台的直营客户）
+              </span>
+            </div>
+
+            <div style={{ padding: 'var(--space-3) var(--space-4)', background: '#FFF8E1', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: '#795548' }}>
+              <strong>平台报价来源：</strong>此处展示的所有报价均为经该平台的直营客户报价经扣点折算后的「平台实得价」，由直营客户报价自动联动生成，不可直接编辑。如需调整，请到「直营客户报价 → 经平台直营客户」中调价。
+            </div>
+
+            <Table
+              headers={['序号', '商品名称', '直营客户', '给客户报价', '扣点', '平台实得价', '折扣率', '备注']}
+              rows={platformRules.map((r, idx) => [
+                <span className="cell-muted">{idx + 1}</span>,
+                <span className="cell-emph">{r.productName}</span>,
+                <span className="cell-emph">{r.customerName}</span>,
+                <span className="mono">{formatMoney(r.quotedPrice)}</span>,
+                <span style={{ fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 'var(--radius-sm)', background: '#FFF3E0', color: '#E65100', fontWeight: 'var(--font-medium)' }}>{r.platformCommissionRate}</span>,
+                <span className="mono cell-emph" style={{ color: '#CB405D', fontWeight: 'var(--font-bold)' }}>{formatMoney(r.platformNetPrice || 0)}</span>,
+                <span className="mono">{Math.round((r.quotedPrice / r.marketPrice) * 100)}%</span>,
+                <span className="cell-muted">{r.remark}</span>,
+              ])}
+            />
+          </Card>
+        )}
+
+        {/* ══════ 渠道客户报价 ══════ */}
+        {activeTab === 'channel' && (
+          <Card style={{ padding: 'var(--space-5)' }}>
+            <div style={{ padding: 'var(--space-3) var(--space-4)', background: '#E8F5E9', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: '#2E7D32' }}>
+              <strong>渠道客户报价：</strong>每个渠道客户设置唯一报价，支持随时调价。渠道客户为二次销售客户，报价通常低于直营客户。
+            </div>
+            <Table
+              headers={['序号', '商品名称', '品牌', '渠道客户', '市场价', '销售价', '报价', '折扣率', '有效期', '操作']}
+              rows={channelRules.map((r, idx) => [
+                <span className="cell-muted">{idx + 1}</span>,
+                <span className="cell-emph">{r.productName}</span>,
+                <span>{r.brand}</span>,
+                <span className="cell-emph">{r.customerName}</span>,
+                <span className="mono">{formatMoney(r.marketPrice)}</span>,
+                <span className="mono">{formatMoney(r.salesPrice)}</span>,
+                editingId === r.id ? (
+                  <input type="number" className="filter-input" style={{ width: 90, height: 30, borderColor: PRIMARY, fontWeight: 'var(--font-semibold)', color: PRIMARY }}
+                    value={editPrice} onChange={e => setEditPrice(e.target.value)} autoFocus />
+                ) : (
+                  <span className="mono cell-emph" style={{ color: PRIMARY }}>{formatMoney(r.quotedPrice)}</span>
+                ),
+                <span className="mono">{Math.round((r.quotedPrice / r.marketPrice) * 100)}%</span>,
+                <span className="cell-muted">{r.validFrom} ~ {r.validTo}</span>,
+                <div className="row-actions">
+                  {editingId === r.id ? (
+                    <>
+                      <Button size="sm" onClick={() => handleSaveEdit(r.id)}>保存</Button>
+                      <Button size="sm" variant="ghost" onClick={handleCancelEdit}>取消</Button>
+                    </>
+                  ) : (
+                    <Button size="sm" variant="ghost" onClick={() => handleStartEdit(r)}>调价</Button>
+                  )}
+                </div>,
+              ])}
+            />
+          </Card>
+        )}
+
+        {/* ══════ 个人客户报价 ══════ */}
+        {activeTab === 'personal' && (
+          <Card style={{ padding: 'var(--space-5)' }}>
+            <div style={{ padding: 'var(--space-3) var(--space-4)', background: '#F3E5F5', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: '#7B1FA2' }}>
+              <strong>个人客户最低销售价：</strong>按客户等级（S/A/B/C）分别设置每个商品的最低销售价。销售下单选择个人客户时，可调整的销售实价<strong>不得低于</strong>此价格。
+            </div>
+            <Table
+              headers={['序号', '商品名称', '品牌', '客户等级', '市场价', '销售价', '最低销售价', '折扣率', '有效期', '操作']}
+              rows={personalRules.map((r, idx) => [
+                <span className="cell-muted">{idx + 1}</span>,
+                <span className="cell-emph">{r.productName}</span>,
+                <span>{r.brand}</span>,
+                <span style={{
+                  fontSize: 'var(--text-xs)', padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontWeight: 'var(--font-medium)',
+                  background: r.personalLevel === 'S级' ? '#FEF2F4' : r.personalLevel === 'A级' ? '#EBF3FC' : r.personalLevel === 'B级' ? '#EBF3FC' : 'var(--color-neutral-100)',
+                  color: r.personalLevel === 'S级' ? '#CB405D' : r.personalLevel === 'A级' ? '#0F64B5' : r.personalLevel === 'B级' ? '#0F64B5' : 'var(--color-neutral-500)',
+                }}>{r.personalLevel}</span>,
+                <span className="mono">{formatMoney(r.marketPrice)}</span>,
+                <span className="mono">{formatMoney(r.salesPrice)}</span>,
+                editingId === r.id ? (
+                  <input type="number" className="filter-input" style={{ width: 90, height: 30, borderColor: '#7B1FA2', fontWeight: 'var(--font-semibold)', color: '#7B1FA2' }}
+                    value={editPrice} onChange={e => setEditPrice(e.target.value)} autoFocus />
+                ) : (
+                  <span className="mono cell-emph" style={{ color: '#7B1FA2', fontWeight: 'var(--font-bold)' }}>{formatMoney(r.quotedPrice)}</span>
+                ),
+                <span className="mono">{Math.round((r.quotedPrice / r.marketPrice) * 100)}%</span>,
+                <span className="cell-muted">{r.validFrom} ~ {r.validTo}</span>,
+                <div className="row-actions">
+                  {editingId === r.id ? (
+                    <>
+                      <Button size="sm" onClick={() => handleSaveEdit(r.id)}>保存</Button>
+                      <Button size="sm" variant="ghost" onClick={handleCancelEdit}>取消</Button>
+                    </>
+                  ) : (
+                    <Button size="sm" variant="ghost" onClick={() => handleStartEdit(r)}>调价</Button>
+                  )}
+                </div>,
+              ])}
+            />
+          </Card>
+        )}
+      </div>
     </>
   );
-}
-
-function PlusIcon() {
-  return <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>;
 }

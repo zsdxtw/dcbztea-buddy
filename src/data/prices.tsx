@@ -145,3 +145,189 @@ export function getPurchaseDefaultPrice(productId: string, supplierId: string): 
   if (product) return { price: Math.round(product.marketPrice * 0.55), source: 'market' };
   return { price: 0, source: 'market' };
 }
+
+/* ════════════════════════════════════════════════════════════
+ * 销售报价规则（SalesQuotationRule）
+ * 按客户类型分区管理：
+ *   1. 直营不经平台：商品 + 客户 → 唯一报价
+ *   2. 直营经平台：商品 + 客户 → 报价，平台实得价 = 报价 × (1-扣点)
+ *   3. 渠道客户：商品 + 客户 → 唯一报价
+ *   4. 个人客户：商品 + 等级 → 最低销售价
+ * ════════════════════════════════════════════════════════════ */
+
+/** 销售报价类型 */
+export type QuotationType = 'direct_no_platform' | 'direct_with_platform' | 'channel' | 'personal_by_level';
+
+/** 销售报价规则 */
+export interface SalesQuotationRule {
+  id: string;
+  productId: string;
+  productName: string;
+  brand: string;
+  category: string;
+  marketPrice: number;
+  salesPrice: number;
+  /** 报价类型 */
+  quotationType: QuotationType;
+  /** 客户 ID（直营/渠道） */
+  customerId?: string;
+  customerName?: string;
+  /** 平台 ID（经平台直营客户） */
+  platformId?: string;
+  platformName?: string;
+  /** 平台扣点（如 '8%'） */
+  platformCommissionRate?: string;
+  /** 报价金额 */
+  quotedPrice: number;
+  /** 平台实得价（经平台直营客户自动计算：报价 × (1-扣点)） */
+  platformNetPrice?: number;
+  /** 个人客户等级（仅个人客户报价） */
+  personalLevel?: string;
+  validFrom: string;
+  validTo: string;
+  status: 'active' | 'inactive';
+  remark?: string;
+}
+
+/** 个人客户等级列表 */
+export const PERSONAL_LEVELS = ['S级', 'A级', 'B级', 'C级'];
+
+/** 生成销售报价规则数据 */
+function generateSalesQuotationRules(): SalesQuotationRule[] {
+  const rules: SalesQuotationRule[] = [];
+  let idx = 0;
+  // 取前 8 个商品生成报价数据
+  const products = teaProducts.slice(0, 8);
+
+  // 直营不经平台客户（c1-c5）
+  const directNoPlatformCustomers = [
+    { id: 'c1', name: '华茗堂茶庄' },
+    { id: 'c2', name: '清心茶坊' },
+    { id: 'c3', name: '品茗轩' },
+    { id: 'c4', name: '翠竹茶行' },
+    { id: 'c5', name: '云顶茶舍' },
+  ];
+  // 直营经平台客户（c6-c10）及其平台关联
+  const directWithPlatformCustomers = [
+    { id: 'c6', name: '浦发银行', platformId: 'p1', platformName: '京东慧采', commission: '8%' },
+    { id: 'c7', name: '交通银行', platformId: 'p2', platformName: '史泰博', commission: '6%' },
+    { id: 'c8', name: '中信证券', platformId: 'p1', platformName: '京东慧采', commission: '7%' },
+    { id: 'c9', name: '中国平安', platformId: 'p4', platformName: '苏宁', commission: '7%' },
+    { id: 'c10', name: '招商银行', platformId: 'p2', platformName: '史泰博', commission: '6%' },
+  ];
+  // 渠道客户（c11-c15）
+  const channelCustomers = [
+    { id: 'c11', name: '天福茗茶' },
+    { id: 'c12', name: '八马茶业' },
+    { id: 'c13', name: '大益茶体验馆' },
+    { id: 'c14', name: '茶里王国' },
+    { id: 'c15', name: '正山堂旗舰店' },
+  ];
+
+  // 1. 直营不经平台报价：折扣率 88-95%
+  directNoPlatformCustomers.forEach(c => {
+    products.forEach((p, pi) => {
+      const discount = 0.88 + ((idx * 2) % 8) / 100;
+      const quotedPrice = Math.round(p.marketPrice * discount);
+      rules.push({
+        id: `sq_${++idx}`,
+        productId: p.id, productName: p.name, brand: p.brand,
+        category: p.category.split('-')[0],
+        marketPrice: p.marketPrice, salesPrice: p.salesPrice,
+        quotationType: 'direct_no_platform',
+        customerId: c.id, customerName: c.name,
+        quotedPrice,
+        validFrom: '2026-01-01', validTo: '2026-12-31',
+        status: 'active',
+        remark: `${c.name}专属报价`,
+      });
+    });
+  });
+
+  // 2. 直营经平台报价：折扣率 85-92%，平台实得价 = 报价 × (1-扣点)
+  directWithPlatformCustomers.forEach(c => {
+    products.forEach((p, pi) => {
+      const discount = 0.85 + ((idx * 3) % 8) / 100;
+      const quotedPrice = Math.round(p.marketPrice * discount);
+      const commissionNum = parseFloat(c.commission) / 100;
+      const platformNetPrice = Math.round(quotedPrice * (1 - commissionNum));
+      rules.push({
+        id: `sq_${++idx}`,
+        productId: p.id, productName: p.name, brand: p.brand,
+        category: p.category.split('-')[0],
+        marketPrice: p.marketPrice, salesPrice: p.salesPrice,
+        quotationType: 'direct_with_platform',
+        customerId: c.id, customerName: c.name,
+        platformId: c.platformId, platformName: c.platformName,
+        platformCommissionRate: c.commission,
+        quotedPrice, platformNetPrice,
+        validFrom: '2026-01-01', validTo: '2026-12-31',
+        status: 'active',
+        remark: `${c.name}经${c.platformName}报价`,
+      });
+    });
+  });
+
+  // 3. 渠道客户报价：折扣率 75-85%
+  channelCustomers.forEach(c => {
+    products.forEach((p, pi) => {
+      const discount = 0.75 + ((idx * 5) % 11) / 100;
+      const quotedPrice = Math.round(p.marketPrice * discount);
+      rules.push({
+        id: `sq_${++idx}`,
+        productId: p.id, productName: p.name, brand: p.brand,
+        category: p.category.split('-')[0],
+        marketPrice: p.marketPrice, salesPrice: p.salesPrice,
+        quotationType: 'channel',
+        customerId: c.id, customerName: c.name,
+        quotedPrice,
+        validFrom: '2026-01-01', validTo: '2026-12-31',
+        status: 'active',
+        remark: `${c.name}渠道报价`,
+      });
+    });
+  });
+
+  // 4. 个人客户按等级报价：折扣率 S级82% / A级78% / B级72% / C级65%
+  const levelDiscounts: Record<string, number> = { 'S级': 0.82, 'A级': 0.78, 'B级': 0.72, 'C级': 0.65 };
+  PERSONAL_LEVELS.forEach(level => {
+    products.forEach((p, pi) => {
+      const baseDiscount = levelDiscounts[level];
+      const discount = baseDiscount + ((idx * 2) % 5) / 100;
+      const quotedPrice = Math.round(p.marketPrice * discount);
+      rules.push({
+        id: `sq_${++idx}`,
+        productId: p.id, productName: p.name, brand: p.brand,
+        category: p.category.split('-')[0],
+        marketPrice: p.marketPrice, salesPrice: p.salesPrice,
+        quotationType: 'personal_by_level',
+        personalLevel: level,
+        quotedPrice,
+        validFrom: '2026-01-01', validTo: '2026-12-31',
+        status: 'active',
+        remark: `${level}个人客户最低销售价`,
+      });
+    });
+  });
+
+  return rules;
+}
+
+export const salesQuotationRules: SalesQuotationRule[] = generateSalesQuotationRules();
+
+/** 根据商品ID和客户ID获取直营/渠道客户报价 */
+export function getSalesQuotation(productId: string, customerId: string): SalesQuotationRule | undefined {
+  return salesQuotationRules.find(r => r.productId === productId && r.customerId === customerId && r.status === 'active');
+}
+
+/** 根据商品ID和个人客户等级获取最低销售价 */
+export function getPersonalMinPrice(productId: string, level: string): number {
+  const rule = salesQuotationRules.find(r => r.productId === productId && r.personalLevel === level && r.status === 'active');
+  return rule?.quotedPrice ?? 0;
+}
+
+/** 计算平台实得价 */
+export function calcPlatformNetPrice(quotedPrice: number, commissionRate: string): number {
+  const commissionNum = parseFloat(commissionRate) / 100;
+  return Math.round(quotedPrice * (1 - commissionNum));
+}

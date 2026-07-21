@@ -10,7 +10,7 @@ import FilterBar, { FilterInput, FilterSelect } from '../../components/business/
 import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
 import { TeaCategory, OrderStatus } from '../../types';
 import type { StatCardData, SalesOrderItem, CustomerItem } from '../../types';
-import { getSalesDefaultPrice } from '../../data/prices';
+import { getSalesDefaultPrice, getPersonalMinPrice } from '../../data/prices';
 import { teaProducts } from '../../data/teaProducts';
 import { employees, getEmployeeName } from '../../data/organization';
 import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
@@ -644,7 +644,16 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
   const actualNum = Number(actualSalesPrice) || 0;
   const amountNum = qtyNum * actualNum;
 
-  const canSave = (isNewCustomer ? (!!customerType && !!newCustomerShortName.trim()) : !!customerId) && !!productId && qtyNum > 0 && actualNum > 0 && !!orderDate;
+  // 个人客户最低销售价校验：销售实价不得低于该客户等级对应的最低销售价
+  const personalMinPrice = useMemo(() => {
+    if (!isNewCustomer && customerId && selectedCustomer?.type === 'personal' && productId) {
+      return getPersonalMinPrice(productId, selectedCustomer.level || 'C级');
+    }
+    return 0;
+  }, [isNewCustomer, customerId, selectedCustomer, productId]);
+  const isBelowMinPrice = personalMinPrice > 0 && actualNum < personalMinPrice;
+
+  const canSave = (isNewCustomer ? (!!customerType && !!newCustomerShortName.trim()) : !!customerId) && !!productId && qtyNum > 0 && actualNum > 0 && !!orderDate && !isBelowMinPrice;
 
   // 根据人员类型获取姓名
   const getPersonName = (id: string, type: 'employee' | 'streamer'): string | undefined => {
@@ -900,16 +909,23 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
                 className="filter-input"
                 style={{
                   width: '100%', height: 34,
-                  borderColor: 'var(--color-module-current-base)',
+                  borderColor: isBelowMinPrice ? '#CB405D' : 'var(--color-module-current-base)',
                   background: 'var(--color-module-current-lightest)',
                   fontWeight: 'var(--font-semibold)',
-                  color: 'var(--color-module-current-base)',
+                  color: isBelowMinPrice ? '#CB405D' : 'var(--color-module-current-base)',
                 }}
                 value={actualSalesPrice}
                 onChange={(e) => setActualSalesPrice(e.target.value)}
                 placeholder="0"
                 disabled={!productId || !hasCustomer}
               />
+              {personalMinPrice > 0 && (
+                <div style={{ fontSize: 'var(--text-xs)', marginTop: 4, color: isBelowMinPrice ? '#CB405D' : 'var(--color-text-tertiary)' }}>
+                  {isBelowMinPrice
+                    ? `⚠ 销售实价不得低于该客户等级（${selectedCustomer?.level}）最低销售价 ${formatMoney(personalMinPrice)}`
+                    : `该客户等级（${selectedCustomer?.level}）最低销售价：${formatMoney(personalMinPrice)}`}
+                </div>
+              )}
             </div>
           </div>
           <div className="drawer-form-row">
