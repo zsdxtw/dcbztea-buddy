@@ -5,7 +5,7 @@ import Card from '../../components/common/Card';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import type { StatCardData, CustomerItem, CustomerType, PlatformItem, PlatformBankAccount, PlatformInvoiceInfo, CustomerBankAccount, CustomerInvoiceInfo, OrderContact } from '../../types';
-import { customerItems as initialCustomers, CUSTOMER_TYPE_LABELS, CUSTOMER_TYPE_DESC, LEVEL_COLORS, CUSTOMER_GROUP_MAP, CUSTOMER_GROUP_LABELS, generateOrderContactId, convertPersonalToDirect } from '../../data/customers';
+import { customerItems as initialCustomers, CUSTOMER_TYPE_LABELS, CUSTOMER_TYPE_DESC, LEVEL_COLORS, CUSTOMER_GROUP_MAP, generateOrderContactId, convertPersonalToDirect } from '../../data/customers';
 import { platformItems as globalPlatforms } from '../../data/platforms';
 import { PROVINCE_NAMES, getCityNames, getDistricts } from '../../data/regions';
 import { generateCustomerCode } from '../../utils/customerCode';
@@ -20,19 +20,22 @@ const PRIMARY_LIGHT = '#EBF3FC';
 const SECONDARY = '#CB405D';
 const SECONDARY_LIGHT = '#FEF2F4';
 
-const GROUP_TABS: { key: 'enterprise' | 'personal'; label: string; desc: string; icon: React.ReactNode }[] = [
-  { key: 'enterprise', label: '企业客户', desc: '包含直营客户、渠道客户、平台客户', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg> },
-  { key: 'personal', label: '个人客户', desc: '个人消费者，可转换为直营客户', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" strokeWidth="1.3" /><path d="M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg> },
+/** 4 个客户类型并列展示配置；前 3 个属于企业客户板块，第 4 个为个人客户 */
+const CUSTOMER_TYPE_CARDS: { key: CustomerType; label: string; desc: string; group: 'enterprise' | 'personal'; icon: React.ReactNode }[] = [
+  { key: 'direct', label: '直营客户', desc: CUSTOMER_TYPE_DESC.direct, group: 'enterprise', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg> },
+  { key: 'channel', label: '渠道客户', desc: CUSTOMER_TYPE_DESC.channel, group: 'enterprise', icon: <svg viewBox="0 0 18 18" fill="none"><path d="M2 10l3 2 3-4 3 5 3-3 2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><circle cx="4" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.3" /></svg> },
+  { key: 'platform', label: '平台客户', desc: CUSTOMER_TYPE_DESC.platform, group: 'enterprise', icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" /><path d="M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5" stroke="currentColor" strokeWidth="1.3" /><path d="M9 8v2M8 9h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg> },
+  { key: 'personal', label: '个人客户', desc: '个人消费者，可转换为直营客户', group: 'personal', icon: <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" strokeWidth="1.3" /><path d="M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg> },
 ];
 
-const ENTERPRISE_SUB_TABS: { key: CustomerType; label: string; desc: string; icon: React.ReactNode }[] = [
-  { key: 'direct', label: '直营客户', desc: CUSTOMER_TYPE_DESC.direct, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M3 8.5L9 3.5l6 5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" strokeLinecap="round" /><path d="M4.5 8v7h9v-7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg> },
-  { key: 'channel', label: '渠道客户', desc: CUSTOMER_TYPE_DESC.channel, icon: <svg viewBox="0 0 18 18" fill="none"><path d="M2 10l3 2 3-4 3 5 3-3 2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><circle cx="4" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.3" /></svg> },
-  { key: 'platform', label: '平台客户', desc: CUSTOMER_TYPE_DESC.platform, icon: <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" /><path d="M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5" stroke="currentColor" strokeWidth="1.3" /><path d="M9 8v2M8 9h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg> },
-];
+/** 企业客户板块色系 */
+const ENTERPRISE_COLOR = '#0F64B5';
+const ENTERPRISE_COLOR_LIGHT = '#EBF3FC';
+/** 个人客户板块色系 */
+const PERSONAL_COLOR = '#7B1FA2';
+const PERSONAL_COLOR_LIGHT = '#F3E5F5';
 
 export default function SalesCustomers() {
-  const [activeGroup, setActiveGroup] = useState<'enterprise' | 'personal'>('enterprise');
   const [activeTab, setActiveTab] = useState<CustomerType>('direct');
   const [keyword, setKeyword] = useState('');
   const [data, setData] = useState<CustomerItem[]>(initialCustomers);
@@ -55,22 +58,12 @@ export default function SalesCustomers() {
   const [editPlatformForm, setEditPlatformForm] = useState<PlatformItem | null>(null);
   const [showAddPlatformDrawer, setShowAddPlatformDrawer] = useState(false);
 
-  const groupCustomers = useMemo(() => {
-    if (activeGroup === 'enterprise') {
-      return data.filter(c => CUSTOMER_GROUP_MAP[c.type] === 'enterprise');
-    }
-    return data.filter(c => c.type === 'personal');
-  }, [data, activeGroup]);
-
   const tabCustomers = useMemo(() => {
-    if (activeGroup === 'personal') {
-      return groupCustomers;
-    }
     if (activeTab === 'platform') {
       return [];
     }
-    return groupCustomers.filter(c => c.type === activeTab);
-  }, [groupCustomers, activeGroup, activeTab]);
+    return data.filter(c => c.type === activeTab);
+  }, [data, activeTab]);
 
   const filtered = useMemo(() => {
     let result = tabCustomers;
@@ -201,7 +194,6 @@ export default function SalesCustomers() {
     setData(prev => prev.filter(c => c.id !== customerToConvert.id).concat(converted));
     setShowConvertConfirm(false);
     setCustomerToConvert(null);
-    setActiveGroup('enterprise');
     setActiveTab('direct');
   };
 
@@ -258,44 +250,37 @@ export default function SalesCustomers() {
       <ContentHeader title="客户管理" breadcrumbs={['销售', '客户管理']} />
 
       <div className="content-body">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
-          {GROUP_TABS.map(t => {
-            const count = t.key === 'enterprise'
-              ? data.filter(c => CUSTOMER_GROUP_MAP[c.type] === 'enterprise').length + platforms.length
-              : data.filter(c => c.type === 'personal').length;
-            const isActive = activeGroup === t.key;
+        {/* 4 个客户类型卡片并列展示，前 3 个属于企业客户板块，第 4 个为个人客户 */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
+          {CUSTOMER_TYPE_CARDS.map((t, idx) => {
+            const count = t.key === 'platform' ? platforms.length : data.filter(c => c.type === t.key).length;
+            const isActive = activeTab === t.key;
+            const isEnterprise = t.group === 'enterprise';
+            const groupColor = isEnterprise ? ENTERPRISE_COLOR : PERSONAL_COLOR;
+            const groupColorLight = isEnterprise ? ENTERPRISE_COLOR_LIGHT : PERSONAL_COLOR_LIGHT;
+            // 前 3 个企业卡片之间间距更小，与个人客户卡片之间有稍大间距
+            const isLastEnterprise = idx === 2;
             return (
-              <div key={t.key} onClick={() => { setActiveGroup(t.key); setKeyword(''); }} style={{ cursor: 'pointer', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)', border: isActive ? `2px solid ${PRIMARY}` : '1px solid var(--color-neutral-200)', background: isActive ? `${PRIMARY}08` : 'var(--color-neutral-0)', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition-fast)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <span style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)', background: isActive ? PRIMARY_LIGHT : 'var(--color-neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isActive ? PRIMARY : 'var(--color-neutral-500)', transition: 'var(--transition-fast)' }}>{t.icon}</span>
-                    <span style={{ fontWeight: 'var(--font-semibold)', fontSize: 'var(--text-base)', color: 'var(--color-neutral-800)' }}>{t.label}</span>
-                  </div>
-                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: isActive ? PRIMARY : 'var(--color-neutral-600)' }}>{count}</span>
+              <div key={t.key} onClick={() => { setActiveTab(t.key); setKeyword(''); }} style={{ cursor: 'pointer', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', position: 'relative', border: isActive ? `2px solid ${groupColor}` : `1px solid var(--color-neutral-200)`, background: isActive ? `${groupColor}08` : 'var(--color-neutral-0)', boxShadow: isActive ? 'var(--shadow-md)' : 'var(--shadow-sm)', transition: 'var(--transition-fast)', marginRight: isLastEnterprise ? 'var(--space-3)' : 0 }}>
+                {/* 右上角分组徽章：企业/个人 */}
+                <span style={{ position: 'absolute', top: 8, right: 8, fontSize: 10, fontWeight: 'var(--font-medium)', padding: '1px 6px', borderRadius: 'var(--radius-sm)', background: isEnterprise ? `${ENTERPRISE_COLOR}12` : `${PERSONAL_COLOR}12`, color: isEnterprise ? ENTERPRISE_COLOR : PERSONAL_COLOR, border: `1px solid ${isEnterprise ? `${ENTERPRISE_COLOR}30` : `${PERSONAL_COLOR}30`}` }}>
+                  {isEnterprise ? '企业' : '个人'}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 6 }}>
+                  <span style={{ width: 30, height: 30, borderRadius: 'var(--radius-md)', background: isActive ? groupColorLight : 'var(--color-neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isActive ? groupColor : 'var(--color-neutral-500)', transition: 'var(--transition-fast)' }}>{t.icon}</span>
+                  <span style={{ fontWeight: 'var(--font-semibold)', fontSize: 'var(--text-sm)', color: 'var(--color-neutral-800)' }}>{t.label}</span>
                 </div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', marginLeft: 40 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: isActive ? groupColor : 'var(--color-neutral-600)' }}>{count}</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-400)' }}>家</span>
+                </div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-neutral-500)', lineHeight: 1.4, height: 28, overflow: 'hidden' }}>
                   {t.desc}
                 </div>
               </div>
             );
           })}
         </div>
-
-        {activeGroup === 'enterprise' && (
-          <div style={{ display: 'flex', gap: 4, padding: 2, background: 'var(--color-neutral-100)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-5)' }}>
-            {ENTERPRISE_SUB_TABS.map(t => {
-              const count = t.key === 'platform' ? platforms.length : data.filter(c => c.type === t.key).length;
-              const isActive = activeTab === t.key;
-              return (
-                <button key={t.key} onClick={() => { setActiveTab(t.key); setKeyword(''); }} style={{ padding: '6px 16px', borderRadius: 'var(--radius-sm)', border: 'none', background: isActive ? 'var(--color-neutral-0)' : 'transparent', fontSize: 'var(--text-sm)', fontWeight: isActive ? 'var(--font-medium)' : 'normal', color: isActive ? PRIMARY : 'var(--color-neutral-500)', cursor: 'pointer', boxShadow: isActive ? 'var(--shadow-sm)' : 'none', transition: 'var(--transition-fast)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {t.icon}
-                  {t.label}
-                  <span style={{ fontSize: 'var(--text-xs)', background: isActive ? PRIMARY_LIGHT : 'var(--color-neutral-200)', padding: '1px 6px', borderRadius: 'var(--radius-sm)' }}>{count}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
 
         {activeTab === 'platform' ? (
           <>
@@ -349,7 +334,7 @@ export default function SalesCustomers() {
         ) : (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
-              <input className="filter-input" placeholder={`搜索${activeGroup === 'personal' ? '个人' : CUSTOMER_TYPE_LABELS[activeTab]}客户名称、简称、编号、联系人、地区...`} value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
+              <input className="filter-input" placeholder={`搜索${CUSTOMER_TYPE_LABELS[activeTab]}客户名称、简称、编号、联系人、地区...`} value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
               <Button variant={showPendingMaintain ? 'primary' : 'ghost'} onClick={() => setShowPendingMaintain(!showPendingMaintain)}>
                 <svg viewBox="0 0 16 16" fill="none" style={{ width: 14, height: 14 }}><path d="M8 2v6M8 14v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.2"/></svg>
                 待维护
@@ -377,7 +362,7 @@ export default function SalesCustomers() {
 
             <Card style={{ padding: 0 }}>
               <Table
-                headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '客户编号', '客户名称', ...(activeTab === 'direct' ? ['是否经平台'] : []), ...(activeGroup === 'personal' ? ['下单人'] : []), '主办人', '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
+                headers={[...(deleteMode ? ['选择'] : ['序号']), '客户简称', '客户编号', '客户名称', ...(activeTab === 'direct' ? ['是否经平台'] : []), ...(activeTab === 'personal' ? ['下单人'] : []), '主办人', '地区', '联系人', '联系电话', '客户来源', '等级', '订单数', '累计金额', '状态', '操作']}
                 rows={filtered.map((c, idx) => {
                   const cells: React.ReactNode[] = [
                     deleteMode ? <input key="chk" type="checkbox" checked={selectedForDelete.has(c.id)} onChange={() => toggleSelect(c.id)} /> : <span key="idx" className="mono">{idx + 1}</span>,
@@ -388,7 +373,7 @@ export default function SalesCustomers() {
                   if (activeTab === 'direct') {
                     cells.push(<span key="via">{viaPlatformTag(c.viaPlatform ?? false)}</span>);
                   }
-                  if (activeGroup === 'personal') {
+                  if (activeTab === 'personal') {
                     cells.push(<span key="oc" className="mono">{c.orderContacts?.length || 0}</span>);
                   }
                   cells.push(
@@ -406,7 +391,7 @@ export default function SalesCustomers() {
                       {activeTab === 'direct' && (
                         <Button size="sm" variant="ghost" onClick={() => handleOpenOrderContacts(c)}>下单人</Button>
                       )}
-                      {activeGroup === 'personal' && (
+                      {activeTab === 'personal' && (
                         <Button size="sm" variant="ghost" onClick={() => handleConvertPersonal(c)}>转直营</Button>
                       )}
                       <Button size="sm" variant="ghost" onClick={() => window.alert('编辑功能（演示）')}>编辑</Button>
@@ -752,7 +737,7 @@ export default function SalesCustomers() {
         </DetailDrawer>
 
         {showAddDrawer && (
-          <CreateDrawer customerType={activeGroup === 'personal' ? 'personal' : activeTab} platforms={platforms} sequence={data.filter(c => c.type === (activeGroup === 'personal' ? 'personal' : activeTab)).length + 1} onCancel={() => setShowAddDrawer(false)}
+          <CreateDrawer customerType={activeTab} platforms={platforms} sequence={data.filter(c => c.type === activeTab).length + 1} onCancel={() => setShowAddDrawer(false)}
             onSave={item => { setData(prev => [item, ...prev]); setShowAddDrawer(false); }}
             onQuickAddPlatform={quickAddPlatform}
           />
