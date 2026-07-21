@@ -96,7 +96,7 @@ const customerTypeColors: Record<CustomerType, { bg: string; color: string; bord
 };
 
 /* ── Mock 订单数据 ── */
-interface SalesOrderRecord {
+export interface SalesOrderRecord {
   id: string;
   code: string;
   customer: string;
@@ -134,7 +134,7 @@ interface SalesOrderRecord {
   platformDeductionRate?: number;
 }
 
-const orderData: SalesOrderRecord[] = [
+export const orderData: SalesOrderRecord[] = [
   {
     id: '1', code: 'SO-2025-0242', customer: '华茗堂茶庄', customerType: 'direct',
     product: '明前龙井', teaCategory: TeaCategory.GREEN, quantity: '30 kg', unitPrice: '¥ 580/50g', amount: '¥ 34,800',
@@ -323,6 +323,7 @@ export default function SalesOrders() {
   };
 
   const handleCreate = (order: SalesOrderRecord) => {
+    orderData.unshift(order);
     setOrders(prev => [order, ...prev]);
     setCodeSeq(s => s + 1);
     setShowCreate(false);

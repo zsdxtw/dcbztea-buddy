@@ -17,6 +17,7 @@ import PurchaseReconciliation from './pages/purchase/PurchaseReconciliation';
 import PurchaseReturn from './pages/purchase/PurchaseReturn';
 
 import SalesOverview from './pages/sales/SalesOverview';
+import SalesOrderCreate from './pages/sales/SalesOrderCreate';
 import SalesOrders from './pages/sales/SalesOrders';
 import SalesPricing from './pages/sales/SalesPricing';
 import SalesReconciliation from './pages/sales/SalesReconciliation';
@@ -103,6 +104,7 @@ export const router = createBrowserRouter([
       /* ── 销售 ── */
       { path: 'sales', element: <SalesOverview /> },
       { path: 'sales/sales-overview', element: <SalesOverview /> },
+      { path: 'sales/sales-order-create', element: <SalesOrderCreate /> },
       { path: 'sales/sales-orders', element: <SalesOrders /> },
       { path: 'sales/sales-pricing', element: <SalesPricing /> },
       { path: 'sales/sales-customers', element: <SalesCustomers /> },
