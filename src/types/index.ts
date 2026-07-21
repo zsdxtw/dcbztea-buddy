@@ -559,6 +559,27 @@ export interface BankAccount {
 /** 客户类型 */
 export type CustomerType = 'direct' | 'channel' | 'personal' | 'platform' | 'guest';
 
+/** 客户分组 */
+export type CustomerGroup = 'enterprise' | 'personal';
+
+/** 下单人（直营客户下的联系人） */
+export interface OrderContact {
+  /** 下单人 ID */
+  id: string;
+  /** 姓名 */
+  name: string;
+  /** 部门 */
+  department?: string;
+  /** 手机号码 */
+  phone?: string;
+  /** 地址 */
+  address?: string;
+  /** 备注 */
+  remark?: string;
+  /** 是否由订单自动创建（销售订单收件人不在下单人内时自动添加） */
+  autoCreated?: boolean;
+}
+
 /** 平台结算账户 */
 export interface PlatformBankAccount {
   accountName: string;
@@ -621,8 +642,8 @@ export interface CustomerItem {
   /** 客户编号（直营KHZY/渠道KHQD-XXXXX） */
   customerCode?: string;
   type: CustomerType;
-  /** 直营客户子类型（仅 type='direct' 时有效）：企业/个人/经平台 */
-  directSubType?: 'enterprise' | 'individual' | 'platform';
+  /** 是否经平台（仅 type='direct' 时有效）：true=经平台，false=无平台 */
+  viaPlatform?: boolean;
   region: string;
   /** 省份 */
   province?: string;
@@ -655,7 +676,10 @@ export interface CustomerItem {
   bankAccounts?: CustomerBankAccount[];
   /** 发票信息列表 */
   invoiceInfos?: CustomerInvoiceInfo[];
+  /** 备注 */
   remark?: string;
+  /** 下单人列表（仅 type='direct' 时有效） */
+  orderContacts?: OrderContact[];
 }
 
 /** 门店（线下茶叶店） */

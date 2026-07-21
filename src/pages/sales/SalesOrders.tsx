@@ -14,7 +14,7 @@ import { getSalesDefaultPrice } from '../../data/prices';
 import { teaProducts } from '../../data/teaProducts';
 import { employees, getEmployeeName } from '../../data/organization';
 import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
-import { customerItems, CUSTOMER_TYPE_LABELS as GLOBAL_CUSTOMER_LABELS, CUSTOMER_TYPE_DESC } from '../../data/customers';
+import { customerItems, CUSTOMER_TYPE_LABELS as GLOBAL_CUSTOMER_LABELS, CUSTOMER_TYPE_DESC, generateOrderContactId } from '../../data/customers';
 import { platformItems } from '../../data/platforms';
 import { streamers } from '../../data/streamers';
 import { generateCustomerCode } from '../../utils/customerCode';
@@ -511,6 +511,7 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
   const [contactPhone, setContactPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [remark, setRemark] = useState('');
+  const [contactSelect, setContactSelect] = useState<string>('');
 
   // 客户搜索与选择
   const [customerSearch, setCustomerSearch] = useState('');
@@ -584,6 +585,10 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
     return null;
   }, [customerId, isNewCustomer]);
 
+  const selectedCustomer = useMemo(() => customerItems.find(c => c.id === customerId) || null, [customerId]);
+  const isDirectCustomer = selectedCustomer?.type === 'direct';
+  const orderContactOptions = selectedCustomer?.orderContacts || [];
+
   const selectedProduct = teaProducts.find(p => p.id === productId);
   const marketPrice = selectedProduct?.marketPrice ?? 0;
   const hasCustomer = !!(customerId || isNewCustomer);
@@ -606,6 +611,33 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
       setActualSalesPrice('');
     }
   }, [productId, customerId, isNewCustomer]);
+
+  useEffect(() => {
+    setContactSelect('');
+    if (isDirectCustomer && orderContactOptions.length === 1) {
+      const only = orderContactOptions[0];
+      setContactSelect(only.id);
+      setContactPerson(only.name);
+      setContactPhone(only.phone || '');
+      setDeliveryAddress(only.address || '');
+    }
+  }, [customerId]);
+
+  const handleContactSelectChange = (id: string) => {
+    setContactSelect(id);
+    if (id === 'new') {
+      setContactPerson('');
+      setContactPhone('');
+      setDeliveryAddress('');
+    } else {
+      const contact = orderContactOptions.find(c => c.id === id);
+      if (contact) {
+        setContactPerson(contact.name);
+        setContactPhone(contact.phone || '');
+        setDeliveryAddress(contact.address || '');
+      }
+    }
+  };
 
   const qtyNum = Number(quantity) || 0;
   const actualNum = Number(actualSalesPrice) || 0;
@@ -665,6 +697,19 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
         orderHostName = customer.hostId
           ? (customer.hostType === 'streamer' ? streamers.find(s => s.id === customer.hostId)?.name : getEmployeeName(customer.hostId))
           : undefined;
+
+        if (isDirectCustomer && contactPerson && !orderContactOptions.find(c => c.name === contactPerson)) {
+          const newContact = {
+            id: generateOrderContactId(customer.id, (customer.orderContacts?.length || 0) + 1),
+            name: contactPerson,
+            phone: contactPhone || undefined,
+            address: deliveryAddress || undefined,
+            remark: '由销售订单自动添加',
+            autoCreated: true,
+          };
+          if (!customer.orderContacts) customer.orderContacts = [];
+          customer.orderContacts.push(newContact);
+        }
       } else {
         const platform = platformItems.find(p => p.id === customerId);
         if (platform) {
@@ -796,6 +841,21 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>联系人：</span>{selectedCustomerInfo.contactPerson}</div>
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>联系电话：</span>{selectedCustomerInfo.contactPhone}</div>
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>等级：</span>{selectedCustomerInfo.level}</div>
+            </div>
+          )}
+
+          {isDirectCustomer && (
+            <div className="drawer-form-row">
+              <div className="drawer-form-field">
+                <label className="drawer-label">下单人</label>
+                <select className="filter-select" style={{ width: '100%' }} value={contactSelect} onChange={(e) => handleContactSelectChange(e.target.value)}>
+                  <option value="">请选择下单人</option>
+                  {orderContactOptions.map(c => (
+                    <option key={c.id} value={c.id}>{c.name} {c.department ? `(${c.department})` : ''}</option>
+                  ))}
+                  <option value="new">+ 新增收件人</option>
+                </select>
+              </div>
             </div>
           )}
           <div className="drawer-form-row">

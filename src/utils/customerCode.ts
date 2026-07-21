@@ -14,7 +14,7 @@ import type { CustomerType } from '../types';
 const TYPE_PREFIX: Record<CustomerType, string> = {
   direct: 'KHZY',
   channel: 'KHQD',
-  personal: 'KHZY',
+  personal: 'KHGR',
   platform: 'KHPT',
   guest: 'KHYK',
 };
