@@ -66,14 +66,14 @@ const directViaPlatform: CustomerItem[] = [
       { id: 'oc-c8-2', name: '吴经理', department: '行政部', phone: '0755-8234****', address: '深圳市福田区深南大道', remark: '礼品采购' },
     ],
   },
-  { id: 'c9', name: '中国平安', shortName: '中国平安', type: 'direct', viaPlatform: true, region: '深圳', province: '广东', city: '深圳市', district: '南山区', contactPerson: '吴经理', phone: '0755-2233****', level: 'A级', orders: 10, totalAmount: 285000, platformIds: ['p4'], platformCommissionRates: { p4: '7%' }, hostId: 'emp-7', hostType: 'employee', cooperationDate: '2024-02-28', status: 'active', settlementMethod: '月结', source: '展会拓客',
+  { id: 'c9', name: '中国平安', shortName: '中国平安', type: 'direct', viaPlatform: true, region: '深圳', province: '广东', city: '深圳市', district: '南山区', contactPerson: '吴经理', contactPhone: '0755-2233****', level: 'A级', orders: 10, totalAmount: 285000, platformIds: ['p4'], platformCommissionRates: { p4: '7%' }, hostId: 'emp-7', hostType: 'employee', cooperationDate: '2024-02-28', status: 'active', settlementMethod: '月结', source: '展会拓客',
     bankAccounts: [{ accountName: '中国平安保险（集团）股份有限公司', accountNo: '4402 **** **** 3456', bankName: '中国农业银行深圳南山支行', bankNo: '10358400XXX' }],
     invoiceInfos: [{ invoiceEntity: '中国平安保险（集团）股份有限公司', taxNo: '91440305MA***0004', taxRate: '6%' }],
     orderContacts: [
       { id: 'oc-c9-1', name: '吴经理', department: '采购部', phone: '0755-2233****', address: '深圳市南山区科技园', remark: '主联系人' },
     ],
   },
-  { id: 'c10', name: '招商银行', shortName: '招商银行', type: 'direct', viaPlatform: true, region: '深圳', province: '广东', city: '深圳市', district: '福田区', contactPerson: '钱主管', phone: '0755-8866****', level: 'B级', orders: 8, totalAmount: 196000, platformIds: ['p2'], platformCommissionRates: { p2: '6%' }, hostId: 'emp-16', hostType: 'employee', cooperationDate: '2024-05-15', status: 'active', settlementMethod: '月结', source: '主动开发',
+  { id: 'c10', name: '招商银行', shortName: '招商银行', type: 'direct', viaPlatform: true, region: '深圳', province: '广东', city: '深圳市', district: '福田区', contactPerson: '钱主管', contactPhone: '0755-8866****', level: 'B级', orders: 8, totalAmount: 196000, platformIds: ['p2'], platformCommissionRates: { p2: '6%' }, hostId: 'emp-16', hostType: 'employee', cooperationDate: '2024-05-15', status: 'active', settlementMethod: '月结', source: '主动开发',
     bankAccounts: [{ accountName: '招商银行股份有限公司', accountNo: '4402 **** **** 7890', bankName: '中国银行深圳福田支行', bankNo: '10458400XXX' }],
     invoiceInfos: [{ invoiceEntity: '招商银行股份有限公司', taxNo: '91440304MA***0005', taxRate: '6%' }],
     orderContacts: [
