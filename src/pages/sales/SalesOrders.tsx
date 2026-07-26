@@ -8,11 +8,11 @@ import Button from '../../components/common/Button';
 import StatusTag, { orderStatusToVariant, orderStatusLabel } from '../../components/common/StatusTag';
 import FilterBar, { FilterInput, FilterSelect } from '../../components/business/FilterBar';
 import DetailDrawer, { DrawerSection, InfoGrid, InfoItem } from '../../components/common/DetailDrawer';
-import { TeaCategory, OrderStatus } from '../../types';
+import { TeaCategory, OrderStatus, PersonRoleType } from '../../types';
 import type { StatCardData, SalesOrderItem, CustomerItem } from '../../types';
 import { getSalesDefaultPrice, getPersonalMinPrice } from '../../data/prices';
 import { teaProducts } from '../../data/teaProducts';
-import { employees, getEmployeeName } from '../../data/organization';
+import { employees, getEmployeeName, getAllPersonOptions, getPersonName, PERSON_TYPE_LABELS } from '../../data/organization';
 import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
 import { customerItems, CUSTOMER_TYPE_LABELS as GLOBAL_CUSTOMER_LABELS, CUSTOMER_TYPE_DESC, generateOrderContactId } from '../../data/customers';
 import { platformItems } from '../../data/platforms';
@@ -114,20 +114,22 @@ export interface SalesOrderRecord {
   remark: string;
   products: SalesOrderItem[];
   timeline: { time: string; event: string; operator: string }[];
-  /** 跟单人 ID（仅员工） */
+  /** 跟单人 ID（负责订单跟进，可为员工/茶人/带货人） */
   followerId?: string;
+  /** 跟单人类型 */
+  followerType?: PersonRoleType;
   /** 跟单人姓名 */
   followerName?: string;
   /** 带货人 ID */
   streamerId?: string;
   /** 带货人姓名 */
   streamerName?: string;
-  /** 主办人 ID */
-  hostId?: string;
-  /** 主办人类型 */
-  hostType?: 'employee' | 'streamer';
-  /** 主办人姓名 */
-  hostName?: string;
+  /** 拓客人 ID（原主办人） */
+  developerId?: string;
+  /** 拓客人类型 */
+  developerType?: PersonRoleType;
+  /** 拓客人姓名 */
+  developerName?: string;
   /** 销售场景（1-6） */
   scenario?: number;
   /** 平台扣点（仅场景2） */
@@ -141,7 +143,7 @@ export const orderData: SalesOrderRecord[] = [
     date: '2025-07-12', status: OrderStatus.PENDING,
     contactPerson: '王经理', contactPhone: '0571-87651234', deliveryAddress: '杭州市西湖区龙井路88号',
     remark: '需冷藏运输，指定顺丰',
-    followerId: 'emp-8',  followerName: '王强', scenario: 1,
+    followerId: 'emp-8', followerType: 'employee', followerName: '王强', scenario: 1,
     products: [
       { productId: '1', name: '明前龙井 — 特级', teaCategory: TeaCategory.GREEN, quantity: '20 kg', marketPrice: 580, defaultPrice: 452, actualSalesPrice: 452, priceSource: 'sales', amount: '¥ 23,200' },
       { productId: '2', name: '碧螺春 — 一级', teaCategory: TeaCategory.GREEN, quantity: '10 kg', marketPrice: 420, defaultPrice: 328, actualSalesPrice: 328, priceSource: 'sales', amount: '¥ 11,600' },
@@ -157,7 +159,7 @@ export const orderData: SalesOrderRecord[] = [
     date: '2025-07-11', status: OrderStatus.APPROVED,
     contactPerson: '赵总', contactPhone: '0599-51234567', deliveryAddress: '武夷山市度假区茶博园6号',
     remark: '长期合作客户，月结',
-    followerId: 'emp-9',  followerName: '张伟', scenario: 3,
+    followerId: 'emp-9', followerType: 'employee', followerName: '张伟', scenario: 3,
     products: [
       { productId: '7', name: '金骏眉 — 特级', teaCategory: TeaCategory.RED, quantity: '15 kg', marketPrice: 1280, defaultPrice: 1024, actualSalesPrice: 1024, priceSource: 'sales', amount: '¥ 36,000' },
     ],
@@ -173,7 +175,7 @@ export const orderData: SalesOrderRecord[] = [
     date: '2025-07-10', status: OrderStatus.SHIPPING,
     contactPerson: '林老板', contactPhone: '0768-2345678', deliveryAddress: '潮州市湘桥区太平路168号',
     remark: '分两批发货',
-    followerId: 'emp-8',  followerName: '王强', scenario: 1,
+    followerId: 'emp-8', followerType: 'employee', followerName: '王强', scenario: 1,
     products: [
       { productId: '12', name: '凤凰单丛 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '25 kg', marketPrice: 560, defaultPrice: 426, actualSalesPrice: 426, priceSource: 'sales', amount: '¥ 28,000' },
       { productId: '10', name: '大红袍 — 特级', teaCategory: TeaCategory.OOLONG, quantity: '15 kg', marketPrice: 720, defaultPrice: 547, actualSalesPrice: 547, priceSource: 'sales', amount: '¥ 16,800' },
@@ -209,7 +211,7 @@ export const orderData: SalesOrderRecord[] = [
     date: '2025-07-08', status: OrderStatus.COMPLETED,
     contactPerson: '周经理', contactPhone: '0774-7234567', deliveryAddress: '梧州市万秀区西江路56号',
     remark: '季度采购，常规订单',
-    followerId: 'emp-9',  followerName: '张伟', scenario: 3,
+    followerId: 'emp-9', followerType: 'employee', followerName: '张伟', scenario: 3,
     products: [
       { productId: '33', name: '六堡茶 — 二级', teaCategory: TeaCategory.DARK, quantity: '30 kg', marketPrice: 280, defaultPrice: 210, actualSalesPrice: 210, priceSource: 'sales', amount: '¥ 10,800' },
       { productId: '18', name: '熟普洱 — 三级', teaCategory: TeaCategory.DARK, quantity: '20 kg', marketPrice: 260, defaultPrice: 195, actualSalesPrice: 195, priceSource: 'sales', amount: '¥ 7,200' },
@@ -258,7 +260,7 @@ export const orderData: SalesOrderRecord[] = [
     date: '2025-07-05', status: OrderStatus.SHIPPING,
     contactPerson: '吴经理', contactPhone: '0595-2345678', deliveryAddress: '安溪县凤城镇茶都路188号',
     remark: '清香型，真空包装',
-    followerId: 'emp-9',  followerName: '张伟', scenario: 5,
+    followerId: 'emp-9', followerType: 'employee', followerName: '张伟', scenario: 5,
     products: [
       { productId: '11', name: '铁观音 — 一级', teaCategory: TeaCategory.OOLONG, quantity: '40 kg', marketPrice: 320, defaultPrice: 243, actualSalesPrice: 243, priceSource: 'sales', amount: '¥ 25,600' },
       { productId: '11', name: '铁观音 — 二级', teaCategory: TeaCategory.OOLONG, quantity: '20 kg', marketPrice: 320, defaultPrice: 243, actualSalesPrice: 243, priceSource: 'sales', amount: '¥ 12,800' },
@@ -276,7 +278,7 @@ export const orderData: SalesOrderRecord[] = [
     date: '2025-07-04', status: OrderStatus.COMPLETED,
     contactPerson: '王经理', contactPhone: '0571-87651234', deliveryAddress: '杭州市西湖区龙井路88号',
     remark: '月度补货订单',
-    followerId: 'emp-8',  followerName: '王强', scenario: 1,
+    followerId: 'emp-8', followerType: 'employee', followerName: '王强', scenario: 1,
     products: [
       { productId: '9', name: '祁门红茶 — 特级', teaCategory: TeaCategory.RED, quantity: '35 kg', marketPrice: 520, defaultPrice: 416, actualSalesPrice: 416, priceSource: 'sales', amount: '¥ 36,400' },
     ],
@@ -351,7 +353,7 @@ export default function SalesOrders() {
 
         <Card>
           <Table
-            headers={['订单编号', '客户', '客户类型', '跟单人', '带货人', '主办人', '商品', '茶类', '数量', '单价', '金额', '下单日期', '状态', '操作']}
+            headers={['订单编号', '客户', '客户类型', '跟单人', '带货人', '拓客人', '商品', '茶类', '数量', '单价', '金额', '下单日期', '状态', '操作']}
             rows={orders.map((o) => {
               const ctColor = customerTypeColors[o.customerType];
               return [
@@ -361,9 +363,9 @@ export default function SalesOrders() {
                 padding: '1px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-medium)',
                 background: ctColor.bg, color: ctColor.color, border: `1px solid ${ctColor.border}`,
               }}>{CUSTOMER_TYPE_LABELS[o.customerType]}</span>,
-              <span key="follower" style={{ fontSize: 'var(--text-sm)', color: o.followerName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.followerName ?? '—'}</span>,
+              <span key="follower" style={{ fontSize: 'var(--text-sm)', color: o.followerName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.followerName ? o.followerType ? `${o.followerName}（${PERSON_TYPE_LABELS[o.followerType]}）` : o.followerName : '—'}</span>,
               <span key="streamer" style={{ fontSize: 'var(--text-sm)', color: o.streamerName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.streamerName ?? '—'}</span>,
-              <span key="host" style={{ fontSize: 'var(--text-sm)', color: o.hostName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.hostName ?? '—'}</span>,
+              <span key="host" style={{ fontSize: 'var(--text-sm)', color: o.developerName ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}>{o.developerName ? o.developerType ? `${o.developerName}（${PERSON_TYPE_LABELS[o.developerType]}）` : o.developerName : '—'}</span>,
               o.product,
               <Tag category={o.teaCategory} />,
               <span className="mono">{o.quantity}</span>,
@@ -413,9 +415,9 @@ export default function SalesOrders() {
                     background: c.bg, color: c.color, border: `1px solid ${c.border}`,
                   }}>{CUSTOMER_TYPE_LABELS[selectedOrder.customerType]}</span>); })()}
                 </InfoItem>
-                <InfoItem label="跟单人">{selectedOrder.followerName ?? '—'}</InfoItem>
+                <InfoItem label="跟单人">{selectedOrder.followerName ? selectedOrder.followerType ? `${selectedOrder.followerName}（${PERSON_TYPE_LABELS[selectedOrder.followerType]}）` : selectedOrder.followerName : '—'}</InfoItem>
                 <InfoItem label="带货人">{selectedOrder.streamerName ?? '—'}</InfoItem>
-                <InfoItem label="主办人">{selectedOrder.hostName ?? '—'}</InfoItem>
+                <InfoItem label="拓客人">{selectedOrder.developerName ? selectedOrder.developerType ? `${selectedOrder.developerName}（${PERSON_TYPE_LABELS[selectedOrder.developerType]}）` : selectedOrder.developerName : '—'}</InfoItem>
                 <InfoItem label="下单日期">{selectedOrder.date}</InfoItem>
                 <InfoItem label="联系人">{selectedOrder.contactPerson}</InfoItem>
                 <InfoItem label="联系电话" mono>{selectedOrder.contactPhone}</InfoItem>
@@ -521,8 +523,9 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
   const [customerType, setCustomerType] = useState<CustomerType | ''>('');
   const [newCustomerShortName, setNewCustomerShortName] = useState('');
 
-  // 跟单人（仅员工）
+  // 跟单人（可为员工/茶人/带货人）
   const [followerId, setFollowerId] = useState('');
+  const [followerType, setFollowerType] = useState<PersonRoleType | ''>('');
   // 带货人（独立字段）
   const [streamerId, setStreamerId] = useState('');
 
@@ -566,22 +569,22 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
     setShowCustomerDropdown(false);
   };
 
-  // 获取选中客户的详细信息（主办人、联系人、电话、等级）
+  // 获取选中客户的详细信息（拓客人、联系人、电话、等级）
   const selectedCustomerInfo = useMemo(() => {
     if (!customerId || isNewCustomer) return null;
     const customer = customerItems.find(c => c.id === customerId);
     if (customer) {
-      const hostName = customer.hostId
-        ? (customer.hostType === 'streamer' ? streamers.find(s => s.id === customer.hostId)?.name : getEmployeeName(customer.hostId))
+      const developerName = customer.developerId
+        ? getPersonName(customer.developerId, customer.developerType)
         : undefined;
-      return { hostName: hostName ?? '—', contactPerson: customer.contactPerson || '—', contactPhone: customer.contactPhone || '—', level: customer.level || '—' };
+      return { hostName: developerName ?? '—', contactPerson: customer.contactPerson || '—', contactPhone: customer.contactPhone || '—', level: customer.level || '—' };
     }
     const platform = platformItems.find(p => p.id === customerId);
     if (platform) {
-      const hostName = platform.hostId
-        ? (platform.hostType === 'streamer' ? streamers.find(s => s.id === platform.hostId)?.name : getEmployeeName(platform.hostId))
+      const developerName = platform.developerId
+        ? getPersonName(platform.developerId, platform.developerType)
         : undefined;
-      return { hostName: hostName ?? '—', contactPerson: platform.contactPerson || '—', contactPhone: platform.contactPhone || '—', level: '—' };
+      return { hostName: developerName ?? '—', contactPerson: platform.contactPerson || '—', contactPhone: platform.contactPhone || '—', level: '—' };
     }
     return null;
   }, [customerId, isNewCustomer]);
@@ -655,12 +658,6 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
 
   const canSave = (isNewCustomer ? (!!customerType && !!newCustomerShortName.trim()) : !!customerId) && !!productId && qtyNum > 0 && actualNum > 0 && !!orderDate && !isBelowMinPrice;
 
-  // 根据人员类型获取姓名
-  const getPersonName = (id: string, type: 'employee' | 'streamer'): string | undefined => {
-    if (type === 'employee') return getEmployeeName(id);
-    return streamers.find(s => s.id === id)?.name;
-  };
-
   // 根据客户类型获取销售场景
   const getScenarioByType = (type: CustomerType): number => {
     const map: Record<CustomerType, number> = { direct: 1, channel: 3, personal: 4, platform: 5, guest: 6 };
@@ -675,12 +672,12 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
     const customerName = isNewCustomer
       ? newCustomerShortName.trim()
       : (allCustomerOptions.find(c => c.id === customerId)?.name ?? '新客户');
-    const followerName = followerId ? getEmployeeName(followerId) : undefined;
+    const followerName = followerId && followerType ? getPersonName(followerId, followerType) : undefined;
     const streamerName = streamerId ? streamers.find(s => s.id === streamerId)?.name : undefined;
 
     // 新客户联动添加到客户管理列表
     let orderHostId: string | undefined;
-    let orderHostType: 'employee' | 'streamer' | undefined;
+    let orderHostType: PersonRoleType | undefined;
     let orderHostName: string | undefined;
     if (isNewCustomer) {
       const newCustId = `c_${Date.now()}`;
@@ -699,13 +696,13 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
       };
       customerItems.push(newCustomer);
     } else {
-      // 已有客户：从客户档案获取主办人信息
+      // 已有客户：从客户档案获取拓客人信息
       const customer = customerItems.find(c => c.id === customerId);
       if (customer) {
-        orderHostId = customer.hostId;
-        orderHostType = customer.hostType;
-        orderHostName = customer.hostId
-          ? (customer.hostType === 'streamer' ? streamers.find(s => s.id === customer.hostId)?.name : getEmployeeName(customer.hostId))
+        orderHostId = customer.developerId;
+        orderHostType = customer.developerType;
+        orderHostName = customer.developerId
+          ? getPersonName(customer.developerId, customer.developerType)
           : undefined;
 
         if (isDirectCustomer && contactPerson && !orderContactOptions.find(c => c.name === contactPerson)) {
@@ -723,10 +720,10 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
       } else {
         const platform = platformItems.find(p => p.id === customerId);
         if (platform) {
-          orderHostId = platform.hostId;
-          orderHostType = platform.hostType;
-          orderHostName = platform.hostId
-            ? (platform.hostType === 'streamer' ? streamers.find(s => s.id === platform.hostId)?.name : getEmployeeName(platform.hostId))
+          orderHostId = platform.developerId;
+          orderHostType = platform.developerType;
+          orderHostName = platform.developerId
+            ? getPersonName(platform.developerId, platform.developerType)
             : undefined;
         }
       }
@@ -749,12 +746,13 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
       deliveryAddress: deliveryAddress || '—',
       remark,
       followerId: followerId || undefined,
+      followerType: followerType || undefined,
       followerName,
       streamerId: streamerId || undefined,
       streamerName,
-      hostId: orderHostId,
-      hostType: orderHostType,
-      hostName: orderHostName,
+      developerId: orderHostId,
+      developerType: orderHostType,
+      developerName: orderHostName,
       scenario: getScenarioByType(customerType as CustomerType),
       products: [{
         productId: selectedProduct.id,
@@ -847,7 +845,7 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
           )}
           {selectedCustomerInfo && (
             <div style={{ display: 'flex', gap: 'var(--space-4)', padding: 'var(--space-3) var(--space-4)', background: 'var(--color-module-current-lightest)', border: '1px solid var(--color-module-current-light)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
-              <div><span style={{ color: 'var(--color-text-tertiary)' }}>主办人：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{selectedCustomerInfo.hostName}</span></div>
+              <div><span style={{ color: 'var(--color-text-tertiary)' }}>拓客人：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{selectedCustomerInfo.hostName}</span></div>
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>联系人：</span>{selectedCustomerInfo.contactPerson}</div>
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>联系电话：</span>{selectedCustomerInfo.contactPhone}</div>
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>等级：</span>{selectedCustomerInfo.level}</div>
@@ -972,7 +970,24 @@ function CreateSalesDrawer({ nextNumber, onCancel, onSave }: {
           <div className="drawer-form-row">
             <div className="drawer-form-field">
               <label className="drawer-label">跟单人</label>
-              <DeptEmployeeSelect value={followerId} onChange={setFollowerId} placeholder="选择员工" style={{ width: '100%' }} />
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                <select className="filter-select" style={{ width: 120 }} value={followerType} onChange={(e) => { setFollowerType(e.target.value as PersonRoleType | ''); setFollowerId(''); }}>
+                  <option value="">请选择</option>
+                  {Object.entries(PERSON_TYPE_LABELS).map(([type, label]) => (
+                    <option key={type} value={type}>{label}</option>
+                  ))}
+                </select>
+                {followerType ? (
+                  <select className="filter-select" style={{ flex: 1 }} value={followerId} onChange={(e) => setFollowerId(e.target.value)}>
+                    <option value="">请选择</option>
+                    {getAllPersonOptions().filter(p => p.type === followerType).map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <div style={{ flex: 1, height: 34, display: 'flex', alignItems: 'center', padding: '0 var(--space-3)', border: '1px solid var(--color-border-primary)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>请先选择类型</div>
+                )}
+              </div>
             </div>
             <div className="drawer-form-field">
               <label className="drawer-label">带货人</label>

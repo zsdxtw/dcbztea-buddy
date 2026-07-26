@@ -4,11 +4,11 @@ import ContentHeader from '../../components/layout/ContentHeader';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import DeptEmployeeSelect from '../../components/business/DeptEmployeeSelect';
-import { TeaCategory, OrderStatus } from '../../types';
+import { TeaCategory, OrderStatus, PersonRoleType } from '../../types';
 import type { CustomerItem } from '../../types';
 import { getSalesDefaultPrice, getPersonalMinPrice } from '../../data/prices';
 import { teaProducts } from '../../data/teaProducts';
-import { getEmployeeName } from '../../data/organization';
+import { getEmployeeName, getAllPersonOptions, getPersonName, PERSON_TYPE_LABELS } from '../../data/organization';
 import { customerItems, CUSTOMER_TYPE_LABELS as GLOBAL_CUSTOMER_LABELS, generateOrderContactId } from '../../data/customers';
 import { platformItems } from '../../data/platforms';
 import { streamers } from '../../data/streamers';
@@ -129,17 +129,17 @@ export default function SalesOrderCreate() {
     if (!customerId || isNewCustomer) return null;
     const customer = customerItems.find(c => c.id === customerId);
     if (customer) {
-      const hostName = customer.hostId
-        ? (customer.hostType === 'streamer' ? streamers.find(s => s.id === customer.hostId)?.name : getEmployeeName(customer.hostId))
+      const developerName = customer.developerId
+        ? getPersonName(customer.developerId, customer.developerType)
         : undefined;
-      return { hostName: hostName ?? '—', contactPerson: customer.contactPerson || '—', contactPhone: customer.contactPhone || '—', level: customer.level || '—' };
+      return { hostName: developerName ?? '—', contactPerson: customer.contactPerson || '—', contactPhone: customer.contactPhone || '—', level: customer.level || '—' };
     }
     const platform = platformItems.find(p => p.id === customerId);
     if (platform) {
-      const hostName = platform.hostId
-        ? (platform.hostType === 'streamer' ? streamers.find(s => s.id === platform.hostId)?.name : getEmployeeName(platform.hostId))
+      const developerName = platform.developerId
+        ? getPersonName(platform.developerId, platform.developerType)
         : undefined;
-      return { hostName: hostName ?? '—', contactPerson: platform.contactPerson || '—', contactPhone: platform.contactPhone || '—', level: '—' };
+      return { hostName: developerName ?? '—', contactPerson: platform.contactPerson || '—', contactPhone: platform.contactPhone || '—', level: '—' };
     }
     return null;
   }, [customerId, isNewCustomer]);
@@ -240,7 +240,7 @@ export default function SalesOrderCreate() {
     const streamerName = streamerId ? streamers.find(s => s.id === streamerId)?.name : undefined;
 
     let orderHostId: string | undefined;
-    let orderHostType: 'employee' | 'streamer' | undefined;
+    let orderHostType: PersonRoleType | undefined;
     let orderHostName: string | undefined;
     if (isNewCustomer) {
       const newCustId = `c_${Date.now()}`;
@@ -261,10 +261,10 @@ export default function SalesOrderCreate() {
     } else {
       const customer = customerItems.find(c => c.id === customerId);
       if (customer) {
-        orderHostId = customer.hostId;
-        orderHostType = customer.hostType;
-        orderHostName = customer.hostId
-          ? (customer.hostType === 'streamer' ? streamers.find(s => s.id === customer.hostId)?.name : getEmployeeName(customer.hostId))
+        orderHostId = customer.developerId;
+        orderHostType = customer.developerType;
+        orderHostName = customer.developerId
+          ? getPersonName(customer.developerId, customer.developerType)
           : undefined;
 
         if (isDirectCustomer && contactPerson && !orderContactOptions.find(c => c.name === contactPerson)) {
@@ -282,10 +282,10 @@ export default function SalesOrderCreate() {
       } else {
         const platform = platformItems.find(p => p.id === customerId);
         if (platform) {
-          orderHostId = platform.hostId;
-          orderHostType = platform.hostType;
-          orderHostName = platform.hostId
-            ? (platform.hostType === 'streamer' ? streamers.find(s => s.id === platform.hostId)?.name : getEmployeeName(platform.hostId))
+          orderHostId = platform.developerId;
+          orderHostType = platform.developerType;
+          orderHostName = platform.developerId
+            ? getPersonName(platform.developerId, platform.developerType)
             : undefined;
         }
       }
@@ -311,9 +311,9 @@ export default function SalesOrderCreate() {
       followerName,
       streamerId: streamerId || undefined,
       streamerName,
-      hostId: orderHostId,
-      hostType: orderHostType,
-      hostName: orderHostName,
+      developerId: orderHostId,
+      developerType: orderHostType,
+      developerName: orderHostName,
       scenario: getScenarioByType(customerType as CustomerType),
       products: [{
         productId: selectedProduct.id,
@@ -428,7 +428,7 @@ export default function SalesOrderCreate() {
           )}
           {selectedCustomerInfo && (
             <div style={{ display: 'flex', gap: 'var(--space-4)', padding: 'var(--space-3) var(--space-4)', background: 'var(--color-module-current-lightest)', border: '1px solid var(--color-module-current-light)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
-              <div><span style={{ color: 'var(--color-text-tertiary)' }}>主办人：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{selectedCustomerInfo.hostName}</span></div>
+              <div><span style={{ color: 'var(--color-text-tertiary)' }}>拓客人：</span><span style={{ fontWeight: 'var(--font-medium)' }}>{selectedCustomerInfo.hostName}</span></div>
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>联系人：</span>{selectedCustomerInfo.contactPerson}</div>
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>联系电话：</span>{selectedCustomerInfo.contactPhone}</div>
               <div><span style={{ color: 'var(--color-text-tertiary)' }}>等级：</span>{selectedCustomerInfo.level}</div>

@@ -601,6 +601,52 @@ export type CustomerBankAccount = PlatformBankAccount;
 /** 客户发票信息（与平台发票信息结构一致） */
 export type CustomerInvoiceInfo = PlatformInvoiceInfo;
 
+/** 人员角色类型：员工 / 茶人 / 带货人 */
+export type PersonRoleType = 'employee' | 'tea_professional' | 'streamer';
+
+/** 分润比例设置 */
+export interface ProfitShareConfig {
+  /** 拓客人分润比例（0-100） */
+  developerRatio: number;
+  /** 维护人分润比例（0-100） */
+  maintainerRatio: number;
+  /** 跟单人分润比例（0-100） */
+  followerRatio: number;
+}
+
+/** 直营客户分子机构 */
+export interface CustomerSubOrganization {
+  id: string;
+  /** 机构名称 */
+  name: string;
+  /** 联系人 */
+  contactPerson: string;
+  /** 联系方式 */
+  contactPhone: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
+  /** 详细地址 */
+  address: string;
+  /** 拓客人 ID */
+  developerId?: string;
+  /** 拓客人类型 */
+  developerType?: PersonRoleType;
+  /** 拓客人姓名（冗余，便于展示） */
+  developerName?: string;
+  /** 维护人 ID */
+  maintainerId?: string;
+  /** 维护人类型 */
+  maintainerType?: PersonRoleType;
+  /** 维护人姓名（冗余，便于展示） */
+  maintainerName?: string;
+  /** 备注 */
+  remark?: string;
+}
+
 /** 平台 */
 export interface PlatformItem {
   id: string;
@@ -623,10 +669,12 @@ export interface PlatformItem {
   deposit?: number;
   /** 保证金应收日期 */
   depositDueDate?: string;
-  /** 主办人 ID（负责该平台客户的拓展与维护，可为员工或带货人） */
-  hostId?: string;
-  /** 主办人类型 */
-  hostType?: 'employee' | 'streamer';
+  /** 拓客人 ID（原主办人，负责该平台客户的拓展与维护，可为员工/茶人/带货人） */
+  developerId?: string;
+  /** 拓客人类型 */
+  developerType?: PersonRoleType;
+  /** 拓客人姓名（冗余，便于展示） */
+  developerName?: string;
   bankAccounts: PlatformBankAccount[];
   invoiceInfos: PlatformInvoiceInfo[];
   status: 'active' | 'inactive';
@@ -662,10 +710,26 @@ export interface CustomerItem {
   platformIds: string[];
   /** 平台扣点映射（仅"带平台方"的直营客户设置，键为平台ID，值为扣点如"8%"；扣点跟随平台，同一客户不同平台可有不同扣点） */
   platformCommissionRates?: Record<string, string>;
-  /** 主办人 ID（负责该客户的拓展与维护，可为员工或带货人） */
-  hostId?: string;
-  /** 主办人类型 */
-  hostType?: 'employee' | 'streamer';
+  /** 拓客人 ID（原主办人，负责客户拓展，可为员工/茶人/带货人） */
+  developerId?: string;
+  /** 拓客人类型 */
+  developerType?: PersonRoleType;
+  /** 拓客人姓名（冗余，便于展示） */
+  developerName?: string;
+  /** 维护人 ID（负责客户维护，可为员工/茶人/带货人） */
+  maintainerId?: string;
+  /** 维护人类型 */
+  maintainerType?: PersonRoleType;
+  /** 维护人姓名（冗余，便于展示） */
+  maintainerName?: string;
+  /** 跟单人 ID（负责订单跟进，可为员工/茶人/带货人） */
+  followerId?: string;
+  /** 跟单人类型 */
+  followerType?: PersonRoleType;
+  /** 跟单人姓名（冗余，便于展示） */
+  followerName?: string;
+  /** 分润比例配置 */
+  profitShare?: ProfitShareConfig;
   cooperationDate: string;
   status: 'active' | 'inactive';
   settlementMethod?: string;
@@ -680,6 +744,8 @@ export interface CustomerItem {
   remark?: string;
   /** 下单人列表（仅 type='direct' 时有效） */
   orderContacts?: OrderContact[];
+  /** 分子机构列表（仅 type='direct' 时有效） */
+  subOrganizations?: CustomerSubOrganization[];
 }
 
 /** 门店（线下茶叶店） */

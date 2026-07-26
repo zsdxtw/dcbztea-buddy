@@ -1,9 +1,11 @@
 /**
  * 组织架构 & 员工管理 数据源
  */
-import type { OrgNode, Employee, EmployeePerformance, SalesScenario } from '../types';
+import type { OrgNode, Employee, EmployeePerformance, SalesScenario, PersonRoleType } from '../types';
 import { customerItems } from './customers';
 import { platformItems } from './platforms';
+import { teaProfessionals } from './teaProfessionals';
+import { streamers } from './streamers';
 
 /* ── 组织架构：公司 → 部门 → 团队 ── */
 
@@ -120,13 +122,13 @@ export interface CompletedOrderForPerformance {
   /** 跟单人 ID（可能为空） */
   followerId?: string;
   /** 跟单人类型 */
-  followerType?: 'employee' | 'streamer';
+  followerType?: PersonRoleType;
   /** 跟单人姓名（可能为空） */
   followerName?: string;
-  /** 主办人 ID */
-  hostId?: string;
-  /** 主办人类型 */
-  hostType?: 'employee' | 'streamer';
+  /** 拓客人 ID（原主办人，可能为空，从客户档案取） */
+  developerId?: string;
+  /** 拓客人类型 */
+  developerType?: PersonRoleType;
   /** 销售场景（1-6） */
   scenario: SalesScenario;
   /** 平台扣点（仅场景2有值，如0.1表示10%） */
@@ -178,21 +180,21 @@ export const completedOrders: CompletedOrderForPerformance[] = [
 
 /* ── 绩效统计工具函数 ── */
 
-function getHostId(order: CompletedOrderForPerformance): { id?: string; type?: 'employee' | 'streamer' } {
-  if (order.hostId) {
-    return { id: order.hostId, type: order.hostType ?? 'employee' };
+function getHostId(order: CompletedOrderForPerformance): { id?: string; type?: PersonRoleType } {
+  if (order.developerId) {
+    return { id: order.developerId, type: order.developerType ?? 'employee' };
   }
-  // 如果订单没有直接指定主办人，则从客户档案查找
+  // 如果订单没有直接指定拓客人，则从客户档案查找
   if (order.customerType === 'platform') {
     if (order.directCustomerId) {
       const directCustomer = customerItems.find((c) => c.id === order.directCustomerId);
-      return { id: directCustomer?.hostId, type: directCustomer?.hostType ?? 'employee' };
+      return { id: directCustomer?.developerId, type: directCustomer?.developerType ?? 'employee' };
     }
     const platform = platformItems.find((p) => p.id === order.customerId);
-    return { id: platform?.hostId, type: platform?.hostType ?? 'employee' };
+    return { id: platform?.developerId, type: platform?.developerType ?? 'employee' };
   }
   const customer = customerItems.find((c) => c.id === order.customerId);
-  return { id: customer?.hostId, type: customer?.hostType ?? 'employee' };
+  return { id: customer?.developerId, type: customer?.developerType ?? 'employee' };
 }
 
 /**
@@ -331,3 +333,83 @@ export const EMP_STATUS_LABELS: Record<string, string> = {
   inactive: '离职',
   probation: '试用期',
 };
+
+/* ── 统一人员选择（员工 + 茶人 + 带货人） ── */
+
+/** 统一人员选项 */
+export interface PersonOption {
+  id: string;
+  name: string;
+  type: PersonRoleType;
+  typeLabel: string;
+  phone: string;
+}
+
+const PERSON_TYPE_LABELS: Record<PersonRoleType, string> = {
+  employee: '员工',
+  tea_professional: '茶人',
+  streamer: '带货人',
+};
+
+/**
+ * 获取所有可选人员（员工 + 茶人 + 带货人）
+ * 用于拓客人、维护人、跟单人的下拉选择
+ */
+export function getAllPersonOptions(): PersonOption[] {
+  const options: PersonOption[] = [];
+
+  employees.forEach((e) => {
+    if (e.status === 'active') {
+      options.push({
+        id: e.id,
+        name: e.name,
+        type: 'employee',
+        typeLabel: '员工',
+        phone: e.phone,
+      });
+    }
+  });
+
+  teaProfessionals.forEach((t) => {
+    if (t.status === 'active') {
+      options.push({
+        id: t.id,
+        name: t.name,
+        type: 'tea_professional',
+        typeLabel: '茶人',
+        phone: t.phone,
+      });
+    }
+  });
+
+  streamers.forEach((s) => {
+    options.push({
+      id: s.id,
+      name: s.name,
+      type: 'streamer',
+      typeLabel: '带货人',
+      phone: s.phone,
+    });
+  });
+
+  return options;
+}
+
+/**
+ * 根据人员ID和类型获取人员姓名
+ */
+export function getPersonName(personId?: string, personType?: PersonRoleType): string {
+  if (!personId) return '—';
+  if (personType === 'employee') {
+    return employees.find((e) => e.id === personId)?.name ?? '—';
+  }
+  if (personType === 'tea_professional') {
+    return teaProfessionals.find((t) => t.id === personId)?.name ?? '—';
+  }
+  if (personType === 'streamer') {
+    return streamers.find((s) => s.id === personId)?.name ?? '—';
+  }
+  return '—';
+}
+
+export { PERSON_TYPE_LABELS };

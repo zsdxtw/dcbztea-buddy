@@ -108,7 +108,7 @@ export default function SalesPricing() {
 
   return (
     <>
-      <ContentHeader title="销售报价" breadcrumbs={['销售', '销售报价']} />
+      <ContentHeader title="客户报价" breadcrumbs={['销售', '客户报价']} />
       <div className="content-body">
         {/* Tab 切换 */}
         <div style={{ display: 'flex', gap: 4, padding: 2, background: 'var(--color-neutral-100)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-5)', width: 'fit-content' }}>
