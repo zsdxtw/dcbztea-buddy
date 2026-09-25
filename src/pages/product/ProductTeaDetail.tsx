@@ -265,15 +265,26 @@ export default function ProductTeaDetail() {
         }
       }
     }
-    // 非茶叶分类
+    // 非茶叶分类（统一使用 "L2-L3" 格式，与商品管理保持一致）
     for (const l1 of l1List) {
       if (l1 === 'tea') continue;
       const data = CATEGORY_DATA_MAP[l1];
-      const l1Label = productCategoryLabels[l1];
       if (data?.children) {
         for (const l2 of data.children) {
-          if ((form.selectedL2 || []).includes(l2.name)) {
-            cats.push(`${l1Label}-${l2.name}`);
+          if (!(form.selectedL2 || []).includes(l2.name)) continue;
+          if (l2.children && l2.children.length > 0) {
+            const selectedL3ForL2 = (form.selectedL3 || []).filter((l3Name: string) =>
+              l2.children!.some(c => c.name === l3Name)
+            );
+            if (selectedL3ForL2.length > 0) {
+              for (const l3Name of selectedL3ForL2) {
+                cats.push(`${l2.name}-${l3Name}`);
+              }
+            } else {
+              cats.push(l2.name);
+            }
+          } else {
+            cats.push(l2.name);
           }
         }
       }

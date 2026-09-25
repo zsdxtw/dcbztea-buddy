@@ -1,18 +1,6 @@
-import ContentHeader from '../../components/layout/ContentHeader';
-import Card from '../../components/common/Card';
+import ProductManage from './ProductManage';
 
-/** 茶周边商品页面（待开发） */
+/** 茶周边商品管理页面 */
 export default function ProductManagePeripheral() {
-  return (
-    <>
-      <ContentHeader title="茶周边商品" breadcrumbs={['商品', '商品管理', '茶周边']} />
-      <div className="content-body">
-        <Card>
-          <div style={{ padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-neutral-400)' }}>
-            茶周边商品管理功能开发中...
-          </div>
-        </Card>
-      </div>
-    </>
-  );
+  return <ProductManage categoryType="tea-peripheral" pageTitle="茶周边商品" breadcrumbs={['商品', '商品管理', '茶周边']} />;
 }

@@ -32,6 +32,36 @@ export const TEA_L2_CATEGORY_CODES: Record<string, string> = {
   '花草茶': '07',
 };
 
+/** 茶具二级分类编号映射 */
+export const TEAWARE_L2_CATEGORY_CODES: Record<string, string> = {
+  '茶壶': '01',
+  '茶杯': '02',
+  '茶盘茶台': '03',
+  '茶道配件': '04',
+};
+
+/** 茶周边二级分类编号映射 */
+export const TEA_PERIPHERAL_L2_CATEGORY_CODES: Record<string, string> = {
+  '茶食品': '01',
+  '礼盒套装': '02',
+  '茶叶罐/包装': '03',
+};
+
+/** 其他二级分类编号映射 */
+export const OTHER_L2_CATEGORY_CODES: Record<string, string> = {
+  '泡茶水': '01',
+  '茶书茶画': '02',
+  '茶香/香道': '03',
+};
+
+/** 合并所有二级分类编号映射（各一级分类下独立从01编号） */
+export const ALL_L2_CATEGORY_CODES: Record<string, string> = {
+  ...TEA_L2_CATEGORY_CODES,
+  ...TEAWARE_L2_CATEGORY_CODES,
+  ...TEA_PERIPHERAL_L2_CATEGORY_CODES,
+  ...OTHER_L2_CATEGORY_CODES,
+};
+
 /** 品牌编号映射（联动品牌管理，使用3位原始编号） */
 export const BRAND_CODES: Record<string, string> = BRAND_CODE_MAP;
 
@@ -81,7 +111,7 @@ export function generateProductCode(
   sequence: number,
 ): string {
   const l1 = L1_CATEGORY_CODES[l1Category] || '9';
-  const l2 = TEA_L2_CATEGORY_CODES[l2Category] || '99';
+  const l2 = ALL_L2_CATEGORY_CODES[l2Category] || '99';
   const brandCode = BRAND_CODES[brand] || '999';
   const seq = String(sequence).padStart(5, '0');
   const check = generateCheckDigit();
